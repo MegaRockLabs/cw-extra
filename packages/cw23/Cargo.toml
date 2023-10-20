@@ -1,0 +1,20 @@
+[package]
+name = "cw23"
+version = "0.1.0"
+authors = [ "Kromsten <s@users.noreply.megarock.labs>" ]
+edition = "2021"
+description = "Definition and types for the CosmWasm-23 interface"
+repository = "https://github.com/MegaRockLabs/cw-plus-plus"
+
+[dependencies]
+cosmwasm-schema = { workspace = true }
+cosmwasm-std    = { workspace = true }
+cw23-derive     = { path = "./derive", version = "0.1.0" }
+
+[dev-dependencies]
+sha2            = { workspace = true }
+k256            = { workspace = true }
+
+cosmwasm-crypto = "1.4.1"
+ed25519-zebra = "4.0.3"
+rand_chacha = "0.3.1"

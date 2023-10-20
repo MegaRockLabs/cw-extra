@@ -1,0 +1,35 @@
+# macOS
+.DS_Store
+
+# Text file backups
+**/*.rs.bk
+
+# Build results
+target/
+
+# IDEs
+.vscode/
+.idea/
+*.iml
+.env
+
+# User-gen
+metadata.csv
+
+# ENV
+.env
+
+# Auto-gen
+.cargo-ok
+
+# Build artifacts
+*.wasm
+hash.txt
+contracts.txt
+artifacts/
+
+# code coverage
+tarpaulin-report.*
+
+# integration tests
+gas_reports/%
