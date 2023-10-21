@@ -5,7 +5,6 @@ Experimental CosmWasm based contracts, packages and protocols
 
 ## Standards
 
-<br/>
 
 
 | Name                                      | Description                                                           |  Examples      |
@@ -29,7 +28,6 @@ Example contracts showcasing usage of the proposed protocols and standards
 
 ---
 
-<br/>
 
 ### Purpose
 This is playground repository for MegaRock to test out new ideas that are standartisable. All the projects will be of an experimental nature with low-maintanace and support. The projects here shouldn't be used for production before being peer-review and explicitly green-lighted by the team. (in case where the usage is licensed )
