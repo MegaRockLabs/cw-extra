@@ -1,10 +1,37 @@
-# Cw++
-Experimental CosmWasm based contracts, packages and protocols. 
-
- *** Coming Soon ***
+# CW++
+Experimental CosmWasm based contracts, packages and protocols 
 
 
-## Purpose
+
+## Standards
+
+<br/>
+
+
+| Name                                      | Description                                                           |  Examples      |
+| ----------------------------------------- | --------------------------------------------------------------------- | -------------- |
+| [`cw-23`](./packages/cw23/)               | Signature verification for smart contracts (inspired by ERC-1271)     | [link](#cw-23) |
+
+
+## Contracts
+
+Example contracts showcasing usage of the proposed protocols and standards
+
+### cw-23
+| Contract                                                         | Description                                                  |
+| ---------------------------------------------------------------- | ------------------------------------------------------------ |
+| [`cw-23-last-signature`](./contracts/cw23-last-signature/)       | Contract owner stores a exprirable signaturen and verifications happens against it |
+| [`cw-23-pubkey`](./contracts/cw23-pubkey/)                       | Using secp256k1 public key provided by contract creator and verifying using ecdsa  |
+| [`cw-23-sn-ks`](./contracts/cw23-sn-ks/)                         | SecretWasm based contract that uses a secp256k1 private key for signature generation and verification |
+
+
+<br/>
+
+---
+
+<br/>
+
+### Purpose
 This is playground repository for MegaRock to test out new ideas that are standartisable. All the projects will be of an experimental nature with low-maintanace and support. The projects here shouldn't be used for production before being peer-review and explicitly green-lighted by the team. (in case where the usage is licensed )
 
 ### Disclaimer
