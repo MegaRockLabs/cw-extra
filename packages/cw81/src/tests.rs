@@ -3,7 +3,7 @@ mod tests {
     use cosmwasm_std::{Binary, to_binary};
     use cosmwasm_crypto::{secp256k1_verify, ed25519_batch_verify};
     use cosmwasm_schema::{cw_serde, QueryResponses};
-    use cw23_derive::valid_signature_query;
+    use cw81_derive::valid_signature_query;
     
     use k256::{
         ecdsa::{

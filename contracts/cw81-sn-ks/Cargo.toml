@@ -1,9 +1,9 @@
 [package]
-name = "cw23-sn-ks"
+name = "cw81-sn-ks"
 version = "0.1.0"
 authors = [ "Kromsten <s@users.noreply.megarock.labs>" ]
 edition = "2021"
-description = "Example contract showcasing cw23 that uses PK generated inside enclave of Secret Network. This approach isn't secure enough and leaks the secret key if SGX to be broken"
+description = "Example contract showcasing cw81 that uses PK generated inside enclave of Secret Network. This approach isn't secure enough and leaks the secret key if SGX to be broken"
 repository = "https://github.com/MegaRockLabs/cw-plus-plus"
 
 [dependencies]
@@ -15,7 +15,7 @@ cosmwasm-schema = { workspace = true }
 cw-storage-plus = { workspace = true }
 sha2            = { workspace = true }
 cw2             = { workspace = true }
-cw23            = { workspace = true }
+cw81            = { workspace = true }
 k256            = { workspace = true }
 thiserror       = { workspace = true }
 

@@ -18,7 +18,7 @@ mod tests {
         digest::{Update, Digest}
     };
 
-    use cw23::ValidSignatureResponse;
+    use cw81::ValidSignatureResponse;
     use crate::{contract::{instantiate, query}, msg::{InstantiateMsg, QueryMsg}};
 
 

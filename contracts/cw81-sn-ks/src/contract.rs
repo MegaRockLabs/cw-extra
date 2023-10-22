@@ -1,6 +1,6 @@
 
 use cosmwasm_std::{entry_point, Response, DepsMut, MessageInfo, Env, StdResult, Binary, Deps, to_binary};
-use cw23::{ValidSignatureResponse, ValidSignaturesResponse};
+use cw81::{ValidSignatureResponse, ValidSignaturesResponse};
 use crate::{msg::{QueryMsg, InstantiateMsg, ContractError}, state::{save_private, read_private}};
 
 
@@ -15,7 +15,7 @@ use rand_chacha::{
 };
 
 
-pub const CONTRACT_NAME: &str = "crates:cw23-sn-ks";
+pub const CONTRACT_NAME: &str = "crates:cw81-sn-ks";
 pub const CONTRACT_VERSION: &str = env!("CARGO_PKG_VERSION");
 
 

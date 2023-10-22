@@ -1,13 +1,13 @@
 use cosmwasm_std::{
     entry_point, Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult, to_binary, BlockInfo, StdError,
 };
-use cw23::{ValidSignatureResponse, ValidSignaturesResponse};
+use cw81::{ValidSignatureResponse, ValidSignaturesResponse};
 use cw_utils::Expiration;
 
 use crate::{msg::{QueryMsg, InstantiateMsg, ExecureMsg}, state::{SIGNATURE_STATE, SignatureState}};
 
 
-pub const CONTRACT_NAME: &str = "crates:cw23-last-signature";
+pub const CONTRACT_NAME: &str = "crates:cw81-last-signature";
 pub const CONTRACT_VERSION: &str = env!("CARGO_PKG_VERSION");
 
 

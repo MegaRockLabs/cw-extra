@@ -1,6 +1,6 @@
 use cosmwasm_std::{Binary, StdError};
 use cosmwasm_schema::{cw_serde, QueryResponses};
-use cw23::{valid_signature_query, ValidSignatureResponse, ValidSignaturesResponse};
+use cw81::{valid_signature_query, ValidSignatureResponse, ValidSignaturesResponse};
 use thiserror::Error;
 
 

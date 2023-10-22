@@ -1,11 +1,11 @@
 use cosmwasm_std::{
     entry_point, Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult, to_binary,
 };
-use cw23::{ValidSignatureResponse, ValidSignaturesResponse};
+use cw81::{ValidSignatureResponse, ValidSignaturesResponse};
 
 use crate::{msg::{QueryMsg, InstantiateMsg}, state::PUBKEY};
 
-pub const CONTRACT_NAME: &str = "crates:cw23-pubkey";
+pub const CONTRACT_NAME: &str = "crates:cw81-pubkey";
 pub const CONTRACT_VERSION: &str = env!("CARGO_PKG_VERSION");
 
 use sha2::{

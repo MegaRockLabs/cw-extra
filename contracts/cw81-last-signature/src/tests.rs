@@ -1,7 +1,7 @@
 #[cfg(test)]
 mod tests {
     use cosmwasm_std::{testing::{mock_dependencies, mock_env, mock_info}, Binary, from_binary};
-    use cw23::ValidSignatureResponse;
+    use cw81::ValidSignatureResponse;
 
     use crate::{contract::{instantiate, execute, query}, msg::{InstantiateMsg, ExecureMsg, QueryMsg}};
 

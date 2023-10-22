@@ -1,4 +1,4 @@
-# CW23: Signature Verification
+# CW81: Signature Verification
 
 With the adoption of smart contract based accounts comes the need to reliably communicate with them. That requires establishing ways to reliably retrieve certain pieces of information that was trivial to get from users using normal cryptographic pair based accounts 
 
@@ -11,7 +11,7 @@ Whatever the logic is we need primitives to verifyably query the results and tha
 
 ## Queries
 
-All CW23-compliant contracts must add the following query variants to their QueryMsg:s and return the corresponding responses:
+All CW81-compliant contracts must add the following query variants to their QueryMsg:s and return the corresponding responses:
 
 
 ```rust
@@ -119,15 +119,15 @@ enum QueryMsg {
 
 The response types must be imported as well for it to work
 ```Rust
-use cw23::{valid_signature_query, ValidSignatureResponse, ValidSignaturesResponse};
+use cw81::{valid_signature_query, ValidSignatureResponse, ValidSignaturesResponse};
 ```
 
 ## Examples
-Example contracts can be found in this repository and are prefixed with `cw23-`  
+Example contracts can be found in this repository and are prefixed with `cw81-`  
 
 | Contract                                                         | Description                                                  |
 | ---------------------------------------------------------------- | ------------------------------------------------------------ |
-| [`cw-23-last-signature`](/contracts/cw23-last-signature/)       | Contract owner stores a exprirable signaturen and verifications happens against it |
-| [`cw-23-pubkey`](/contracts/cw23-pubkey/)                       | Using secp256k1 public key provided by contract creator and verifying using ecdsa  |
-| [`cw-23-sn-ks`](/contracts/cw23-sn-ks/)                         | SecretWasm based contract that uses a secp256k1 private key for signature generation and verification |
+| [`cw-81-last-signature`](/contracts/cw81-last-signature/)       | Contract owner stores a exprirable signaturen and verifications happens against it |
+| [`cw-81-pubkey`](/contracts/cw81-pubkey/)                       | Using secp256k1 public key provided by contract creator and verifying using ecdsa  |
+| [`cw-81-sn-ks`](/contracts/cw81-sn-ks/)                         | SecretWasm based contract that uses a secp256k1 private key for signature generation and verification |
 
