@@ -19,9 +19,9 @@ Example contracts showcasing usage of the proposed protocols and standards
 ### CW81
 | Contract                                                         | Description                                                  |
 | ---------------------------------------------------------------- | ------------------------------------------------------------ |
-| [`cw-81-last-signature`](./contracts/cw23-last-signature/)       | Contract owner stores a exprirable signaturen and verifications happens against it |
-| [`cw-81-pubkey`](./contracts/cw23-pubkey/)                       | Using secp256k1 public key provided by contract creator and verifying using ecdsa  |
-| [`cw-81-sn-ks`](./contracts/cw23-sn-ks/)                         | SecretWasm based contract using a secp256k1 private key for signature generation and verification |
+| [`cw-81-last-signature`](./contracts/cw81-last-signature/)       | Contract owner stores a exprirable signaturen and verifications happens against it |
+| [`cw-81-pubkey`](./contracts/cw81-pubkey/)                       | Using secp256k1 public key provided by contract creator and verifying using ecdsa  |
+| [`cw-81-sn-ks`](./contracts/cw81-sn-ks/)                         | SecretWasm based contract using a secp256k1 private key for signature generation and verification |
 
 
 <br/>

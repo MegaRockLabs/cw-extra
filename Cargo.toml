@@ -18,12 +18,12 @@ sha2 = "0.10.8"
 
 cw-utils = "1.0.2"
 cw2 = "1.1.1"
-cw23 = { version = "0.1.0", path = "packages/cw23" }
+cw81 = { version = "0.1.0", path = "packages/cw81" }
 
 thiserror = { version = "1.0" }
 
 
-[profile.release.package.cw23]
+[profile.release.package.cw81]
 codegen-units = 1
 incremental = false
 
