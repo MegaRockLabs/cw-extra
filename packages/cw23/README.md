@@ -1,4 +1,4 @@
-# CW23 Spec: Signature Verification
+# CW23: Signature Verification
 
 With the adoption of smart contract based accounts comes the need to reliably communicate with them. That requires standardisation so that other contracts and external applications can verifiably get certain information from a contract that was trivial to get from a normal key pair based account.
 
@@ -93,9 +93,39 @@ A contract that wishes to follow the standard must add the variants described ab
 enum QueryMsg {}
 ```
 
+This will make it equivavlent to
+```Rust
+#[cw_serde]
+#[derive(QueryResponses)]
+enum QueryMsg {
+    #[returns(ValidSignatureResponse)]
+    ValidSignature {
+        data: Binary,
+        signature: Binary,
+        payload: Option<Binary>
+    },
+
+    #[returns(ValidSignaturesResponse)]
+    ValidSignatures {
+        data: Vec<Binary>,
+        signatures: Vec<Binary>,
+        payload: Option<Binary>
+    }
+}
+```
+
+
 The response types must be imported as well for it to work
 ```Rust
 use cw23::{valid_signature_query, ValidSignatureResponse, ValidSignaturesResponse};
 ```
 
-See example contracts prefixed with cw23- in this repository for actual usage 
+## Examples
+Example contracts can be found in this repository and are prefixed with `cw23-`  
+
+| Contract                                                         | Description                                                  |
+| ---------------------------------------------------------------- | ------------------------------------------------------------ |
+| [`cw-23-last-signature`](/contracts/cw23-last-signature/)       | Contract owner stores a exprirable signaturen and verifications happens against it |
+| [`cw-23-pubkey`](/contracts/cw23-pubkey/)                       | Using secp256k1 public key provided by contract creator and verifying using ecdsa  |
+| [`cw-23-sn-ks`](/contracts/cw23-sn-ks/)                         | SecretWasm based contract that uses a secp256k1 private key for signature generation and verification |
+
