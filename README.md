@@ -9,14 +9,14 @@ Experimental CosmWasm based contracts, packages and protocols
 
 | Name                                      | Description                                                           |  Examples      |
 | ----------------------------------------- | --------------------------------------------------------------------- | -------------- |
-| [`cw-23`](./packages/cw23/)               | Signature verification for smart contracts (inspired by ERC-1271)     | [link](#cw-23) |
+| [`cw23`](./packages/cw23/)               | Signature verification for smart contracts (inspired by ERC-1271)     | [link](#cw23) |
 
 
 ## Contracts
 
 Example contracts showcasing usage of the proposed protocols and standards
 
-### cw-23
+### CW23
 | Contract                                                         | Description                                                  |
 | ---------------------------------------------------------------- | ------------------------------------------------------------ |
 | [`cw-23-last-signature`](./contracts/cw23-last-signature/)       | Contract owner stores a exprirable signaturen and verifications happens against it |
