@@ -1,10 +1,12 @@
 # CW23: Signature Verification
 
-With the adoption of smart contract based accounts comes the need to reliably communicate with them. That requires standardisation so that other contracts and external applications can verifiably get certain information from a contract that was trivial to get from a normal key pair based account.
+With the adoption of smart contract based accounts comes the need to reliably communicate with them. That requires establishing ways to reliably retrieve certain pieces of information that was trivial to get from users using normal cryptographic pair based accounts 
 
-This standard touches on the problem and proposes a standard way to verify that a signature belongs to a contract. Normally user would sign a message with his private key, but since it's private information it can't be securely stored inside storage of a contract on most chains and therefore used for signing.
+This standard touches on the problem and proposes a standard way to verify that a signature belongs to a contract. Normally users would sign a message with their private keys, but since they are to be secret they can't be securely stored inside storage of a contract on most chains and therefore used for signing.
 
-For that reason, the logic for saying that the signature is valid depends on the internal implementation of a contract. It can check validity based on input from an owner, use any key curve and signature schema, rely on oauth token verification and so on. Whatever the logic is we need primitives to verifyably query the results and that's the only thing that the standard is covering.
+For that reason, the logic for saying that the signature is valid depends on the internal implementation of a contract. It can check validity based on input from an owner, use any key curve and signature schema, rely on oauth token verification and so on. 
+
+Whatever the logic is we need primitives to verifyably query the results and that's the only thing that the standard is covering.
 
 
 ## Queries
