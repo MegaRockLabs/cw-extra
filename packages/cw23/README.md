@@ -1,58 +1,101 @@
-# CW2 Spec: Contract Info
+# CW23 Spec: Signature Verification
 
-Most of the CW* specs are focused on the *public interfaces*
-of the contract. The APIs used for `ExecuteMsg` or `QueryMsg`.
-However, when we wish to migrate or inspect smart contract info,
-we need some form of smart contract information embedded on state.
+With the adoption of smart contract based accounts comes the need to reliably communicate with them. That requires standardisation so that other contracts and external applications can verifiably get certain information from a contract that was trivial to get from a normal key pair based account.
 
-This is where CW2 comes in. It specifies a special Item to
-be stored on disk by all contracts on `instantiate`. 
+This standard touches on the problem and proposes a standard way to verify that a signature belongs to a contract. Normally user would sign a message with his private key, but since it's private information it can't be securely stored inside storage of a contract on most chains and therefore used for signing.
 
-`ContractInfo` must be stored under the `"contract_info"` key which translates 
-to `"636F6E74726163745F696E666F"` in hex format.
-Since the state is well defined, we do not need to support any "smart queries".
-We do provide a helper to construct a "raw query" to read the ContractInfo
-of any CW2-compliant contract.
+For that reason, the logic for saying that the signature is valid depends on the internal implementation of a contract. It can check validity based on input from an owner, use any key curve and signature schema, rely on oauth token verification and so on. Whatever the logic is we need primitives to verifyably query the results and that's the only thing that the standard is covering.
 
-You can query using:
-```shell
-wasmd query wasm contract-state raw [contract_addr] 636F6E74726163745F696E666F --node $RPC
-```
 
-When the `migrate` function is called, then the new contract
-can read that data andsee if this is an expected contract we can 
-migrate from. And also contain extra version information if we 
-support multiple migrate paths.
+## Queries
 
-### Data structures
+All CW23-compliant contracts must add the following query variants to their QueryMsg:s and return the corresponding responses:
 
-**Required**
-
-All CW2-compliant contracts must store the following data:
-
-* key: `contract_info`
-* data: Json-serialized `ContractVersion`
 
 ```rust
-pub struct ContractVersion {
-    /// contract is a globally unique identifier for the contract.
-    /// it should build off standard namespacing for whichever language it is in,
-    /// and prefix it with the registry we use.
-    /// For rust we prefix with `crates.io:`, to give us eg. `crates.io:cw20-base`
-    pub contract: String,
-    /// version is any string that this implementation knows. It may be simple counter "1", "2".
-    /// or semantic version on release tags "v0.7.0", or some custom feature flag list.
-    /// the only code that needs to understand the version parsing is code that knows how to
-    /// migrate from the given contract (and is tied to it's implementation somehow)
-    pub version: String,
+pub enum QueryMsg {
+    ...
+
+    #[returns(ValidSignatureResponse)]
+    ValidSignature {
+        data: Binary,
+        signature: Binary,
+        payload: Option<Binary>
+    },
+
+    #[returns(ValidSignaturesResponse)]
+    ValidSignatures {
+        data: Vec<Binary>,
+        signatures: Vec<Binary>,
+        payload: Option<Binary>
+    }
+
+    ...
 }
 ```
 
-Thus, an serialized example may looks like:
+### ValidSignature
 
-```json
-{
-    "contract": "crates.io:cw20-base",
-    "version": "v0.1.0"
+Used to verify one message and its corresponding signature. Useful in atomic scenarios where a batch of data/transactions is combined together and treated as the same unit with one signature.
+
+#### Fields
+
+`data` that can include any transactional data, cosmos messages, arbitrary text, cryptographic digest or anything else. Unlike ERC-1271 the standard doesn't enforce the input to be pre-hashed but allows it. CosmWasm environment is more optimized for binary inputs and doesn't have as significant performance bottlenecks.
+
+`signature` stands for signed bytes of the data field and doesn't enforce any conditions
+
+`payload` is an optional payload used for passing additional info to the contract. It can be used to pass necessary data like a list of public keys for a multisign contract but also meta information for complex contracts e.g. what signature schema to use, hashing algorithm to select or whether data had been pre-hashed already.
+
+#### Returns
+```Rust 
+struct ValidSignatureResponse {
+  pub is_valid: bool
 }
 ```
+ERC-1271 introduces a `MAGICVALUE` as a return type instead of a boolean in order to have stricter and simpler verification of a signature. We can follow the same rationale, but instead of arbitrary bytes we can follow the existing conventions and return a struct
+
+
+### ValidSignatures
+
+In case of the need to verify multiple signatures at the same time, we can reduce the number of RPC requests by allowing them to be batched inside one QueryMsg. Some APIs already have methods for batch verification such as `deps.api.ed25519_batch_verify`in std/crypto library
+
+A great example use-case would be is situation where a querier is satisfied with one of the messages being invalid and can proceed with the rest
+
+
+#### Fields
+
+`data` has identical meaning behind it except for including a list (vector) of messages, the signature of which we are checking
+
+`signatures` contains a list of signatures for each message in the data list. Must have the same length.
+
+`payload` field is identical.
+
+***
+Technically doesn't need a different schema, but semantically works better this way. Since we use Binary (bytes) we even can use one field and serialize it to anything we need, but that doesn't provide additional intuitional utilities
+
+#### Returns
+```Rust 
+struct ValidSignaturesResponse {
+  pub are_valid: Vec<bool>
+}
+```
+
+`are_valid` is a list of booleans that must be of the same length with `data` and `signatures` lists. It tells whether an individual signature for a corresponsing message was valid.
+
+
+## Usage
+A contract that wishes to follow the standard must add the variants described above to their query messages. This package exposes a helper macro attribute `valid_signature_query` that injects it automatically:
+
+```Rust
+#[valid_signature_query] // <- Must be before #[cw_serde]
+#[cw_serde]
+#[derive(QueryResponses)]
+enum QueryMsg {}
+```
+
+The response types must be imported as well for it to work
+```Rust
+use cw23::{valid_signature_query, ValidSignatureResponse, ValidSignaturesResponse};
+```
+
+See example contracts prefixed with cw23- in this repository for actual usage 
