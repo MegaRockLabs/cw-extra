@@ -13,8 +13,7 @@ use std::fmt;
 #[cw_serde]
 #[derive(QueryResponses)]
 pub enum Cw82QueryMsg <T = Empty>
-where T: Clone + fmt::Debug + PartialEq + JsonSchema {
-}
+where T: Clone + fmt::Debug + PartialEq + JsonSchema {}
 
 
 #[extended_smart_account_query]

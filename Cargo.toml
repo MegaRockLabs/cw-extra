@@ -23,6 +23,7 @@ thiserror = { version = "1.0" }
 cw1                 = "1.1.1"
 cw2                 = "1.1.1"
 cw81                = { path = "packages/cw81" }
+cw82                = { path = "packages/cw82" }
 cw-utils            = "1.0.2"
 
 

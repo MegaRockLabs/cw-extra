@@ -1,9 +1,9 @@
 [package]
-name = "cw81-sn-ks"
+name = "cw82-sn-sym"
 version = "0.1.0"
 authors = [ "Kromsten <s@users.noreply.megarock.labs>" ]
 edition = "2021"
-description = "Example contract showcasing cw81 that uses PK generated inside enclave of Secret Networ"
+description = "Example contract showcasing cw82 that uses symmetric secrets for checking execution permissions"
 repository = "https://github.com/MegaRockLabs/cw-plus-plus"
 
 [dependencies]
@@ -15,11 +15,14 @@ cosmwasm-schema = { workspace = true }
 cw-storage-plus = { workspace = true }
 sha2            = { workspace = true }
 cw2             = { workspace = true }
-cw81            = { workspace = true }
+cw82            = { workspace = true }
 k256            = { workspace = true }
 thiserror       = { workspace = true }
+schemars        = { workspace = true }
 
-rand_chacha = { version = "0.3.1", default-features = false}
+ecies           = { version = "0.2.6", default-features = false, features = ["pure"] }
+rand_chacha     = { version = "0.3.1", default-features = false }
+
 semver = "1.0.18"
 
 
