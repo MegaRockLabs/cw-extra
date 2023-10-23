@@ -303,6 +303,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "cw1"
+version = "1.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4cd87b521055960569f562a143078c93031d5e8780d9520936cc97f8aa2f1101"
+dependencies = [
+ "cosmwasm-schema",
+ "cosmwasm-std",
+ "schemars",
+ "serde",
+]
+
+[[package]]
 name = "cw2"
 version = "1.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -318,7 +330,7 @@ dependencies = [
 
 [[package]]
 name = "cw81"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "cosmwasm-crypto",
  "cosmwasm-schema",
@@ -380,6 +392,33 @@ dependencies = [
  "semver",
  "sha2 0.10.8",
  "thiserror",
+]
+
+[[package]]
+name = "cw82"
+version = "0.2.0"
+dependencies = [
+ "cosmwasm-crypto",
+ "cosmwasm-schema",
+ "cosmwasm-std",
+ "cw1",
+ "cw2",
+ "cw81",
+ "cw82-derive",
+ "ed25519-zebra 4.0.3",
+ "k256 0.13.1",
+ "rand_chacha",
+ "schemars",
+ "sha2 0.10.8",
+]
+
+[[package]]
+name = "cw82-derive"
+version = "0.1.0"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 1.0.109",
 ]
 
 [[package]]

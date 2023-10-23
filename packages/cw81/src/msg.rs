@@ -1,21 +1,11 @@
-use cosmwasm_schema::cw_serde;
 use cosmwasm_std::Binary;
+use cosmwasm_schema::{cw_serde, QueryResponses};
+use cw81_derive::valid_signature_query;
 
-
+#[valid_signature_query]
 #[cw_serde]
-pub struct ValidSignature {
-    pub data: Binary,
-    pub signature: Binary,
-    pub payload: Option<Binary>
-}
-
-#[cw_serde]
-pub struct ValidSignatures {
-    pub data: Vec<Binary>,
-    pub signatures: Vec<Binary>,
-    pub payload: Option<Binary>
-}
-
+#[derive(QueryResponses)]
+pub enum Cw81QueryMsg {}
 
 #[cw_serde]
 pub struct ValidSignatureResponse {

@@ -5,7 +5,7 @@ members = ["packages/*", "contracts/*"]
 resolver = "2"
 
 [workspace.package]
-version    = "0.1.0"
+version    = "0.2.0"
 edition    = "2021"
 
 [workspace.dependencies]
@@ -16,14 +16,21 @@ cw-storage-plus = "1.1.0"
 k256 = { version = "0.13.1", features = ["ecdsa"] }
 sha2 = "0.10.8"
 
-cw-utils = "1.0.2"
-cw2 = "1.1.1"
-cw81 = { version = "0.1.0", path = "packages/cw81" }
-
+schemars = "0.8.15"
 thiserror = { version = "1.0" }
 
 
+cw1                 = "1.1.1"
+cw2                 = "1.1.1"
+cw81                = { path = "packages/cw81" }
+cw-utils            = "1.0.2"
+
+
 [profile.release.package.cw81]
+codegen-units = 1
+incremental = false
+
+[profile.release.package.cw82]
 codegen-units = 1
 incremental = false
 
