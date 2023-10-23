@@ -1,11 +1,9 @@
 mod msg;
 mod helpers;
-mod tests;
 
 pub use cw1::CanExecuteResponse;
 pub use cw2::ContractVersion;
 pub use cw81::{ValidSignatureResponse, ValidSignaturesResponse};
-
 pub use cw82_derive::{smart_account_query, extended_smart_account_query};
 
 pub use msg::{Cw82QueryMsg, Cw82ExtendedQueryMsg, Cw82ExecuteMsg};

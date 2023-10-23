@@ -23,6 +23,7 @@ mod tests {
 
     use crate::msg::Cw81QueryMsg;
 
+    
     const MSG: &str = "Testing String!";
 
 
@@ -89,7 +90,7 @@ mod tests {
 
         let data = vec![msg, another_msg];
         let signatures = vec![signature, another_signature];
-
+   
 
         let msg = Cw81QueryMsg::ValidSignatures { 
             data, 
