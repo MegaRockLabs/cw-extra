@@ -534,6 +534,33 @@ dependencies = [
 ]
 
 [[package]]
+name = "cw83"
+version = "0.2.0"
+dependencies = [
+ "cosmwasm-crypto",
+ "cosmwasm-schema",
+ "cosmwasm-std",
+ "cw1",
+ "cw2",
+ "cw82",
+ "cw83-derive",
+ "ed25519-zebra 4.0.3",
+ "k256 0.13.1",
+ "rand_chacha",
+ "schemars",
+ "sha2 0.10.8",
+]
+
+[[package]]
+name = "cw83-derive"
+version = "0.1.0"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 1.0.109",
+]
+
+[[package]]
 name = "der"
 version = "0.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
