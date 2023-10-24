@@ -456,7 +456,7 @@ dependencies = [
 
 [[package]]
 name = "cw81-sn-ks"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "cosmwasm-schema",
  "cw-storage-plus",
@@ -497,6 +497,20 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 1.0.109",
+]
+
+[[package]]
+name = "cw82-pubkey"
+version = "0.2.0"
+dependencies = [
+ "cosmwasm-schema",
+ "cosmwasm-std",
+ "cw-storage-plus",
+ "cw-utils",
+ "cw2",
+ "cw82",
+ "k256 0.13.1",
+ "sha2 0.10.8",
 ]
 
 [[package]]

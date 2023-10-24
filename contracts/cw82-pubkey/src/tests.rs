@@ -1,10 +1,17 @@
 #[cfg(test)]
 mod tests {
     use cosmwasm_std::{
-        testing::{mock_dependencies, mock_env, mock_info}, 
-        Binary, from_binary, to_binary
+        testing::{
+            mock_dependencies, 
+            mock_env, 
+            mock_info
+        }, 
+        from_binary, 
+        to_binary, 
+        coins, CosmosMsg, BankMsg, Binary
     };
 
+    use cw82::{CanExecuteResponse, ValidSignatureResponse};
     use k256::{
         ecdsa::{
             signature::DigestSigner,
@@ -18,8 +25,66 @@ mod tests {
         digest::{Update, Digest}
     };
 
-    use cw81::ValidSignatureResponse;
-    use crate::{contract::{instantiate, query}, msg::{InstantiateMsg, QueryMsg}};
+    use crate::{
+        contract::{instantiate, query}, 
+        msg::{InstantiateMsg, SignedMsg, QueryMsg}
+    };
+
+
+    #[test]
+    fn can_execute_test() {
+
+        let mut deps = mock_dependencies();
+        let env = mock_env();
+        let info = mock_info("creator", &[]);
+
+        let secret_key = SigningKey::random(&mut OsRng);
+        let public_key = VerifyingKey::from(&secret_key);
+
+        // user store public key
+        instantiate(deps.as_mut(), env.clone(), info.clone(), InstantiateMsg {
+            pub_key: public_key.to_encoded_point(false).as_bytes().into()
+        }).unwrap();
+
+
+        let bank =  BankMsg::Send { 
+            to_address: "test".into(), 
+            amount: coins(1, "test") 
+        };
+
+
+        let res : CanExecuteResponse = from_binary(&query(deps.as_ref(), env.clone(), 
+            QueryMsg::CanExecute { 
+                sender: "test".into(),
+                msg: bank.clone().into()
+            }
+        ).unwrap()).unwrap();
+
+        // only supporting signed messages
+        assert_eq!(res.can_execute, false);
+
+
+        let signed_hash: Signature = secret_key.sign_digest(
+            Sha256::new()
+            .chain(&to_binary(&CosmosMsg::<SignedMsg>::Bank(bank.clone())).unwrap())
+        );
+
+
+        let msg : CosmosMsg<SignedMsg> = CosmosMsg::Custom(SignedMsg {
+            signed_hash: signed_hash.to_bytes().as_slice().into(),
+            msg: bank.into()
+        });
+
+
+        let res : CanExecuteResponse = from_binary(&query(deps.as_ref(), env.clone(), 
+            QueryMsg::CanExecute { 
+                sender: "test".into(),
+                msg
+            }
+        ).unwrap()).unwrap();
+
+        assert_eq!(res.can_execute, true);
+    }
 
 
     #[test]
@@ -33,12 +98,15 @@ mod tests {
         let secret_key = SigningKey::random(&mut OsRng);
         let public_key = VerifyingKey::from(&secret_key);
 
+
         let another_key = SigningKey::random(&mut OsRng);
+
 
         // user store public key
         instantiate(deps.as_mut(), env.clone(), info.clone(), InstantiateMsg {
             pub_key: public_key.to_encoded_point(false).as_bytes().into()
         }).unwrap();
+
 
         // dapp asks user to sign message
         let data : Binary = to_binary("message").unwrap();
@@ -73,5 +141,4 @@ mod tests {
         let res : ValidSignatureResponse = from_binary(&query_res).unwrap();
         assert_eq!(res.is_valid, false);
     }
-
 }

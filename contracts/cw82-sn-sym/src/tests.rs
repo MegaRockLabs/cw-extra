@@ -13,7 +13,7 @@ mod tests {
 
 
     #[test]
-    fn simple_test() {
+    fn can_execute_test() {
 
         let mut deps = mock_dependencies();
         let env = mock_env();

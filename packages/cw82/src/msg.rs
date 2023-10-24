@@ -23,4 +23,4 @@ pub enum Cw82ExtendedQueryMsg <T = Empty>
 where T: Clone + fmt::Debug + PartialEq + JsonSchema {}
 
 
-pub type Cw82ExecuteMsg = Cw1ExecuteMsg;
+pub type Cw82ExecuteMsg<T> = Cw1ExecuteMsg<T>;

@@ -1,7 +1,7 @@
 [package]
 name = "cw81-sn-ks"
-version = "0.1.0"
-authors = [ "Kromsten <s@users.noreply.megarock.labs>" ]
+version = { workspace = true }
+authors = [ "Kromsten <s@noreply.megarock.labs>" ]
 edition = "2021"
 description = "Example contract showcasing cw81 that uses PK generated inside enclave of Secret Networ"
 repository = "https://github.com/MegaRockLabs/cw-plus-plus"

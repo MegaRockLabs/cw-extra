@@ -1,8 +1,12 @@
 
 use cosmwasm_std::{entry_point, Response, DepsMut, MessageInfo, Env, StdResult, Binary, Deps, to_binary, CosmosMsg, from_binary};
-use cw2::ContractVersion;
 use cw82::{ValidSignatureResponse, ValidSignaturesResponse, CanExecuteResponse};
-use crate::{msg::{InstantiateMsg, ContractError, QueryMsg}, state::{save_private, read_private, KeyType}};
+use cw2::ContractVersion;
+
+use crate::{
+    msg::{InstantiateMsg, QueryMsg}, 
+    state::{save_private, read_private, KeyType}
+};
 
 
 use k256::ecdsa::{signature::DigestSigner, SigningKey, Signature};
@@ -26,7 +30,7 @@ use sha2::{
 
 #[entry_point]
 pub fn instantiate(deps: DepsMut, env : Env, _ : MessageInfo, msg : InstantiateMsg,) 
--> Result<Response, ContractError> {
+-> StdResult<Response> {
     let mut ring = ChaChaRng::from_seed(env.block.random.unwrap().to_array()?);
     let secret_key = SigningKey::random(&mut ring);
     let secret_binary : Binary = secret_key.to_bytes().as_slice().into();
