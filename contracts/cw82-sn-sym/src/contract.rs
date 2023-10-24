@@ -4,7 +4,7 @@ use cw82::{ValidSignatureResponse, ValidSignaturesResponse, CanExecuteResponse};
 use cw2::ContractVersion;
 
 use crate::{
-    msg::{InstantiateMsg, QueryMsg}, 
+    msg::{InstantiateMsg, QueryMsg, EncryptedMsg, ExecuteMsg}, 
     state::{save_private, read_private, KeyType}
 };
 
@@ -39,6 +39,30 @@ pub fn instantiate(deps: DepsMut, env : Env, _ : MessageInfo, msg : InstantiateM
     save_private(deps.storage, &msg.secret_key, KeyType::Decrypting)?;
 
     Ok(Response::default())
+}
+
+#[entry_point]
+pub fn execute(deps: DepsMut, _ : Env, _ : MessageInfo, msg : ExecuteMsg) 
+-> StdResult<Response> {
+
+    match msg {
+        ExecuteMsg::Execute { msgs } => {
+
+            let key = read_private(deps.storage, KeyType::Decrypting);
+
+            let msgs : StdResult<Vec<CosmosMsg>, > = msgs
+                .iter()
+                .map(|msg| 
+                    validate_encrypted(deps.as_ref(), msg, &key)
+                )
+                .collect();
+
+            Ok(Response::new()
+                .add_messages(msgs.unwrap())
+            )
+        }
+    }
+
 }
 
 
@@ -85,24 +109,16 @@ pub fn query(deps: Deps, _: Env, msg: QueryMsg) -> StdResult<Binary> {
 
         QueryMsg::CanExecute { msg, .. } => {
 
-            match msg {
-                CosmosMsg::Custom(msg) => {
+            let key = read_private(deps.storage, KeyType::Decrypting);
 
-                    let decrypted = decrypt(deps, &msg.encrypted_msg)?;
-                    from_binary::<CosmosMsg>(&decrypted)?;
+            let can_execute = 
+                if let Ok(_) = validate_encrypted(deps, &msg, &key) {
+                    true
+                } else {
+                    false
+                };
 
-                    // if nothing failed so far then it's good
-
-                    let can_execute = true;
-                    to_binary(&CanExecuteResponse { can_execute  })
-                },
-
-                _ => {
-                    let can_execute = false;
-                    to_binary(&CanExecuteResponse { can_execute  })
-                }
-            }
-
+            to_binary(&CanExecuteResponse { can_execute  })
         },
 
         QueryMsg::ValidSignature { signature, data, .. } => {
@@ -142,9 +158,12 @@ fn sign(deps: Deps, to_sign: &[u8]) -> StdResult<Binary> {
     Ok(signature)
 }
 
-fn decrypt(deps: Deps, to_decrypt: &[u8]) -> StdResult<Binary> {
-    let key = read_private(deps.storage, KeyType::Decrypting);
-    let key = SecretKey::parse_slice(&key).unwrap();
+fn decrypt(
+    deps: Deps, 
+    to_decrypt: &[u8],
+    key: &[u8]
+) -> StdResult<Binary> {
+    let key = SecretKey::parse_slice(key).unwrap();
 
     let decrypted : Binary = sym_decrypt(
         &key.serialize(), 
@@ -152,4 +171,24 @@ fn decrypt(deps: Deps, to_decrypt: &[u8]) -> StdResult<Binary> {
     ).unwrap().into();
 
     Ok(decrypted)
+}
+
+fn validate_encrypted(
+    deps: Deps,
+    msg: &CosmosMsg<EncryptedMsg>,
+    key: &[u8]
+) -> StdResult<CosmosMsg> {
+
+    match msg {
+        CosmosMsg::Custom(msg) => {
+            let decrypted = decrypt(deps, &msg.encrypted_msg, key)?;
+            Ok(from_binary(&decrypted)?)
+        },
+        _ => Err(cosmwasm_std::StdError::GenericErr { 
+            msg: "Only EnctyptedMsg is supported".into() 
+        })
+    }
+
+    
+
 }

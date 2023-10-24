@@ -26,8 +26,12 @@ pub enum QueryMsg <T = EncryptedMsg> {
 
 }
 
-
 #[cw_serde]
 pub struct InstantiateMsg {
     pub secret_key : Binary
+}
+
+#[cw_serde]
+pub enum ExecuteMsg {
+    Execute { msgs: Vec<CosmosMsg<EncryptedMsg>> },
 }
