@@ -1,5 +1,10 @@
 use cosmwasm_schema::cw_serde;
 
+#[cw_serde]
+pub struct InitTokenAccount {
+    token_contract: String,
+    token_id: String
+}
 
 
 #[cw_serde]

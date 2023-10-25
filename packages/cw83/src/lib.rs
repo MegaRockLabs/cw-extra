@@ -1,7 +1,5 @@
 mod msg;
-mod helpers;
+mod registry;
 
-pub use cw1::CanExecuteResponse;
-pub use cw2::ContractVersion;
-pub use cw82::{ValidSignatureResponse, ValidSignaturesResponse};
-pub use helpers::Cw83RegistryContract;
+pub use registry::{Cw83RegistryContract, INTERFACE_NAME, CREATE_ACCOUNT_REPLY_ID};
+pub use msg::Cw83ExecuteMsg;

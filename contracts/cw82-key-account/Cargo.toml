@@ -1,7 +1,7 @@
 [package]
-name = "cw81-pubkey"
-version = "0.1.0"
-authors = [ "Kromsten <s@users.noreply.megarock.labs>" ]
+name = "cw82-key-account"
+version = { workspace = true }
+authors = [ "Kromsten <s@noreply.megarock.labs>" ]
 edition = "2021"
 description = "Example contract showcasing cw81 that uses the last signature in the storage for verification"
 repository = "https://github.com/MegaRockLabs/cw-plus-plus"
@@ -10,8 +10,9 @@ repository = "https://github.com/MegaRockLabs/cw-plus-plus"
 cosmwasm-schema = { workspace = true }
 cosmwasm-std    = { workspace = true }
 cw-storage-plus = { workspace = true }
+cw-utils        = { workspace = true }
 sha2            = { workspace = true }
 cw2             = { workspace = true }
 cw22            = { workspace = true }
-cw81            = { workspace = true }
+cw82            = { workspace = true }
 k256            = { workspace = true }

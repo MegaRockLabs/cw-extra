@@ -15,7 +15,13 @@ pub const CONTRACT_VERSION: &str = env!("CARGO_PKG_VERSION");
 pub fn instantiate(deps: DepsMut, _ : Env, _ : MessageInfo, _ : InstantiateMsg,) 
 -> StdResult<Response> {
     cw2::set_contract_version(deps.storage, CONTRACT_NAME, CONTRACT_VERSION)?;
-
+    cw22::set_contract_supported_interface(
+        deps.storage, 
+        &[cw22::ContractSupportedInterface {
+            supported_interface: cw81::INTERFACE_NAME.into(),
+            version: CONTRACT_VERSION.into()
+        }]
+    )?;
     SIGNATURE_STATE.save(deps.storage, &SignatureState {
         signature: Binary::default(),
         expiration: Expiration::Never {},

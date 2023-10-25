@@ -1,5 +1,8 @@
 [workspace]
-members = ["packages/*", "contracts/*"]
+members = [
+    "packages/*", 
+    "contracts/*",
+]
 
 # Resolver has to be set explicitely in workspaces, see https://github.com/rust-lang/cargo/issues/9956
 resolver = "2"
@@ -7,6 +10,8 @@ resolver = "2"
 [workspace.package]
 version    = "0.2.0"
 edition    = "2021"
+repository = "https://github.com/MegaRockLabs/cw-extra"
+
 
 [workspace.dependencies]
 cosmwasm-schema = "1.4.1"
@@ -16,15 +21,21 @@ cw-storage-plus = "1.1.0"
 k256 = { version = "0.13.1", features = ["ecdsa"] }
 sha2 = "0.10.8"
 
-schemars = "0.8.15"
-thiserror = { version = "1.0" }
+schemars                = "0.8.15"
+semver                  = "1.0.20"
+thiserror               = "1.0.50"
 
+cw-utils                = "1.0.2"
+cw1                     = "1.1.1"
+cw2                     = "1.1.1"
+cw81                    = { path = "packages/cw81" }
+cw82                    = { path = "packages/cw82" }
+cw83                    = { path = "packages/cw83" }
+cw22                    = { git = "https://github.com/aura-nw/cw-plus", package = "cw22" }
+cw721                   = "0.18.0"
 
-cw1                 = "1.1.1"
-cw2                 = "1.1.1"
-cw81                = { path = "packages/cw81" }
-cw82                = { path = "packages/cw82" }
-cw-utils            = "1.0.2"
+cw82-token-account      = { path = "contracts/cw82-token-account" }
+cw83-tba-factory        = { path = "contracts/cw83-tba-factory" }
 
 
 [profile.release.package.cw81]

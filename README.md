@@ -1,4 +1,4 @@
-# CW++
+# CW Extra
 Experimental CosmWasm based contracts, packages and protocols 
 
 

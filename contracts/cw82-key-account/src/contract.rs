@@ -5,7 +5,7 @@ use cw82::{ValidSignaturesResponse, ValidSignatureResponse, CanExecuteResponse};
 
 use crate::{msg::{QueryMsg, InstantiateMsg, ExecuteMsg, SignedMsg}, state::PUBKEY};
 
-pub const CONTRACT_NAME: &str = "crates:cw81-pubkey";
+pub const CONTRACT_NAME: &str = "crates:cw82-key-account";
 pub const CONTRACT_VERSION: &str = env!("CARGO_PKG_VERSION");
 
 use sha2::{
@@ -17,34 +17,51 @@ use sha2::{
 pub fn instantiate(deps: DepsMut, _ : Env, _ : MessageInfo, msg : InstantiateMsg,) 
 -> StdResult<Response> {
     cw2::set_contract_version(deps.storage, CONTRACT_NAME, CONTRACT_VERSION)?;
+    cw22::set_contract_supported_interface(
+        deps.storage, 
+        &[
+            cw22::ContractSupportedInterface {
+                supported_interface: cw82::INTERFACE_NAME.into(),
+                version: CONTRACT_VERSION.into()
+            },
+            cw22::ContractSupportedInterface {
+                supported_interface: "crates:cw81".into(),
+                version: CONTRACT_VERSION.into()
+            },
+            cw22::ContractSupportedInterface {
+                supported_interface: "crates:cw1".into(),
+                version: "1.1.1".into()
+            },
+            cw22::ContractSupportedInterface {
+                supported_interface: "crates:cw22".into(),
+                // TODO change version
+                version: CONTRACT_VERSION.into()
+            }
+        ]
+    )?;
     PUBKEY.save(deps.storage, &msg.pub_key)?;
     Ok(Response::default())
 }
 
+
 #[entry_point]
 pub fn execute(deps: DepsMut, _ : Env, _ : MessageInfo, msg : ExecuteMsg) 
 -> StdResult<Response> {
-
     match msg {
         ExecuteMsg::Execute { msgs } => {
-
             let key: Binary = PUBKEY.load(deps.storage)?;
-
             let msgs : StdResult<Vec<CosmosMsg>, > = msgs
                 .iter()
                 .map(|msg| 
                     validate_signed(deps.as_ref(), msg, &key)
                 )
                 .collect();
-
             Ok(Response::new()
                 .add_messages(msgs.unwrap())
             )
         }
     }
-
 }
-
 
 
 #[entry_point]
@@ -54,14 +71,12 @@ pub fn query(deps: Deps, _: Env, msg: QueryMsg) -> StdResult<Binary> {
 
         QueryMsg::CanExecute { msg, .. } => {
             let key: Binary = PUBKEY.load(deps.storage)?;
-            
             let can_execute = 
                 if let Ok(_) = validate_signed(deps, &msg, &key) {
                     true
                 } else {
                     false
                 };
-            
             to_binary(&CanExecuteResponse { can_execute })
         },
 

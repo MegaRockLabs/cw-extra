@@ -11,9 +11,9 @@ cosmwasm-schema = { workspace = true }
 cosmwasm-std    = { workspace = true }
 schemars        = { workspace = true }
 
-
 cw1             = { workspace = true }
 cw2             = { workspace = true }
+cw22            = { workspace = true }
 cw82            = { workspace = true }
 cw83-derive     = { path = "./derive", version = "0.1.0" }
 

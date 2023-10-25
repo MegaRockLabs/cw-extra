@@ -53,7 +53,7 @@ pub fn execute(deps: DepsMut, _ : Env, _ : MessageInfo, msg : ExecuteMsg)
             let msgs : StdResult<Vec<CosmosMsg>, > = msgs
                 .iter()
                 .map(|msg| 
-                    validate_encrypted(deps.as_ref(), msg, &key)
+                    validate_encrypted(msg, &key)
                 )
                 .collect();
 
@@ -112,7 +112,7 @@ pub fn query(deps: Deps, _: Env, msg: QueryMsg) -> StdResult<Binary> {
             let key = read_private(deps.storage, KeyType::Decrypting);
 
             let can_execute = 
-                if let Ok(_) = validate_encrypted(deps, &msg, &key) {
+                if let Ok(_) = validate_encrypted(&msg, &key) {
                     true
                 } else {
                     false
@@ -159,7 +159,6 @@ fn sign(deps: Deps, to_sign: &[u8]) -> StdResult<Binary> {
 }
 
 fn decrypt(
-    deps: Deps, 
     to_decrypt: &[u8],
     key: &[u8]
 ) -> StdResult<Binary> {
@@ -174,14 +173,13 @@ fn decrypt(
 }
 
 fn validate_encrypted(
-    deps: Deps,
     msg: &CosmosMsg<EncryptedMsg>,
     key: &[u8]
 ) -> StdResult<CosmosMsg> {
 
     match msg {
         CosmosMsg::Custom(msg) => {
-            let decrypted = decrypt(deps, &msg.encrypted_msg, key)?;
+            let decrypted = decrypt( &msg.encrypted_msg, key)?;
             Ok(from_binary(&decrypted)?)
         },
         _ => Err(cosmwasm_std::StdError::GenericErr { 

@@ -9,6 +9,7 @@ repository = "https://github.com/MegaRockLabs/cw-plus-plus"
 [dependencies]
 cosmwasm-schema = { workspace = true }
 cosmwasm-std    = { workspace = true }
+cw22            = { workspace = true }
 cw81-derive     = { path = "./derive", version = "0.1.0" }
 
 

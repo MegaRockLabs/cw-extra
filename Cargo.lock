@@ -407,12 +407,39 @@ dependencies = [
 ]
 
 [[package]]
+name = "cw22"
+version = "0.1.0"
+source = "git+https://github.com/aura-nw/cw-plus#fb37be3babe26e3ddfe05f04bc447c4970af4803"
+dependencies = [
+ "cosmwasm-schema",
+ "cosmwasm-std",
+ "cw-storage-plus",
+ "schemars",
+ "semver",
+ "serde",
+]
+
+[[package]]
+name = "cw721"
+version = "0.18.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e3c4d286625ccadc957fe480dd3bdc54ada19e0e6b5b9325379db3130569e914"
+dependencies = [
+ "cosmwasm-schema",
+ "cosmwasm-std",
+ "cw-utils",
+ "schemars",
+ "serde",
+]
+
+[[package]]
 name = "cw81"
 version = "0.2.0"
 dependencies = [
  "cosmwasm-crypto",
  "cosmwasm-schema",
  "cosmwasm-std",
+ "cw22",
  "cw81-derive",
  "ed25519-zebra 4.0.3",
  "k256 0.13.1",
@@ -438,6 +465,7 @@ dependencies = [
  "cw-storage-plus",
  "cw-utils",
  "cw2",
+ "cw22",
  "cw81",
 ]
 
@@ -449,6 +477,7 @@ dependencies = [
  "cosmwasm-std",
  "cw-storage-plus",
  "cw2",
+ "cw22",
  "cw81",
  "k256 0.13.1",
  "sha2 0.10.8",
@@ -461,6 +490,7 @@ dependencies = [
  "cosmwasm-schema",
  "cw-storage-plus",
  "cw2",
+ "cw22",
  "cw81",
  "k256 0.13.1",
  "rand_chacha",
@@ -481,6 +511,7 @@ dependencies = [
  "cosmwasm-std",
  "cw1",
  "cw2",
+ "cw22",
  "cw81",
  "cw82-derive",
  "ed25519-zebra 4.0.3",
@@ -500,7 +531,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "cw82-pubkey"
+name = "cw82-key-account"
 version = "0.2.0"
 dependencies = [
  "cosmwasm-schema",
@@ -508,6 +539,7 @@ dependencies = [
  "cw-storage-plus",
  "cw-utils",
  "cw2",
+ "cw22",
  "cw82",
  "k256 0.13.1",
  "sha2 0.10.8",
@@ -534,6 +566,24 @@ dependencies = [
 ]
 
 [[package]]
+name = "cw82-token-account"
+version = "0.2.0"
+dependencies = [
+ "cosmwasm-schema",
+ "cosmwasm-std",
+ "cw-storage-plus",
+ "cw-utils",
+ "cw2",
+ "cw22",
+ "cw82",
+ "cw83",
+ "k256 0.13.1",
+ "semver",
+ "sha2 0.10.8",
+ "thiserror",
+]
+
+[[package]]
 name = "cw83"
 version = "0.2.0"
 dependencies = [
@@ -542,6 +592,7 @@ dependencies = [
  "cosmwasm-std",
  "cw1",
  "cw2",
+ "cw22",
  "cw82",
  "cw83-derive",
  "ed25519-zebra 4.0.3",
@@ -558,6 +609,23 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 1.0.109",
+]
+
+[[package]]
+name = "cw83-tba-factory"
+version = "0.2.0"
+dependencies = [
+ "cosmwasm-schema",
+ "cosmwasm-std",
+ "cw-storage-plus",
+ "cw-utils",
+ "cw2",
+ "cw22",
+ "cw721",
+ "cw82",
+ "cw83",
+ "semver",
+ "thiserror",
 ]
 
 [[package]]
