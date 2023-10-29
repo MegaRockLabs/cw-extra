@@ -4,7 +4,7 @@ authors = [ "Kromsten <s@users.noreply.megarock.labs>" ]
 edition = "2021"
 version     = { workspace = true }
 description = "Definition and types for the CosmWasm-82 interface"
-repository = "https://github.com/MegaRockLabs/cw-plus-plus"
+repository = "https://github.com/MegaRockLabs/cw-extra"
 
 [dependencies]
 cosmwasm-schema = { workspace = true }
