@@ -34,8 +34,9 @@ cw83                    = { path = "packages/cw83" }
 cw22                    = { git = "https://github.com/aura-nw/cw-plus", package = "cw22" }
 cw721                   = "0.18.0"
 sg721                   = "3.3.0"
+sg721-base              = "3.3.0"
 cw82-token-account      = { path = "contracts/cw82-token-account" }
-cw83-tba-registry        = { path = "contracts/cw83-tba-registry" }
+cw83-tba-registry       = { path = "contracts/cw83-tba-registry" }
 
 
 [profile.release.package.cw81]
@@ -54,7 +55,7 @@ incremental = false
 codegen-units = 1
 incremental   = false
 
-[profile.release.package.cw83-tba-factory]
+[profile.release.package.cw83-tba-registry]
 codegen-units = 1
 incremental = false
 

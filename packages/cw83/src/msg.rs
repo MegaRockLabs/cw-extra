@@ -1,4 +1,5 @@
 use cosmwasm_schema::cw_serde;
+use cosmwasm_std::Binary;
 
 #[cw_serde]
 pub struct InitTokenAccount {
@@ -8,11 +9,9 @@ pub struct InitTokenAccount {
 
 
 #[cw_serde]
-pub enum Cw83ExecuteMsg<T> {
+pub enum Cw83ExecuteMsg {
     CreateAccount {
         code_id: u64,
-        init_msg: T,
-        token_contract: String,
-        token_id: String
+        init_msg: Binary
     }
 }

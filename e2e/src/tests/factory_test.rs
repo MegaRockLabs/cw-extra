@@ -1,3 +1,5 @@
+use cosmrs::crypto::secp256k1;
+use cosmwasm_std::Binary;
 /* use assert_matches::assert_matches;
 use cosm_orc::orchestrator::cosm_orc::tokio_block;
 use cosm_orc::orchestrator::error::CosmwasmError::TxError;
@@ -12,34 +14,26 @@ use test_context::test_context;
 use crate::helpers::{
     chain::Chain,
     helper::{
-        instantiate_registry, latest_block_time, instantiate_collection, instantiate_proxy /* ,  gen_users, CREATION_FEE,
+        instantiate_registry, latest_block_time, instantiate_collection, instantiate_proxy, mint_token, create_token_account, query_token_owner /* ,  gen_users, CREATION_FEE,
         MAX_TOKENS, MINT_PRICE, */
     },
 };
 
 
 #[test_context(Chain)]
-#[tokio::test]
-#[ignore]
-async fn test_instantiate_factory(chain: &mut Chain) {
-    let user = chain.cfg.users[0].clone();
-    instantiate_registry(chain, user.account.address, &user.key).unwrap();
-}
-
-
-/* #[test_context(Chain)]
 #[test]
 #[ignore]
 fn test_instantiate_factory(chain: &mut Chain) {
     let user = chain.cfg.users[0].clone();
     instantiate_registry(chain, user.account.address, &user.key).unwrap();
-} */
+}
+
 
 
 #[test_context(Chain)]
-#[tokio::test]
+#[test]
 #[ignore]
-async fn test_instantiate_proxy(chain: &mut Chain) {
+fn test_instantiate_proxy(chain: &mut Chain) {
     let user = chain.cfg.users[0].clone();
     instantiate_proxy(chain, user.account.address, &user.key).unwrap();
 }
@@ -47,227 +41,146 @@ async fn test_instantiate_proxy(chain: &mut Chain) {
 
 
 #[test_context(Chain)]
-#[tokio::test]
+#[test]
 #[ignore]
-async fn test_instantiate_collection(chain: &mut Chain) {
+fn test_instantiate_collection(chain: &mut Chain) {
     let user = chain.cfg.users[0].clone();
-    instantiate_proxy(chain, user.account.address.clone(), &user.key).unwrap().address;
-    instantiate_collection(chain, user.account.address, &user.key).await.unwrap();
+
+    /* let infos: Vec<(String, DeployInfo)> =  chain.cfg.orc_cfg.contract_deploy_info.clone().into_iter().collect();
+    println!("infos: {:?}", infos);
+    */
+
+    let res = instantiate_proxy(chain, user.account.address.clone(), &user.key).unwrap().address;
+    instantiate_collection(
+        chain, 
+        user.account.address,
+        res.to_string(),
+        &user.key
+    ).unwrap();
+
 }
 
 #[test_context(Chain)]
-#[tokio::test]
+#[test]
 #[ignore]
-async fn test_mint_token(chain: &mut Chain) {
+fn test_mint_token(chain: &mut Chain) {
     let user = chain.cfg.users[0].clone();
-    instantiate_proxy(chain, user.account.address.clone(), &user.key).unwrap().address;
-    let res = instantiate_collection(chain, user.account.address.clone(), &user.key).await.unwrap();
-    
-    println!("res events: {:?}", res.res.events);
-    let tags = res
-        .res
-        .find_event_tags("instantiate".to_string(), "_contract_address".to_string());
+    let proxy = instantiate_proxy(chain, user.account.address.clone(), &user.key).unwrap().address;
+   
+    let init_res = instantiate_collection(
+        chain, 
+        user.account.address.clone(), 
+        proxy.clone().to_string(),
+        &user.key
+    ).unwrap();
 
-    println!("tags: {:?}", tags);
+    let tags = init_res
+                        .res
+                        .find_event_tags(
+                            "instantiate".to_string(), 
+                            "_contract_address".to_string()
+                        );
+
+    let col_address = tags[0].value.clone();
     
-    assert!(false)
-    
-    //mint_token(chain, user.account.address, &user.key).unwrap();
+    let mint_res = mint_token(
+        chain, 
+        col_address.clone(), 
+        user.account.address.clone(), 
+        &user.key
+    ).unwrap();
+
+
+    let token_id = mint_res
+                .res
+                .find_event_tags(
+                    "wasm".to_string(), 
+                    "token_id".to_string()
+                )[0].value.clone();
+
+
+    let owner_res = query_token_owner(
+        chain,
+        col_address,
+        token_id,
+    ).unwrap();
+
+    assert_eq!(user.account.address, owner_res.owner)
+
 }
 
 
-#[test_context(Chain)]
-#[tokio::test]
-#[ignore]
-async fn test_create_token_account(chain: &mut Chain) {
 
-    // let denom = chain.cfg.orc_cfg.chain_cfg.denom.clone();
+#[test_context(Chain)]
+#[test]
+#[ignore]
+fn test_create_token_account(chain: &mut Chain) {
+
     let user = chain.cfg.users[0].clone();
     let user_addr = &user.account.address;
+    
 
     instantiate_registry(chain, user_addr.to_string(), &user.key).unwrap();
 
-    let start_time = latest_block_time(chain).plus_seconds(60);
+    let _start_time = latest_block_time(chain).plus_seconds(60);
     
-    instantiate_proxy(chain, user.account.address.clone(), &user.key).unwrap().address;
-    instantiate_collection(chain, user.account.address.clone(), &user.key).await.unwrap();
-    //mint_token(chain, user.account.address, &user.key).unwrap();
+    let proxy = instantiate_proxy(chain, user.account.address.clone(), &user.key).unwrap().address;
+   
+    let init_res = instantiate_collection(
+        chain, 
+        user.account.address.clone(), 
+        proxy.clone().to_string(),
+        &user.key
+    ).unwrap();
+
+    let col_address  = init_res
+                        .res
+                        .find_event_tags(
+                            "instantiate".to_string(), 
+                            "_contract_address".to_string()
+                        )[0].value.clone();
+
+    
+    let mint_res = mint_token(
+        chain, 
+        col_address.clone(), 
+        user.account.address.clone(), 
+        &user.key
+    ).unwrap();
 
 
-    /*
-
-    let minter_msg =  CreateMinter(create_minter_msg(
-        chain,
-        user_addr.to_string(),
-        MAX_TOKENS,
-        50,
-        start_time,
-        None,
-    ));
-
-    // requires fee
-    let err = chain
-        .orc
-        .execute(
-            FACTORY_NAME,
-            "factory_exec_minter_inst_no_fee_err",
-            &minter_msg,
-            &user.key,
-            vec![],
-        )
-        .unwrap_err();
-    assert_matches!(err, ProcessError::CosmwasmError(TxError(..)));
-    assert!(err.to_string().contains("No funds sent"));
-
-    // requires exact fee
-    let err = chain
-        .orc
-        .execute(
-            FACTORY_NAME,
-            "factory_exec_minter_inst_exact_fee_err",
-            &minter_msg,
-            &user.key,
-            vec![OrcCoin {
-                amount: 50_000_000,
-                denom: denom.parse().unwrap(),
-            }],
-        )
-        .unwrap_err();
-    assert_matches!(err, ProcessError::CosmwasmError(TxError(..)));
-    assert!(err.to_string().contains("Insufficient fee"));
-
-    let start_time = latest_block_time(chain).plus_seconds(5);
+    let token_id = mint_res
+                .res
+                .find_event_tags(
+                    "wasm".to_string(), 
+                    "token_id".to_string()
+                )[0].value.clone();
 
 
-    let minter_msg = Sg2ExecuteMsg::CreateMinter(create_minter_msg(
-        chain,
-        user_addr.to_string(),
-        MAX_TOKENS,
-        50,
-        start_time,
-        None,
-    ));
+    let signing : secp256k1::SigningKey = user.key.clone().try_into().unwrap();
+    let pubkey : Binary = signing.public_key().to_bytes().into();
+    
 
-    let res = chain
-        .orc
-        .execute(
-            FACTORY_NAME,
-            "factory_exec_minter_inst",
-            &minter_msg,
-            &user.key,
-            vec![OrcCoin {
-                amount: CREATION_FEE,
-                denom: denom.parse().unwrap(),
-            }],
-        )
-        .unwrap();
 
-    let tags = res
-        .res
-        .find_event_tags("instantiate".to_string(), "_contract_address".to_string());
+    let create_res = create_token_account(
+        chain, 
+        col_address,
+        token_id,
+        user_addr.clone(),
+        pubkey,
+        &user.key
+    ).unwrap();
 
-    let (minter_addr, sg721_addr) = (tags[0].value.to_string(), tags[1].value.to_string());
-    assert!(!minter_addr.trim().is_empty());
-    assert!(!sg721_addr.trim().is_empty());
 
-    // generate 200 user keys and send them all enough money to each mint 50 tokens + gas
-    let users = gen_users(chain, 200, MINT_PRICE * 52, None);
-
-    let init_balance = tokio_block(
-        chain
-            .orc
-            .client
-            .bank_query_balance(user_addr.parse().unwrap(), denom.parse().unwrap()),
-    )
-    .unwrap()
-    .balance;
-
-    // Sleep to ensure we can start minting
-    chain
-        .orc
-        .poll_for_n_secs(6, Duration::from_millis(20_000))
-        .unwrap();
-
-    let mut total_mints = 0;
-    let mut mints: HashMap<String, bool> = HashMap::new();
-
-    let num_users = users.len() as u32;
-
-    // Batch mint all tokens:
-    chain
-        .orc
-        .contract_map
-        .add_address("minter", minter_addr)
-        .unwrap();
-
-    for user in &users {
-        let mut reqs = vec![];
-        for _ in 0..MAX_TOKENS / num_users {
-            total_mints += 1;
-            reqs.push(ExecReq {
-                contract_name: "minter".to_string(),
-                msg: Box::new(vending_minter::msg::ExecuteMsg::Mint {}),
-                funds: vec![OrcCoin {
-                    amount: MINT_PRICE,
-                    denom: denom.parse().unwrap(),
-                }],
-            });
-        }
-
-        let res = chain
-            .orc
-            .execute_batch("minter_batch_exec_mint_token", reqs, user)
-            .unwrap();
-
-        let token_ids = res
+    let aaa = create_res
             .res
-            .find_event_tags("wasm".to_string(), "token_id".to_string());
+            .find_event_tags(
+                "reply".into(),
+                "_contract_address".into()
+            )[0].value.clone();
+    
 
-        let mut map = HashMap::new();
-        for id in token_ids {
-            map.insert(&id.value, true);
-        }
-
-        for (token_id, _) in map {
-            assert_eq!(mints.get(token_id), None);
-            mints.insert(token_id.to_string(), true);
-        }
-    }
-
-    for n in 1..=MAX_TOKENS {
-        assert_eq!(mints.get(&n.to_string()), Some(&true));
-    }
-    assert_eq!(total_mints, MAX_TOKENS);
-
-    let balance = tokio_block(
-        chain
-            .orc
-            .client
-            .bank_query_balance(user_addr.parse().unwrap(), denom.parse().unwrap()),
-    )
-    .unwrap()
-    .balance;
-
-    // 10k x MINT_PRICE = 1M STARS x 0.9 (10% fee)
-    assert_eq!(balance.amount, init_balance.amount + 900_000_000_000);
-
-    // Cannot mint more:
-    let res = chain.orc.execute(
-        "minter",
-        "minter_exec_mint_token_err",
-        &vending_minter::msg::ExecuteMsg::Mint {},
-        &chain.cfg.users[1].key,
-        vec![OrcCoin {
-            amount: MINT_PRICE,
-            denom: denom.parse().unwrap(),
-        }],
-    );
-
-    let err = res.unwrap_err();
-    assert_matches!(err, ProcessError::CosmwasmError(TxError(..)));
-    assert!(err.to_string().contains("Sold out")); */
-
-
+    assert!(aaa.len() > 0);
 
 }
 

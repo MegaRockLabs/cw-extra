@@ -8,7 +8,7 @@ use std::env;
 use std::fs;
 use std::path::Path;
 use std::time::Duration;
-use test_context::AsyncTestContext;
+use test_context::TestContext;
 
 static CONFIG: OnceCell<Cfg> = OnceCell::new();
 
@@ -40,6 +40,23 @@ pub struct Chain {
 }
 
 
+
+
+impl TestContext for Chain {
+    fn setup() -> Self {
+        let cfg = CONFIG.get_or_init(global_setup).clone();
+        let orc = CosmOrc::new(cfg.orc_cfg.clone(), true).unwrap();
+        Self { cfg, orc }
+    }
+
+    fn teardown(self) {
+        let cfg = CONFIG.get().unwrap();
+        save_gas_report(&self.orc, &cfg.gas_report_dir);
+    }
+}
+
+
+/* 
 #[async_trait::async_trait]
 impl AsyncTestContext for Chain {
     async fn setup() -> Self {
@@ -55,43 +72,8 @@ impl AsyncTestContext for Chain {
         save_gas_report(&self.orc, &cfg.gas_report_dir);
     }
 }
+*/
 
-
-/* impl TestContext for Chain {
-    fn setup() -> Self {
-       /*  println!("Calling setup()");
-        let get_cfg = CONFIG.get();
-        println!("CONFIG: {:?}", get_cfg);
-
-        CONFIG.wait();
-        let cfg = if get_cfg.is_none() {
-            let init = global_setup();
-            CONFIG.set(init.clone()).unwrap();
-            let cfg = CONFIG.get_or_init(global_setup).clone();
-            init
-        } else {
-            let clone = get_cfg.unwrap().clone();
-            CONFIG.set(clone.clone()).unwrap();
-            clone.clone()
-        }; */
-
-        println!("CFG INIT ");
-        let cfg = CONFIG.get_or_init(global_setup).clone();
-
-        println!();
-        
-        let orc = CosmOrc::new(cfg.orc_cfg.clone(), true).unwrap();
-        Self { cfg, orc }
-    }
-
-    fn teardown(self) {
-        let cfg = CONFIG.get().unwrap();
-        save_gas_report(&self.orc, &cfg.gas_report_dir);
-    }
-}
-
-
- */
 // global_setup() runs once before all of the tests:
 // - loads cosm orc / test account config files
 // - stores contracts on chain for all tests to reuse
@@ -141,7 +123,7 @@ fn test_accounts() -> Vec<SigningAccount> {
             key: SigningKey {
                 name: a.name,
                 key: Key::Mnemonic(a.mnemonic),
-                derivation_path: "".to_string(),
+                //derivation_path: "".to_string(),
             },
         })
         .collect()

@@ -1,16 +1,16 @@
+use std::str::FromStr;
+
 use super::chain::Chain;
 use super::msg::ProxyInstantiateMsg;
 use cosm_orc::orchestrator::cosm_orc::tokio_block;
-use cosm_orc::orchestrator::deploy::DeployInfo;
-use cosm_orc::orchestrator::error::ProcessError;
-use cosm_orc::orchestrator::{Coin as OrcCoin, ExecResponse, Address};
+use cosm_orc::orchestrator::error::{ProcessError, CosmwasmError};
+use cosm_orc::orchestrator::{Coin as OrcCoin, ExecResponse, QueryResponse, Address};
 use cosm_orc::orchestrator::{InstantiateResponse, SigningKey};
 use cosm_tome::chain::request::TxOptions;
 use cosm_tome::modules::bank::model::SendRequest;
-use cosmwasm_std::{Timestamp, Addr, Empty, CosmosMsg, WasmMsg, to_binary};
+use cosmwasm_std::{Timestamp, Empty, CosmosMsg, WasmMsg, to_binary, Binary, from_binary};
 
 use cw83_tba_registry::msg::InstantiateMsg;
-use test_context::futures::TryFutureExt;
 
 // contract names used by cosm-orc to register stored code ids / instantiated addresses:
 pub const REGISTRY_NAME     : &str = "cw83_tba_registry";
@@ -63,23 +63,23 @@ pub fn instantiate_proxy(
     )
 }
 
-pub async fn instantiate_collection(
+pub fn instantiate_collection(
     chain: &mut Chain,
     creator_addr: String,
+    minter: String,
     key: &SigningKey,
 ) -> Result<ExecResponse, ProcessError> {
     // let infos: Vec<(String, DeployInfo)> =  chain.cfg.orc_cfg.contract_deploy_info.clone().into_iter().collect();
     
-    let address : Address = key.to_addr(&chain.cfg.orc_cfg.chain_cfg.prefix).await.unwrap();
     let code_id = chain.orc.contract_map.code_id(COLLECTION_NAME)?;
 
     let init_msg : CosmosMsg::<Empty> = CosmosMsg::Wasm(WasmMsg::Instantiate { 
-        admin: Some(address.to_string()), 
+        admin: Some(minter.clone().to_string()), 
         code_id, 
         msg: to_binary(&sg721::InstantiateMsg {
             name: "test".into(),
             symbol: "test".into(),
-            minter: address.to_string(),
+            minter: minter,
             collection_info: sg721::CollectionInfo {
                 creator: creator_addr,
                 description: "todo!()".into(),
@@ -96,7 +96,7 @@ pub async fn instantiate_collection(
 
     chain.orc.execute(
         PROXY_NAME,
-        "collection_instantiate",
+        "proxy_collection_instantiate",
         &cw1::Cw1ExecuteMsg::Execute { 
             msgs: vec![init_msg] 
         },
@@ -113,14 +113,24 @@ pub fn mint_token(
     owner: String,
     key: &SigningKey,
 ) -> Result<ExecResponse, ProcessError> {
+
+    let mint_msg = sg721_base::ExecuteMsg::Mint { 
+        token_id: "1".into(), 
+        owner, 
+        token_uri: None, 
+        extension: None
+    };
+
+
     chain.orc.execute(
-        COLLECTION_NAME,
-        "token_mint",
-        &sg721::ExecuteMsg::<Empty, Empty>::Mint { 
-            token_id: "1".into(), 
-            owner, 
-            token_uri: None, 
-            extension: Empty {}
+        PROXY_NAME,
+        "proxy_token_mint",
+        &cw1::Cw1ExecuteMsg::<Empty>::Execute { 
+            msgs: vec![WasmMsg::Execute { 
+                contract_addr: collection, 
+                msg: to_binary(&mint_msg).unwrap(), 
+                funds: vec![]
+            }.into()] 
         },
         key,
         vec![],
@@ -129,45 +139,68 @@ pub fn mint_token(
 
 
 
-
-/* pub fn create_account(
+pub fn create_token_account(
     chain: &mut Chain,
-    registry_addr: String,
+    token_contract: String,
+    token_id: String,
+    owner: String,
+    pubkey: Binary,
     key: &SigningKey,
-) -> Result<InstantiateResponse, ProcessError> {
+) -> Result<ExecResponse, ProcessError> {
 
-    cw83::Cw83ExecuteMsg::CreateAccount { 
-        code_id: (), 
-        init_msg: (), 
-        token_contract: (), 
-        token_id: () 
-    }
+    let init_msg = cw82_token_account::msg::InstantiateMsg {
+        owner,
+        pubkey,
+        token_contract,
+        token_id,
+    };
+
+    let init_msg = to_binary(&init_msg).unwrap();
+    let code_id = chain.orc.contract_map.code_id(ACOUNT_NAME)?;
 
     chain.orc.execute(
         REGISTRY_NAME, 
         "registry_create_account", 
-        msg, 
+        &cw83_tba_registry::msg::ExecuteMsg::CreateAccount { 
+            code_id, 
+            init_msg, 
+        }, 
         key, 
         vec![]
     )
-
-    cw83::Cw83RegistryContract(Addr::unchecked(registry_addr)).create_account_submsg(code_id, init_msg, token_contract, token_id, funds);
-
-    chain.orc.instantiate(
-        REGISTRY_NAME,
-        "registry_inst",
-        &InstantiateMsg {
-            allowed_ids: vec![account_id],
-        },
-        key,
-        Some(creator_addr.parse().unwrap()),
-        vec![],
-    )
 }
- */
+ 
+
+
+
+pub fn query_token_owner(
+    chain: &mut Chain,
+    collection: String,
+    token_id: String,
+) -> Result<cw721::OwnerOfResponse, CosmwasmError> {
+
+    let res = tokio_block(async { 
+        chain.orc.client.wasm_query(
+            Address::from_str(&collection)?,
+            &cw721::Cw721QueryMsg::OwnerOf { 
+                token_id, include_expired: None
+            }
+        )
+        .await }
+    );
+
+    let owner_res : cw721::OwnerOfResponse = from_binary(
+        &res.unwrap().res.data.unwrap().into()
+    ).unwrap();
+
+    Ok(owner_res)
+}
+ 
+
+
 // gen_users will create `num_users` random SigningKeys
 // and then transfer `init_balance` of funds to each of them.
-pub async fn gen_users(
+pub fn gen_users(
     chain: &mut Chain,
     num_users: u32,
     init_balance: u128,
@@ -179,7 +212,7 @@ pub async fn gen_users(
 
     let mut users = vec![];
     for n in 0..num_users {
-        users.push(SigningKey::random_mnemonic(n.to_string(), String::default()));
+        users.push(SigningKey::random_mnemonic(n.to_string()));
     }
 
     let mut reqs = vec![];
@@ -197,7 +230,7 @@ pub async fn gen_users(
         }
         reqs.push(SendRequest {
             from: from_user.account.address.parse().unwrap(),
-            to: user.to_addr(prefix).await.unwrap(),
+            to: user.to_addr(prefix).unwrap(),
             amounts,
         });
     }

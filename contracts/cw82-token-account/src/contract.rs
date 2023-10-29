@@ -17,7 +17,7 @@ use sha2::{
     digest::{Update, Digest}
 };
 
-#[entry_point]
+#[cfg_attr(not(feature = "library"), entry_point)]
 pub fn instantiate(deps: DepsMut, _ : Env, info : MessageInfo, msg : InstantiateMsg) 
 -> Result<Response, ContractError> {
 
@@ -45,7 +45,7 @@ pub fn instantiate(deps: DepsMut, _ : Env, info : MessageInfo, msg : Instantiate
         ]
     )?;
 
-    if !cw83::Cw83RegistryContract(info.sender.clone()).supports_interface(deps.as_ref())? {
+    if !cw83::Cw83RegistryBase(info.sender.clone()).supports_interface(deps.as_ref())? {
         return Err(ContractError::Unauthorized {})
     };
     
@@ -61,7 +61,7 @@ pub fn instantiate(deps: DepsMut, _ : Env, info : MessageInfo, msg : Instantiate
 }
 
 
-#[entry_point]
+#[cfg_attr(not(feature = "library"), entry_point)]
 pub fn execute(deps: DepsMut, _ : Env, info : MessageInfo, msg : ExecuteMsg) 
 -> Result<Response, ContractError> {
     match msg {
@@ -78,7 +78,7 @@ pub fn execute(deps: DepsMut, _ : Env, info : MessageInfo, msg : ExecuteMsg)
 }
 
 
-#[entry_point]
+#[cfg_attr(not(feature = "library"), entry_point)]
 pub fn query(deps: Deps, _: Env, msg: QueryMsg) -> StdResult<Binary> {
     match msg {
         QueryMsg::PubKey {} => to_binary(&PUBKEY.load(deps.storage)?),

@@ -337,9 +337,9 @@ checksum = "e496a50fda8aacccc86d7529e2c1e0892dbd0f898a6b5645b5561b89c3210efa"
 
 [[package]]
 name = "cosm-orc"
-version = "4.0.1"
+version = "3.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6676a17fddc94aac5fe07bad646d99b7f7cef1f0cc2c74b61af25733cbbb9f08"
+checksum = "09d7b3a13272e1fac3bea1f95bafff21f737052cbb8e47fff66550a2dc71ce63"
 dependencies = [
  "config",
  "cosm-tome",
@@ -353,14 +353,13 @@ dependencies = [
 
 [[package]]
 name = "cosm-tome"
-version = "0.2.2"
+version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "596064e3608349aa302eb68b2df8ed3a66bbb51d9b470dbd9afff70843e44642"
+checksum = "3daaf99d2364465e81ac948e6c27ecdc63aab74ab948d9f526793009dacd9d28"
 dependencies = [
  "async-trait",
  "cosmrs",
  "regex",
- "schemars",
  "serde",
  "serde_json",
  "thiserror",
@@ -912,8 +911,10 @@ dependencies = [
  "cw22",
  "cw721 0.18.0",
  "cw82",
+ "cw82-token-account",
  "cw83",
  "semver",
+ "sg721-base",
  "thiserror",
 ]
 
@@ -998,11 +999,13 @@ dependencies = [
  "async-trait",
  "cosm-orc",
  "cosm-tome",
+ "cosmrs",
  "cosmwasm-schema",
  "cosmwasm-std",
  "cw1",
  "cw2 1.1.1",
  "cw22",
+ "cw721 0.18.0",
  "cw81",
  "cw82",
  "cw82-token-account",
@@ -1014,6 +1017,7 @@ dependencies = [
  "serde",
  "serde_json",
  "sg721",
+ "sg721-base",
  "test-context",
  "tokio",
 ]
@@ -2454,6 +2458,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "sg-std"
+version = "3.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4db53aebc2b4f981dc20a51213544adde8beaace6880345627f4babe2e1bc3ab"
+dependencies = [
+ "cosmwasm-schema",
+ "cosmwasm-std",
+ "cw-utils 1.0.2",
+ "cw721 0.18.0",
+ "schemars",
+ "serde",
+ "thiserror",
+]
+
+[[package]]
 name = "sg721"
 version = "3.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2466,6 +2485,27 @@ dependencies = [
  "cw721-base 0.18.0",
  "serde",
  "thiserror",
+]
+
+[[package]]
+name = "sg721-base"
+version = "3.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bcaffbe4a8d278a54c3ac4dcce30aa971cd55bce8184b43b6344a45cff9eea48"
+dependencies = [
+ "cosmwasm-schema",
+ "cosmwasm-std",
+ "cw-ownable",
+ "cw-storage-plus 1.1.0",
+ "cw-utils 1.0.2",
+ "cw2 1.1.1",
+ "cw721 0.18.0",
+ "cw721-base 0.18.0",
+ "serde",
+ "sg-std",
+ "sg721",
+ "thiserror",
+ "url",
 ]
 
 [[package]]

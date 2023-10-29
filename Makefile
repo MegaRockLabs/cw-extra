@@ -4,9 +4,9 @@ TEST_ADDRS ?= $(shell jq -r '.[].address' ./e2e/configs/test_accounts.json | tr 
 GAS_LIMIT ?= "75000000"
 
 deploy-local:
-	docker kill stargaze || true
-	docker volume rm -f stargaze_data
-	docker run --rm -d --name stargaze \
+	sudo docker kill stargaze || true
+	sudo docker volume rm -f stargaze_data
+	sudo docker run --rm -d --name stargaze \
 		-e DENOM=ustars \
 		-e CHAINID=testing \
 		-e GAS_LIMIT=$(GAS_LIMIT) \
