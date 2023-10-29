@@ -1,10 +1,23 @@
 [package]
-name = "cw83-tba-factory"
+name = "cw83-tba-registry"
 version = { workspace = true }
 authors = [ "Kromsten <s@noreply.megarock.labs>" ]
 edition = "2021"
-description = "Example contract showcasing cw81 that uses the last signature in the storage for verification"
-repository = "https://github.com/MegaRockLabs/cw-plus-plus"
+description = "Example contract showcasing cw83 that uses the last signature in the storage for verification"
+repository = "https://github.com/MegaRockLabs/cw-extra"
+
+
+exclude = [
+  "contract.wasm",
+  "hash.txt",
+]
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[features]
+backtraces = ["cosmwasm-std/backtraces"]
+library = []
 
 [dependencies]
 thiserror       = { workspace = true }
