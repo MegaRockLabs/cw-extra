@@ -4,7 +4,7 @@ use super::chain::Chain;
 use super::msg::ProxyInstantiateMsg;
 use cosm_orc::orchestrator::cosm_orc::tokio_block;
 use cosm_orc::orchestrator::error::{ProcessError, CosmwasmError};
-use cosm_orc::orchestrator::{Coin as OrcCoin, ExecResponse, QueryResponse, Address};
+use cosm_orc::orchestrator::{Coin as OrcCoin, ExecResponse, Address};
 use cosm_orc::orchestrator::{InstantiateResponse, SigningKey};
 use cosm_tome::chain::request::TxOptions;
 use cosm_tome::modules::bank::model::SendRequest;

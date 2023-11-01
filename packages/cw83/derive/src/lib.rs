@@ -83,31 +83,15 @@ pub fn basic_smart_account_query(metadata: TokenStream, input: TokenStream) -> T
 
 /// Note: `#[valid_signature_query]` must be applied _before_ `#[cw_serde]`.
 #[proc_macro_attribute]
-pub fn smart_account_query(metadata: TokenStream, input: TokenStream) -> TokenStream {
+pub fn registy_execute(metadata: TokenStream, input: TokenStream) -> TokenStream {
     merge_variants(
         metadata,
         input,
         quote! {
             enum Right {
-
-                /// cw1
-                #[returns(CanExecuteResponse)]
-                CanExecute { sender: String, msg: CosmosMsg<T> },
-
-
-                /// cw81
-                #[returns(ValidSignatureResponse)]
-                ValidSignature {
-                    data: Binary,
-                    signature: Binary,
-                    payload: Option<Binary>
-                },
-
-                #[returns(ValidSignaturesResponse)]
-                ValidSignatures {
-                    data: Vec<Binary>,
-                    signatures: Vec<Binary>,
-                    payload: Option<Binary>
+                CreateAccount {
+                    code_id: u64,
+                    init_msg: Binary,
                 }
             }
         }
@@ -115,57 +99,3 @@ pub fn smart_account_query(metadata: TokenStream, input: TokenStream) -> TokenSt
     )
 }
 
-
-
-
-#[proc_macro_attribute]
-pub fn extended_smart_account_query(metadata: TokenStream, input: TokenStream) -> TokenStream {
-    merge_variants(
-        metadata,
-        input,
-        quote! {
-            enum Right {
-
-                /// cw1
-                #[returns(CanExecuteResponse)]
-                CanExecute { sender: String, msg: CosmosMsg<T> },
-
-                /// cw2 for non-raw
-                /// not necessary since be queried by raw
-                /// useful if raw query not available and
-                /// as syntactic sugar for consistency 
-                #[returns(ContractVersion)]
-                ContractVersion {},
-
-                /// cw22 is not confirmed and still in PR
-                /// this is a custom extended version
-                #[returns(bool)]
-                SupportedInterface {
-                    name: String,
-                    version: Option<String>,
-                },
-
-                #[returns(Vec<bool>)]
-                SupportedInterfaces {
-                    interfaces: Vec<(String, Option<String>)>
-                },
-
-                /// cw81
-                #[returns(ValidSignatureResponse)]
-                ValidSignature {
-                    data: Binary,
-                    signature: Binary,
-                    payload: Option<Binary>
-                },
-
-                #[returns(ValidSignaturesResponse)]
-                ValidSignatures {
-                    data: Vec<Binary>,
-                    signatures: Vec<Binary>,
-                    payload: Option<Binary>
-                }
-            }
-        }
-        .into(),
-    )
-}

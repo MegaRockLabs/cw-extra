@@ -13,3 +13,4 @@ pub struct StoredAccount {
 pub static STORED_ACCOUNTS : Map<&str, StoredAccount>   = Map::new("s");
 pub static LAST_ATTEMPTING : Item<StoredAccount>        = Item::new("l");
 pub static ALLOWED_IDS     : Item<Vec<u64>>             = Item::new("i");
+pub static ADMIN           : Item<String>                 = Item::new("a");

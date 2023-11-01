@@ -40,8 +40,13 @@ impl<T> From<SignedMsg<T>> for CosmosMsg::<SignedMsg<T>> {
 #[derive(QueryResponses)]
 pub enum QueryMsg <T = SignedMsg> {
     #[returns(Binary)]
-    PubKey {},
+    Pubkey {},
 }
 
+#[cw_serde]
+pub struct PayloadInfo {
+    pub account: String,
+    pub algo: String
+}
 
 pub type ExecuteMsg = Cw82ExecuteMsg<Empty>;

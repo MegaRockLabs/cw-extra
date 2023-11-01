@@ -5,17 +5,17 @@ use cw82::Cw82Contract;
 use cw83::CREATE_ACCOUNT_REPLY_ID;
 
 use crate::{
-    state::{STORED_ACCOUNTS, LAST_ATTEMPTING, ALLOWED_IDS},
+    state::{STORED_ACCOUNTS, LAST_ATTEMPTING, ALLOWED_IDS, ADMIN},
     msg::{InstantiateMsg, ExecuteMsg}, 
     error::ContractError, execute::create_account, 
 };
 
-pub const CONTRACT_NAME: &str = "crates:cw83-tba-factory";
+pub const CONTRACT_NAME: &str = "crates:cw83-tba-registry";
 pub const CONTRACT_VERSION: &str = env!("CARGO_PKG_VERSION");
 
 
 #[cfg_attr(not(feature = "library"), entry_point)]
-pub fn instantiate(deps: DepsMut, _ : Env, _ : MessageInfo, msg : InstantiateMsg,) 
+pub fn instantiate(deps: DepsMut, _ : Env, info : MessageInfo, msg : InstantiateMsg,) 
 -> Result<Response, ContractError> {
     cw2::set_contract_version(deps.storage, CONTRACT_NAME, CONTRACT_VERSION)?;
     cw22::set_contract_supported_interface(
@@ -27,7 +27,7 @@ pub fn instantiate(deps: DepsMut, _ : Env, _ : MessageInfo, msg : InstantiateMsg
             }
         ]
     )?;
-
+    ADMIN.save(deps.storage, &info.sender.to_string())?;
     ALLOWED_IDS.save(deps.storage, &msg.allowed_ids)?;
     Ok(Response::default())
 }
@@ -47,7 +47,18 @@ pub fn execute(deps: DepsMut, env : Env, info : MessageInfo, msg : ExecuteMsg)
             code_id, 
             init_msg, 
             vec![]
-        )
+        ),
+        
+        ExecuteMsg::UpdateAllowedIds { 
+            allowed_ids 
+        } => {
+            let admin = ADMIN.load(deps.storage)?;
+            if info.sender != admin {
+                return Err(ContractError::Unauthorized {})
+            }
+            ALLOWED_IDS.save(deps.storage, &allowed_ids)?;
+            Ok(Response::default())
+        }
     }
 }
 

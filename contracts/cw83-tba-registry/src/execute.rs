@@ -1,4 +1,4 @@
-use cosmwasm_std::{Response, Env, Binary, DepsMut, Coin, from_binary, SubMsg, ReplyOn, WasmMsg, StdError};
+use cosmwasm_std::{Response, Env, Binary, DepsMut, Coin, from_binary, SubMsg, ReplyOn, WasmMsg};
 use cw83::CREATE_ACCOUNT_REPLY_ID;
 
 use crate::{

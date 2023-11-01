@@ -2,7 +2,7 @@
 name        = "cw83-derive"
 version     = "0.1.0"
 description = "Macros for generating code used by the `cw83` package"
-authors     = [ "Kromsten <s@users.noreply.megarock.labs>" ]
+authors     = [ "Kromsten <s@noreply.megarock.labs>" ]
 edition     = { workspace = true }
 
 [lib]

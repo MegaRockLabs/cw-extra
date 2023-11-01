@@ -1,5 +1,5 @@
 use cosmwasm_schema::cw_serde;
-use cosmwasm_std::{Deps, to_binary, Binary, from_binary, Addr, Coin, StdResult, CosmosMsg, SubMsg, ReplyOn, StdError};
+use cosmwasm_std::{Deps, to_binary, Binary, Addr, Coin, StdResult, CosmosMsg, SubMsg, ReplyOn};
 use cw83::{Cw83RegistryBase, CREATE_ACCOUNT_REPLY_ID};
 
 use crate::error::ContractError;

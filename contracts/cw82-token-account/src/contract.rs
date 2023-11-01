@@ -1,21 +1,21 @@
 use cosmwasm_std::{
-    entry_point, Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult, to_binary,
+    Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult, to_binary, from_binary, StdError,
 };
+#[cfg(not(feature = "library"))]
+use cosmwasm_std::entry_point;
+
 use cw82::{ValidSignaturesResponse, ValidSignatureResponse, CanExecuteResponse};
 
 use crate::{
     state::{REGISTRY_ADDRESS, TOKEN_INFO, OWNER, PUBKEY}, 
-    msg::{QueryMsg, InstantiateMsg, ExecuteMsg, TokenInfo}, 
+    msg::{QueryMsg, InstantiateMsg, ExecuteMsg, TokenInfo, PayloadInfo}, 
     error::ContractError
 };
 
 pub const CONTRACT_NAME: &str = "crates:cw82-token-account";
 pub const CONTRACT_VERSION: &str = env!("CARGO_PKG_VERSION");
 
-use sha2::{
-    Sha256, 
-    digest::{Update, Digest}
-};
+use k256::sha2::{Digest, Sha256};
 
 #[cfg_attr(not(feature = "library"), entry_point)]
 pub fn instantiate(deps: DepsMut, _ : Env, info : MessageInfo, msg : InstantiateMsg) 
@@ -50,6 +50,7 @@ pub fn instantiate(deps: DepsMut, _ : Env, info : MessageInfo, msg : Instantiate
     };
     
     REGISTRY_ADDRESS.save(deps.storage, &info.sender.to_string())?;
+    PUBKEY.save(deps.storage, &msg.pubkey)?;
     OWNER.save(deps.storage, &msg.owner)?;
 
     TOKEN_INFO.save(deps.storage, &TokenInfo {
@@ -79,9 +80,9 @@ pub fn execute(deps: DepsMut, _ : Env, info : MessageInfo, msg : ExecuteMsg)
 
 
 #[cfg_attr(not(feature = "library"), entry_point)]
-pub fn query(deps: Deps, _: Env, msg: QueryMsg) -> StdResult<Binary> {
+pub fn query(deps: Deps, _ : Env, msg: QueryMsg) -> StdResult<Binary> {
     match msg {
-        QueryMsg::PubKey {} => to_binary(&PUBKEY.load(deps.storage)?),
+        QueryMsg::Pubkey {} => to_binary(&PUBKEY.load(deps.storage)?),
 
         QueryMsg::CanExecute { sender, .. } => {
             let owner : String = OWNER.load(deps.storage)?;
@@ -91,43 +92,37 @@ pub fn query(deps: Deps, _: Env, msg: QueryMsg) -> StdResult<Binary> {
         QueryMsg::ValidSignature { signature, data, payload } => {
 
             let pk: Binary = PUBKEY.load(deps.storage)?;
-            
-            let hash: Vec<u8> = if payload.is_some() {
-                Sha256::new().chain(&data).chain(&data).finalize().as_slice().into()
-            } else {
-                data.into()
-            };
+            let payload = parse_payload(&payload)?;
 
             to_binary(&ValidSignatureResponse {
-                is_valid: deps.api.secp256k1_verify(
-                    &hash, 
-                    &signature, 
+                is_valid: verify_arbitrary(
+                    deps,
+                    &payload.account,
+                    data,
+                    signature,
                     &pk
-                ).unwrap_or(false),
+                )
             })
         },
 
         QueryMsg::ValidSignatures { signatures, data, payload, .. } => {
             let pk: Binary = PUBKEY.load(deps.storage).unwrap();
+            let payload = parse_payload(&payload)?;
 
             let are_valid : Vec<bool> = signatures
-                .iter()
+                .into_iter()
                 .enumerate()
                 .map(|(i, signature)| {
 
                     let data = data.get(i).unwrap().clone();
 
-                    let hash: Vec<u8> = if payload.is_some() {
-                        Sha256::new().chain(&data).chain(&data).finalize().as_slice().into()
-                    } else {
-                        data.into()
-                    };
-
-                    deps.api.secp256k1_verify(
-                        &hash, 
-                        &signature, 
+                    verify_arbitrary(
+                        deps,
+                        &payload.account,
+                        data,
+                        signature,
                         &pk
-                    ).unwrap_or(false)
+                    )
 
                 })
                 .collect(); 
@@ -139,3 +134,55 @@ pub fn query(deps: Deps, _: Env, msg: QueryMsg) -> StdResult<Binary> {
         }
     }
 }
+
+
+pub fn parse_payload(
+    payload: &Option<Binary>
+) -> StdResult<PayloadInfo> {
+
+    if payload.is_none() {
+        return Err(StdError::GenericErr { 
+            msg: "Invalid payload. Must have an 'account' address and 'algo' must be 'amino'".into() 
+        })
+    }
+
+    let payload : PayloadInfo = from_binary(payload.as_ref().unwrap())?;
+    
+    if payload.account.len() < 1 || payload.algo != "amino" {
+        return Err(StdError::GenericErr { 
+            msg: "Invalid payload. Must have an 'account' address and 'algo' must be 'amino'".into() 
+        })
+    }
+
+    Ok(payload)
+}
+
+
+fn generate_amino_transaction_string(signer: &str, data: &str) -> String {
+    format!(
+        "{{\"account_number\":\"0\",\"chain_id\":\"\",\"fee\":{{\"amount\":[],\"gas\":\"0\"}},\"memo\":\"\",\"msgs\":[{{\"type\":\"sign/MsgSignData\",\"value\":{{\"data\":\"{}\",\"signer\":\"{}\"}}}}],\"sequence\":\"0\"}}", 
+        data, signer
+    )
+}
+
+
+pub fn verify_arbitrary(
+    deps: Deps,
+    account_addr: &str,
+    data: Binary,
+    signature: Binary,
+    pubkey: &[u8],
+) -> bool {
+
+    let digest = Sha256::new_with_prefix(generate_amino_transaction_string(
+        account_addr,
+        from_binary::<String>(&data).unwrap().as_str(),
+    )).finalize();
+
+    deps.api.secp256k1_verify(
+        &digest, 
+        &signature, 
+        pubkey
+    ).unwrap_or(false)
+}
+
