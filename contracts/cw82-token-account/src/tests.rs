@@ -10,9 +10,9 @@ mod tests {
         msg::{PayloadInfo, InstantiateMsg, QueryMsg},
     };
 
-    const MSG: &str = "VGVzdCBNZXNzYWdl";
+    const MSG: &str = "dGVzdA==";
     const PUBKEY: &str = "A2LjUH7Q0gi7+Wi0/MnXMZqN8slsz7iHMfTWp8xUXspH";
-    const SIGNATURE: &str = "sg9LmkuEpJhJGCih4ukMU4eYk5Jyam7ZAECUQU44dWw5yzZiG2FSkGJbyClBegc9A2HkIH17bbf6nG+v7AB+pQ==";
+    const SIGNATURE: &str = "6UDr+Cu5+6SAgbMRj3hQfXZecdpxsmznLfTMcWkXPDl1DBJRNg+XrFal3BqF8TWJ+o9KM8+z5sfZZ1hfUPkSbg==";
     const ACCOUNT : &str = "stars1v85m4sxnndwmswtd8jrz3cd2m8u8eegqdxyluz";
 
 
@@ -27,10 +27,9 @@ mod tests {
             to_binary(MSG).unwrap(),
             Binary::from_base64(SIGNATURE).unwrap(),
             Binary::from_base64(PUBKEY).unwrap().as_slice(),
-        );
+        ).unwrap();
 
-        assert!(ok)
-        
+        assert!(ok);
     }
 
 

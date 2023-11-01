@@ -101,7 +101,7 @@ pub fn query(deps: Deps, _ : Env, msg: QueryMsg) -> StdResult<Binary> {
                     data,
                     signature,
                     &pk
-                )
+                ).unwrap_or(false)
             })
         },
 
@@ -122,7 +122,7 @@ pub fn query(deps: Deps, _ : Env, msg: QueryMsg) -> StdResult<Binary> {
                         data,
                         signature,
                         &pk
-                    )
+                    ).unwrap_or(false)
 
                 })
                 .collect(); 
@@ -172,17 +172,19 @@ pub fn verify_arbitrary(
     data: Binary,
     signature: Binary,
     pubkey: &[u8],
-) -> bool {
+) -> StdResult<bool> {
 
     let digest = Sha256::new_with_prefix(generate_amino_transaction_string(
         account_addr,
-        from_binary::<String>(&data).unwrap().as_str(),
+        from_binary::<String>(&data)?.as_str(),
     )).finalize();
 
     deps.api.secp256k1_verify(
         &digest, 
         &signature, 
         pubkey
-    ).unwrap_or(false)
+    )?;
+
+    Ok(true)
 }
 
