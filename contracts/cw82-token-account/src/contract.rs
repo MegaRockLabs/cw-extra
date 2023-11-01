@@ -68,7 +68,7 @@ pub fn execute(deps: DepsMut, _ : Env, info : MessageInfo, msg : ExecuteMsg)
     match msg {
         ExecuteMsg::Execute { msgs } => {
             let owner = OWNER.load(deps.storage)?;
-            if info.sender.to_string() == owner {
+            if info.sender.to_string() != owner {
                 return Err(ContractError::Unauthorized {})
             }
             Ok(Response::new()
