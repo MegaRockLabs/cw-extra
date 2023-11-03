@@ -188,3 +188,13 @@ pub fn verify_arbitrary(
     Ok(true)
 }
 
+
+
+pub fn become_aware(
+    _deps: DepsMut
+) -> StdResult<()> {
+
+
+
+    Ok(())
+}

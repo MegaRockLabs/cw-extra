@@ -2,30 +2,28 @@ use cosmwasm_schema::cw_serde;
 use cosmwasm_std::{Deps, to_binary, Binary, Addr, Coin, StdResult, CosmosMsg, SubMsg, ReplyOn};
 use cw83::{Cw83RegistryBase, CREATE_ACCOUNT_REPLY_ID};
 
-use crate::error::ContractError;
+use crate::{error::ContractError, msg::TokenInfo};
 
 
 pub fn construct_label(
-    token_contract: &str, 
-    token_id: &str
+    info: &TokenInfo
 ) -> String {
-    format!("{}-{}-account", token_contract, token_id)
+    format!("{}-{}-account", info.contract, info.id)
 }
 
 
 pub fn verify_nft_ownership(
     deps: Deps,
     sender: &String,
-    token_contract: String,
-    token_id : String,
+    token_info: TokenInfo
 ) -> Result<(), ContractError> {
 
     let owner_res = deps
         .querier
         .query_wasm_smart::<cw721::OwnerOfResponse>(
-        token_contract, 
+            token_info.contract, 
         &sg721_base::QueryMsg::OwnerOf {
-            token_id,
+            token_id: token_info.id,
             include_expired: None
         }
     )?;
@@ -75,9 +73,8 @@ impl Cw83TokenRegistryContract {
         &self, 
         code_id: u64, 
         owner: String,
+        info: &TokenInfo,
         pubkey: Binary,
-        token_contract: String, 
-        token_id: String,
         funds: Vec<Coin>
     ) -> StdResult<CosmosMsg> {
 
@@ -86,11 +83,11 @@ impl Cw83TokenRegistryContract {
             self.init_binary(
                 owner,
                 pubkey,
-                token_contract.clone(),
-                token_id.clone(),
+                info.contract.clone(),
+                info.id.clone(),
             )?,
             funds,
-            construct_label(&token_contract, &token_id)
+            construct_label(info)
         )
     }
 
@@ -98,9 +95,8 @@ impl Cw83TokenRegistryContract {
         &self, 
         code_id: u64, 
         owner: String,
+        info: &TokenInfo,
         pubkey: Binary,
-        token_contract: String, 
-        token_id: String,
         funds: Vec<Coin>
     ) -> StdResult<SubMsg> {
 
@@ -109,9 +105,8 @@ impl Cw83TokenRegistryContract {
             msg: self.create_account_init_msg(
                 code_id,
                 owner,
+                info,
                 pubkey,
-                token_contract,
-                token_id,
                 funds
             )?,
             reply_on: ReplyOn::Success,

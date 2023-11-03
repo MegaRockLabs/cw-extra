@@ -1,10 +1,10 @@
-use cosmwasm_std::{Response, Env, Binary, DepsMut, Coin, from_binary, SubMsg, ReplyOn, WasmMsg};
+use cosmwasm_std::{Response, Env, Binary, DepsMut, Coin, SubMsg, ReplyOn, WasmMsg, to_binary};
 use cw83::CREATE_ACCOUNT_REPLY_ID;
 
 use crate::{
-    state::{LAST_ATTEMPTING, StoredAccount},
+    state::LAST_ATTEMPTING,
     helpers::{verify_nft_ownership, construct_label}, 
-    error::ContractError
+    error::ContractError, msg::TokenInfo
 };
 
 pub fn create_account(
@@ -12,22 +12,21 @@ pub fn create_account(
     env: Env,
     sender: String,
     code_id: u64,
-    init_msg: Binary,
+    token_info: TokenInfo,
+    pubkey: Binary,
     funds: Vec<Coin>
 ) -> Result<Response, ContractError> {
 
-    let decoded : cw82_token_account::msg::InstantiateMsg  = from_binary(&init_msg)?;
+    verify_nft_ownership(deps.as_ref(), &sender, token_info.clone())?;
+    LAST_ATTEMPTING.save(deps.storage, &token_info)?;
 
-    let token_contract = decoded.token_contract;
-    let token_id = decoded.token_id;
+    let init_msg = cw82_token_account::msg::InstantiateMsg {
+        owner: sender.clone(),
+        token_contract: token_info.contract.clone(),
+        token_id: token_info.id.clone(),
+        pubkey
+    };
 
-    verify_nft_ownership(deps.as_ref(), &sender, token_contract.clone(), token_id.clone())?;
-
-    LAST_ATTEMPTING.save(deps.storage, &StoredAccount{
-        owner: sender,
-        token_contract: token_contract.clone(),
-        token_id: token_id.clone()
-    })?;
 
     Ok(Response::default()
        .add_submessage(SubMsg {
@@ -36,9 +35,9 @@ pub fn create_account(
                 WasmMsg::Instantiate { 
                     admin: Some(env.contract.address.to_string()), 
                     code_id, 
-                    msg: init_msg, 
+                    msg: to_binary(&init_msg)?, 
                     funds, 
-                    label: construct_label(&token_contract, &token_id) 
+                    label: construct_label(&token_info) 
                 }
             ),
             reply_on: ReplyOn::Success,

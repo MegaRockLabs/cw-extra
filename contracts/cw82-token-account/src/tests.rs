@@ -28,10 +28,8 @@ mod tests {
             Binary::from_base64(SIGNATURE).unwrap(),
             Binary::from_base64(PUBKEY).unwrap().as_slice(),
         ).unwrap();
-
         assert!(ok);
     }
-
 
 
     #[test]

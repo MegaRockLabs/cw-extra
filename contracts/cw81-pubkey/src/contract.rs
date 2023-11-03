@@ -24,7 +24,7 @@ pub fn instantiate(deps: DepsMut, _ : Env, _ : MessageInfo, msg : InstantiateMsg
             version: CONTRACT_VERSION.into()
         }]
     )?;
-    PUBKEY.save(deps.storage, &msg.pub_key)?;
+    PUBKEY.save(deps.storage, &msg.pubkey)?;
     Ok(Response::default())
 }
 

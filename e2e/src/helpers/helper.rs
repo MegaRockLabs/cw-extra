@@ -10,7 +10,7 @@ use cosm_tome::chain::request::TxOptions;
 use cosm_tome::modules::bank::model::SendRequest;
 use cosmwasm_std::{Timestamp, Empty, CosmosMsg, WasmMsg, to_binary, Binary, from_binary};
 
-use cw83_tba_registry::msg::InstantiateMsg;
+use cw83_tba_registry::msg::{InstantiateMsg, CreateAccountMsg, TokenInfo};
 
 // contract names used by cosm-orc to register stored code ids / instantiated addresses:
 pub const REGISTRY_NAME     : &str = "cw83_tba_registry";
@@ -143,28 +143,29 @@ pub fn create_token_account(
     chain: &mut Chain,
     token_contract: String,
     token_id: String,
-    owner: String,
     pubkey: Binary,
     key: &SigningKey,
 ) -> Result<ExecResponse, ProcessError> {
 
-    let init_msg = cw82_token_account::msg::InstantiateMsg {
-        owner,
+    let init_msg = cw83_tba_registry::msg::CreateInitMsg {
         pubkey,
-        token_contract,
-        token_id,
+        token_info: TokenInfo {
+            contract: token_contract,
+            id: token_id,
+        },
     };
 
-    let init_msg = to_binary(&init_msg).unwrap();
     let code_id = chain.orc.contract_map.code_id(ACOUNT_NAME)?;
 
     chain.orc.execute(
         REGISTRY_NAME, 
         "registry_create_account", 
-        &cw83_tba_registry::msg::ExecuteMsg::CreateAccount { 
-            code_id, 
-            init_msg, 
-        }, 
+        &cw83_tba_registry::msg::ExecuteMsg::CreateAccount(
+            CreateAccountMsg {
+                code_id,
+                msg: init_msg,
+            }
+        ), 
         key, 
         vec![]
     )

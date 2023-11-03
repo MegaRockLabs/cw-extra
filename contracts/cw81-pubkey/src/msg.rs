@@ -4,7 +4,7 @@ use cw81::{valid_signature_query, ValidSignatureResponse, ValidSignaturesRespons
 
 #[cw_serde]
 pub struct InstantiateMsg {
-    pub pub_key: Binary
+    pub pubkey: Binary
 }
 
 

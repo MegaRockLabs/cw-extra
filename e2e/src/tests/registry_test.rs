@@ -1,21 +1,13 @@
 use cosmrs::crypto::secp256k1;
 use cosmwasm_std::Binary;
-/* use assert_matches::assert_matches;
-use cosm_orc::orchestrator::cosm_orc::tokio_block;
-use cosm_orc::orchestrator::error::CosmwasmError::TxError;
-use cosm_orc::orchestrator::error::ProcessError;
-use cosm_orc::orchestrator::Coin as OrcCoin;
-use cosm_orc::orchestrator::ExecReq;
-use std::collections::HashMap;
-use std::env;
-use std::time::Duration; */
 use test_context::test_context;
 
 use crate::helpers::{
     chain::Chain,
     helper::{
-        instantiate_registry, latest_block_time, instantiate_collection, instantiate_proxy, mint_token, create_token_account, query_token_owner /* ,  gen_users, CREATION_FEE,
-        MAX_TOKENS, MINT_PRICE, */
+        instantiate_registry, instantiate_collection, instantiate_proxy, 
+        mint_token, create_token_account, query_token_owner,
+        latest_block_time
     },
 };
 
@@ -166,7 +158,6 @@ fn test_create_token_account(chain: &mut Chain) {
         chain, 
         col_address,
         token_id,
-        user_addr.clone(),
         pubkey,
         &user.key
     ).unwrap();

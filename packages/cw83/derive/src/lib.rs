@@ -3,6 +3,7 @@ use quote::quote;
 use syn::{parse_macro_input, AttributeArgs, DataEnum, DeriveInput};
 
 
+
 fn merge_variants(metadata: TokenStream, left: TokenStream, right: TokenStream) -> TokenStream {
     use syn::Data::Enum;
 
@@ -44,10 +45,8 @@ fn merge_variants(metadata: TokenStream, left: TokenStream, right: TokenStream) 
 
 
 
-
-/// Note: `#[valid_signature_query]` must be applied _before_ `#[cw_serde]`.
 #[proc_macro_attribute]
-pub fn basic_smart_account_query(metadata: TokenStream, input: TokenStream) -> TokenStream {
+pub fn smart_account_query(metadata: TokenStream, input: TokenStream) -> TokenStream {
     merge_variants(
         metadata,
         input,
@@ -56,7 +55,7 @@ pub fn basic_smart_account_query(metadata: TokenStream, input: TokenStream) -> T
 
                 /// cw1
                 #[returns(CanExecuteResponse)]
-                CanExecute { sender: String, msg: CosmosMsg },
+                CanExecute { sender: String, msg: CosmosMsg<T> },
 
 
                 /// cw81
@@ -80,22 +79,32 @@ pub fn basic_smart_account_query(metadata: TokenStream, input: TokenStream) -> T
 }
 
 
-
-/// Note: `#[valid_signature_query]` must be applied _before_ `#[cw_serde]`.
 #[proc_macro_attribute]
-pub fn registy_execute(metadata: TokenStream, input: TokenStream) -> TokenStream {
+pub fn registy_query(metadata: TokenStream, input: TokenStream) -> TokenStream {
     merge_variants(
         metadata,
         input,
         quote! {
             enum Right {
-                CreateAccount {
-                    code_id: u64,
-                    init_msg: Binary,
-                }
+                #[returns(AccountInfoResponse)]
+                AccountInfo(AccountQuery)
             }
         }
         .into(),
     )
 }
 
+
+ #[proc_macro_attribute]
+pub fn registy_execute(metadata: TokenStream, input: TokenStream) -> TokenStream {
+    merge_variants(
+        metadata,
+        input,
+        quote! {
+            enum Right {
+                CreateAccount(CreateAccountMsg)
+            }
+        }
+        .into(),
+    )
+}

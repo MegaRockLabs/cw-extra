@@ -37,7 +37,7 @@ mod tests {
 
         // user store public key
         instantiate(deps.as_mut(), env.clone(), info.clone(), InstantiateMsg {
-            pub_key: public_key.to_encoded_point(false).as_bytes().into()
+            pubkey: public_key.to_encoded_point(false).as_bytes().into()
         }).unwrap();
 
         // dapp asks user to sign message

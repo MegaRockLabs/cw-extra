@@ -81,7 +81,6 @@ pub fn basic_smart_account_query(metadata: TokenStream, input: TokenStream) -> T
 
 
 
-/// Note: `#[valid_signature_query]` must be applied _before_ `#[cw_serde]`.
 #[proc_macro_attribute]
 pub fn smart_account_query(metadata: TokenStream, input: TokenStream) -> TokenStream {
     merge_variants(
