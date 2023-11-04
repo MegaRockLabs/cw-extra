@@ -65,5 +65,8 @@ pub enum ExecuteMsg<T = Empty> {
     ForgetTokens { collection: String, token_ids: Vec<String> },
     UpdateOwnership { new_owner: String, new_pubkey: Binary },
     ReceiveNft(Cw721ReceiveMsg),
-    Freeze {},
+    Freeze { 
+        // to_revoke: Option<Vec<String>> 
+    },
+    Unfreeze {},
 }

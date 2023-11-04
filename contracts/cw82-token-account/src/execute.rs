@@ -19,6 +19,7 @@ pub fn try_execute(
 pub fn try_freeze(
     deps: DepsMut,
     sender: Addr,
+    //to_revoke: Option<Vec<String>>
 ) -> Result<Response, ContractError> {
     if !is_factory(deps.as_ref(), sender)? {
         return Err(ContractError::Unauthorized {})
@@ -26,6 +27,18 @@ pub fn try_freeze(
     STATUS.save(deps.storage, &Status { frozen: true })?;
     Ok(Response::default())
 }
+
+pub fn try_unfreeze(
+    deps: DepsMut,
+    sender: Addr,
+) -> Result<Response, ContractError> {
+    if !is_factory(deps.as_ref(), sender)? {
+        return Err(ContractError::Unauthorized {})
+    }
+    STATUS.save(deps.storage, &Status { frozen: false })?;
+    Ok(Response::default())
+}
+
 
 
 pub fn try_change_pubkey(
@@ -90,7 +103,6 @@ pub fn try_update_known_tokens(
         start_after, 
         limit 
     })?;
-
 
     for id in res.tokens {
         KNOWN_TOKENS.save(
@@ -173,3 +185,32 @@ pub fn try_send_token(
 
     Ok(Response::default().add_message(msg))
 }
+
+
+/* fn revoke_approvals_msgs(
+    deps: Deps,
+    sender: &str,
+    to_revoke: Vec<String>
+ ) -> StdResult<Vec<CosmosMsg>> {
+
+    let mut msgs : Vec<CosmosMsg> = vec![];
+
+    for collection in to_revoke {
+
+        cw721::Cw721Query::approvals(&self, deps, env, token_id, include_expired)
+
+        sg721_base::ExecuteMsg::RevokeAll { operator: () }
+        msgs.push(
+            WasmMsg::Execute {
+                contract_addr: sender.to_string(),
+                msg: to_binary(&sg721_base::ExecuteMsg::RevokeApproval { 
+                    token_id: token_id.clone()
+                })?,
+                funds: vec![]
+            }.into()
+        );
+    }
+
+
+    Ok(msgs)
+} */

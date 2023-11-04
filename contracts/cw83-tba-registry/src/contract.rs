@@ -8,9 +8,9 @@ use cw82::Cw82Contract;
 use cw83::CREATE_ACCOUNT_REPLY_ID;
 
 use crate::{
-    state::{LAST_ATTEMPTING, ALLOWED_IDS, ADMIN, TOKEN_ADDRESSES},
+    state::{LAST_ATTEMPTING, ALLOWED_IDS, TOKEN_ADDRESSES, ADMINS, AdminList},
     msg::{InstantiateMsg, ExecuteMsg, QueryMsg}, 
-    error::ContractError, execute::{create_account, update_account_owner}, query::{account_info, collection_accounts}, 
+    error::ContractError, execute::{create_account, update_account_owner, freeze_account, unfreeze_account}, query::{account_info, collection_accounts}, 
 };
 
 pub const CONTRACT_NAME: &str = "crates:cw83-tba-registry";
@@ -30,8 +30,13 @@ pub fn instantiate(deps: DepsMut, _ : Env, info : MessageInfo, msg : Instantiate
             }
         ]
     )?;
-    ADMIN.save(deps.storage, &info.sender.to_string())?;
+
+    ADMINS.save(deps.storage, &AdminList {
+        admins: msg.admins.unwrap_or(vec![info.sender])
+    })?;
+
     ALLOWED_IDS.save(deps.storage, &msg.allowed_ids)?;
+
     Ok(Response::default())
 }
 
@@ -56,8 +61,7 @@ pub fn execute(deps: DepsMut, env : Env, info : MessageInfo, msg : ExecuteMsg)
         ExecuteMsg::UpdateAllowedIds { 
             allowed_ids 
         } => {
-            let admin = ADMIN.load(deps.storage)?;
-            if info.sender != admin {
+            if !ADMINS.load(deps.storage)?.is_admin(info.sender) {
                 return Err(ContractError::Unauthorized {})
             }
             ALLOWED_IDS.save(deps.storage, &allowed_ids)?;
@@ -73,7 +77,11 @@ pub fn execute(deps: DepsMut, env : Env, info : MessageInfo, msg : ExecuteMsg)
             token_info, 
             new_pubkey, 
             info.funds
-        )
+        ),
+
+        ExecuteMsg::FreezeAccount { token_info } => freeze_account(deps, info.sender, token_info),
+        
+        ExecuteMsg::UnfreezeAccount { token_info } => unfreeze_account(deps, info.sender, token_info),
     }
 }
 

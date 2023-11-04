@@ -1,5 +1,5 @@
 use cosmwasm_schema::{cw_serde, QueryResponses};
-use cosmwasm_std::{Binary, Empty};
+use cosmwasm_std::{Binary, Empty, Addr};
 use cw83::{registy_execute, registy_query, 
     CreateAccountMsg as CreateAccountMsgBase,
     AccountQuery as AccountQueryBase,
@@ -8,6 +8,7 @@ use cw83::{registy_execute, registy_query,
 
 #[cw_serde]
 pub struct InstantiateMsg {
+    pub admins: Option<Vec<Addr>>,
     pub allowed_ids: Vec<u64>,
 }
 
@@ -64,6 +65,14 @@ pub enum ExecuteMsg {
     UpdateAccountOwnership {
         token_info: TokenInfo,
         new_pubkey: Binary 
+    },
+
+    FreezeAccount {
+        token_info: TokenInfo
+    },
+
+    UnfreezeAccount {
+        token_info: TokenInfo
     },
 
 }

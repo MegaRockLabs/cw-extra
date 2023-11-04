@@ -2,7 +2,7 @@ use cosmwasm_std::{Response, Env, Binary, DepsMut, Coin, SubMsg, ReplyOn, WasmMs
 use cw83::CREATE_ACCOUNT_REPLY_ID;
 
 use crate::{
-    state::{LAST_ATTEMPTING, TOKEN_ADDRESSES},
+    state::{LAST_ATTEMPTING, TOKEN_ADDRESSES, ADMINS},
     helpers::{verify_nft_ownership, construct_label}, 
     error::ContractError, msg::TokenInfo
 };
@@ -70,6 +70,64 @@ pub fn update_account_owner(
         contract_addr, 
         msg: to_binary(&msg)?, 
         funds 
+    });
+
+    Ok(Response::default()
+       .add_message(msg)
+    )
+}
+
+
+pub fn freeze_account(
+    deps: DepsMut,
+    sender: Addr,
+    token_info: TokenInfo,
+) -> Result<Response, ContractError> {
+
+    if !ADMINS.load(deps.storage)?.is_admin(sender) {
+        return Err(ContractError::Unauthorized {})
+    }
+    
+    let contract_addr = TOKEN_ADDRESSES.load(
+        deps.storage, 
+        (token_info.contract.as_str(), token_info.id.as_str())
+    )?;
+
+    let msg = cw82_token_account::msg::ExecuteMsg::<Empty>::Freeze {};
+
+    let msg = CosmosMsg::Wasm(WasmMsg::Execute { 
+        contract_addr, 
+        msg: to_binary(&msg)?, 
+        funds: vec![]
+    });
+
+    Ok(Response::default()
+       .add_message(msg)
+    )
+}
+
+
+pub fn unfreeze_account(
+    deps: DepsMut,
+    sender: Addr,
+    token_info: TokenInfo,
+) -> Result<Response, ContractError> {
+
+    if !ADMINS.load(deps.storage)?.is_admin(sender) {
+        return Err(ContractError::Unauthorized {})
+    }
+    
+    let contract_addr = TOKEN_ADDRESSES.load(
+        deps.storage, 
+        (token_info.contract.as_str(), token_info.id.as_str())
+    )?;
+
+    let msg = cw82_token_account::msg::ExecuteMsg::<Empty>::Unfreeze {};
+
+    let msg = CosmosMsg::Wasm(WasmMsg::Execute { 
+        contract_addr, 
+        msg: to_binary(&msg)?, 
+        funds: vec![]
     });
 
     Ok(Response::default()

@@ -11,7 +11,7 @@ use crate::{
     msg::{QueryMsg, InstantiateMsg, ExecuteMsg, TokenInfo, Status}, 
     error::ContractError, 
     query::{can_execute, valid_signature, valid_signatures, known_tokens}, 
-    execute::{try_execute, try_update_ownership, try_update_known_tokens, try_forget_tokens, try_update_known_on_receive, try_transfer_token, try_send_token, try_freeze}, 
+    execute::{try_execute, try_update_ownership, try_update_known_tokens, try_forget_tokens, try_update_known_on_receive, try_transfer_token, try_send_token, try_freeze, try_unfreeze}, 
     utils::is_factory
 };
 pub const CONTRACT_NAME: &str = "crates:cw82-token-account";
@@ -100,6 +100,8 @@ pub fn execute(deps: DepsMut, env : Env, info : MessageInfo, msg : ExecuteMsg)
         ),
 
         ExecuteMsg::Freeze {} => try_freeze(deps, info.sender),
+        
+        ExecuteMsg::Unfreeze {} => try_unfreeze(deps, info.sender),
 
         ExecuteMsg::ForgetTokens { 
             collection, 
