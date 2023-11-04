@@ -1,10 +1,10 @@
-use cosmwasm_std::{StdResult, Deps, Binary, from_binary, Order};
+use cosmwasm_std::{StdResult, Deps, Binary, from_binary, Order, Env};
 use cw82::{CanExecuteResponse, ValidSignatureResponse, ValidSignaturesResponse};
 use k256::sha2::{Digest, Sha256};
 
 use crate::{
     state::{OWNER, PUBKEY, KNOWN_TOKENS}, 
-    utils::{generate_amino_transaction_string, parse_payload}
+    utils::{generate_amino_transaction_string, parse_payload}, msg::{AssetsResponse, TokenInfo}
 };
 
 
@@ -91,18 +91,37 @@ pub fn verify_arbitrary(
 }
 
 
+pub fn assets(
+    deps: Deps,
+    env: Env,
+) -> StdResult<AssetsResponse> {
+
+    let nfts = known_tokens(deps)?;
+    let balance = deps.querier.query_all_balances(env.contract.address)?;
+
+
+    Ok(AssetsResponse {
+        balances: balance,
+        tokens: nfts
+    })
+}
+
 
 pub fn known_tokens(
     deps: Deps,
-) -> StdResult<Vec<(String, String)>> {
+) -> StdResult<Vec<TokenInfo>> {
 
-    let tokens : StdResult<Vec<(String, String)>> = KNOWN_TOKENS
+    let tokens : StdResult<Vec<TokenInfo>> = KNOWN_TOKENS
     .keys(
         deps.storage, 
         None, 
         None, 
         Order::Ascending
     )
+    .map(|kp| {
+        let kp = kp?;
+        Ok(TokenInfo { token_contract: kp.0, token_id: kp.1 })
+    })
     .collect();
 
     tokens

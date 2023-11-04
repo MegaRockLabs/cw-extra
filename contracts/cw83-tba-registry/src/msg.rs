@@ -24,6 +24,11 @@ pub struct CreateInitMsg {
     pub pubkey: Binary,
 }
 
+#[cw_serde]
+pub struct CollectionsResponse {
+    pub collections: Vec<String>,
+
+}
 
 #[cw_serde]
 pub struct CollectionAccount {
@@ -32,7 +37,7 @@ pub struct CollectionAccount {
 
 }
 
-pub type CollectionAccountsResponse = Vec<CollectionAccount>;
+pub type AccountsResponse = Vec<CollectionAccount>;
 
 
 pub type AccountQuery = AccountQueryBase<TokenInfo>;
@@ -45,11 +50,17 @@ pub type CreateAccountMsg = CreateAccountMsgBase<CreateInitMsg>;
 #[derive(QueryResponses)]
 pub enum QueryMsg {
 
-    #[returns(CollectionAccountsResponse)]
-    CollectionAccounts {
+    #[returns(AccountsResponse)]
+    Accounts {
         collection: String,
-        start_after: Option<u32>,
+        skip: Option<u32>,
         limit: Option<u32>,
+    },
+
+    #[returns(CollectionsResponse)]
+    Collections {
+        skip: Option<u32>,
+        limit: Option<u32>
     },
 }
 

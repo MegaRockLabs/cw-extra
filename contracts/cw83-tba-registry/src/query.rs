@@ -1,6 +1,6 @@
 use cosmwasm_std::{StdResult, Deps, Order};
 
-use crate::{state::TOKEN_ADDRESSES, msg::{AccountInfoResponse, TokenInfo, CollectionAccount, CollectionAccountsResponse}};
+use crate::{state::{TOKEN_ADDRESSES, KNOWN_COLLECTIONS}, msg::{AccountInfoResponse, TokenInfo, CollectionAccount, AccountsResponse, CollectionsResponse}};
 
 const DEFAULT_BATCH_SIZE : u32 = 100;
 
@@ -20,30 +20,45 @@ pub fn account_info(
     })
 }
 
-pub fn collection_accounts(
+
+pub fn collections(
+    deps: Deps,
+    skip: Option<u32>,
+    limit: Option<u32>
+) -> StdResult<CollectionsResponse> {
+    
+    let skip  = skip.unwrap_or(0) as usize;
+    let limit = limit.unwrap_or(DEFAULT_BATCH_SIZE) as usize;
+
+    let collections =  KNOWN_COLLECTIONS
+        .keys(deps.storage, None, None, Order::Descending)
+        .into_iter()
+        .enumerate()
+        .filter(|(i, _)| *i >= skip)
+        .take(limit)
+        .map(|(_, c) | c.unwrap())
+        .collect::<Vec<String>>();
+
+    Ok(CollectionsResponse { collections })
+}
+
+
+pub fn accounts(
     deps: Deps,
     collection: &str,
-    start_after: Option<u32>,
+    skip: Option<u32>,
     limit: Option<u32>
-) -> StdResult<CollectionAccountsResponse> {
+) -> StdResult<AccountsResponse> {
+
+    let skip  = skip.unwrap_or(0) as usize;
+    let limit = limit.unwrap_or(DEFAULT_BATCH_SIZE) as usize;
             
     TOKEN_ADDRESSES
         .prefix(collection)
-        .range(
-            deps.storage, 
-            None, 
-            None, 
-            Order::Ascending
-        )
+        .range(deps.storage, None, None, Order::Descending)
         .enumerate()
-        .filter(|(i, _)| {
-            if let Some(start_after) = start_after {
-                i >= &(start_after as usize)
-            } else {
-                true
-            }
-        })
-        .take(limit.unwrap_or(DEFAULT_BATCH_SIZE) as usize)
+        .filter(|(i, _)| *i >= skip)
+        .take(limit)
         .map(|(_,item)| {
             let (id, address) = item?;
             Ok(CollectionAccount { id, address })

@@ -16,8 +16,8 @@ impl AdminList {
     }
 }
 
+pub static KNOWN_COLLECTIONS : Map<&str, bool>              = Map::new("c");
 pub static TOKEN_ADDRESSES   : Map<(&str, &str), String>    = Map::new("t");
 pub static LAST_ATTEMPTING   : Item<TokenInfo>              = Item::new("l");
 pub static ALLOWED_IDS       : Item<Vec<u64>>               = Item::new("i");
-
 pub static ADMINS            : Item<AdminList>              = Item::new("a");

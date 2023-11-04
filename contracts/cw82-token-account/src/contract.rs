@@ -10,7 +10,7 @@ use crate::{
     state::{REGISTRY_ADDRESS, TOKEN_INFO, PUBKEY, STATUS}, 
     msg::{QueryMsg, InstantiateMsg, ExecuteMsg, TokenInfo, Status}, 
     error::ContractError, 
-    query::{can_execute, valid_signature, valid_signatures, known_tokens}, 
+    query::{can_execute, valid_signature, valid_signatures, known_tokens, assets}, 
     execute::{try_execute, try_update_ownership, try_update_known_tokens, try_forget_tokens, try_update_known_on_receive, try_transfer_token, try_send_token, try_freeze, try_unfreeze}, 
     utils::is_factory
 };
@@ -121,10 +121,12 @@ pub fn execute(deps: DepsMut, env : Env, info : MessageInfo, msg : ExecuteMsg)
 
 
 #[cfg_attr(not(feature = "library"), entry_point)]
-pub fn query(deps: Deps, _ : Env, msg: QueryMsg) -> StdResult<Binary> {
+pub fn query(deps: Deps, env : Env, msg: QueryMsg) -> StdResult<Binary> {
     match msg {
+        QueryMsg::Token {} => to_binary(&TOKEN_INFO.load(deps.storage)?),
         QueryMsg::Status {} => to_binary(&STATUS.load(deps.storage)?),
         QueryMsg::Pubkey {} => to_binary(&PUBKEY.load(deps.storage)?),
+        QueryMsg::Assets {} => to_binary(&assets(deps, env)?),
         QueryMsg::Ownership {} => to_binary(&get_ownership(deps.storage)?),
         QueryMsg::CanExecute { sender, .. } => to_binary(&can_execute(deps, sender)?),
         QueryMsg::ValidSignature { 
