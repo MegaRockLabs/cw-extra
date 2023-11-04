@@ -859,14 +859,17 @@ version = "0.2.0"
 dependencies = [
  "cosmwasm-schema",
  "cosmwasm-std",
+ "cw-ownable",
  "cw-storage-plus 1.1.0",
  "cw-utils 1.0.2",
  "cw2 1.1.1",
  "cw22",
+ "cw721 0.18.0",
  "cw82",
  "cw83",
  "k256 0.13.1",
  "semver",
+ "sg721-base",
  "sha2 0.10.8",
  "thiserror",
 ]

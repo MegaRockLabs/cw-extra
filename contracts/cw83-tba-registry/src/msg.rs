@@ -56,7 +56,14 @@ pub enum QueryMsg {
 #[registy_execute]
 #[cw_serde]
 pub enum ExecuteMsg {
+
     UpdateAllowedIds {
         allowed_ids: Vec<u64>
     },
+
+    UpdateAccountOwnership {
+        token_info: TokenInfo,
+        new_pubkey: Binary 
+    },
+
 }

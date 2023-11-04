@@ -23,6 +23,7 @@ library = []
 sha2            = { workspace = true }
 semver          = { workspace = true }
 thiserror       = { workspace = true }
+k256            = { workspace = true }
 
 cosmwasm-schema = { workspace = true }
 cosmwasm-std    = { workspace = true }
@@ -32,4 +33,6 @@ cw2             = { workspace = true }
 cw22            = { workspace = true }
 cw82            = { workspace = true }
 cw83            = { workspace = true }
-k256            = { workspace = true }
+cw721           = { workspace = true }
+sg721-base      = { workspace = true, features = ["library"] }
+cw-ownable = "0.5.1"

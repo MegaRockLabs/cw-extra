@@ -1,4 +1,5 @@
 use cosmwasm_std::StdError;
+use cw_ownable::OwnershipError;
 use cw_utils::ParseReplyError;
 use thiserror::Error;
 
@@ -20,6 +21,12 @@ pub enum ContractError {
 impl From<semver::Error> for ContractError {
     fn from(err: semver::Error) -> Self {
         Self::SemVer(err.to_string())
+    }
+}
+
+impl From<OwnershipError> for ContractError {
+    fn from(err: OwnershipError) -> Self {
+        Self::Std(StdError::generic_err(err.to_string()))
     }
 }
 

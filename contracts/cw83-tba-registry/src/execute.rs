@@ -1,8 +1,8 @@
-use cosmwasm_std::{Response, Env, Binary, DepsMut, Coin, SubMsg, ReplyOn, WasmMsg, to_binary};
+use cosmwasm_std::{Response, Env, Binary, DepsMut, Coin, SubMsg, ReplyOn, WasmMsg, to_binary, CosmosMsg, Empty, Addr};
 use cw83::CREATE_ACCOUNT_REPLY_ID;
 
 use crate::{
-    state::LAST_ATTEMPTING,
+    state::{LAST_ATTEMPTING, TOKEN_ADDRESSES},
     helpers::{verify_nft_ownership, construct_label}, 
     error::ContractError, msg::TokenInfo
 };
@@ -43,5 +43,36 @@ pub fn create_account(
             reply_on: ReplyOn::Success,
             gas_limit: None
         })
+    )
+}
+
+
+pub fn update_account_owner(
+    deps: DepsMut,
+    sender: Addr,
+    token_info: TokenInfo,
+    new_pubkey: Binary,
+    funds: Vec<Coin>
+) -> Result<Response, ContractError> {
+    verify_nft_ownership(deps.as_ref(), sender.as_str(), token_info.clone())?;
+
+    let contract_addr = TOKEN_ADDRESSES.load(
+        deps.storage, 
+        (token_info.contract.as_str(), token_info.id.as_str())
+    )?;
+
+    let msg = cw82_token_account::msg::ExecuteMsg::<Empty>::UpdateOwnership { 
+        new_owner: sender.to_string(), 
+        new_pubkey
+    };
+
+    let msg = CosmosMsg::Wasm(WasmMsg::Execute { 
+        contract_addr, 
+        msg: to_binary(&msg)?, 
+        funds 
+    });
+
+    Ok(Response::default()
+       .add_message(msg)
     )
 }

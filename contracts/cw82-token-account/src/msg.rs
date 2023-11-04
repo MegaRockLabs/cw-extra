@@ -1,11 +1,13 @@
 use cosmwasm_std::{Binary, Empty, CosmosMsg};
 use cosmwasm_schema::{cw_serde, QueryResponses};
+use cw721::Cw721ReceiveMsg;
 use cw82::{
     smart_account_query, 
     CanExecuteResponse, 
     ValidSignatureResponse, 
-    ValidSignaturesResponse, Cw82ExecuteMsg
+    ValidSignaturesResponse
 };
+use cw_ownable::cw_ownable_query;
 
 #[cw_serde]
 pub struct InstantiateMsg {
@@ -23,30 +25,45 @@ pub struct TokenInfo {
 
 
 #[cw_serde]
-pub struct SignedMsg<T = Empty> {
-    pub msg : CosmosMsg::<T>,
-    pub signed_hash : Binary
-}
-
-impl<T> From<SignedMsg<T>> for CosmosMsg::<SignedMsg<T>> {
-    fn from(msg: SignedMsg<T>) -> Self {
-        CosmosMsg::<SignedMsg<T>>::Custom(msg)
-    }
-}
-
-
-#[smart_account_query]
-#[cw_serde]
-#[derive(QueryResponses)]
-pub enum QueryMsg <T = SignedMsg> {
-    #[returns(Binary)]
-    Pubkey {},
-}
-
-#[cw_serde]
 pub struct PayloadInfo {
     pub account: String,
     pub algo: String
 }
 
-pub type ExecuteMsg = Cw82ExecuteMsg<Empty>;
+
+#[cw_serde]
+pub struct Status {
+    pub frozen: bool,
+}
+
+
+pub type KnownTokenResponse = Vec<(String, String)>;
+
+#[smart_account_query]
+#[cw_ownable_query]
+#[cw_serde]
+#[derive(QueryResponses)]
+pub enum QueryMsg <T = Empty> {
+    #[returns(Binary)]
+    Pubkey {},
+
+    #[returns(KnownTokenResponse)]
+    KnownTokens {},
+
+    #[returns(Status)]
+    Status {},
+}
+
+
+
+#[cw_serde]
+pub enum ExecuteMsg<T = Empty> {
+    Execute { msgs: Vec<CosmosMsg<T>> },
+    SendToken { collection: String, token_id: String, contract: String, msg: Binary },
+    TransferToken { collection: String, token_id: String, recipient: String  },
+    UpdateKnownTokens { collection: String, start_after: Option<String>, limit: Option<u32> },
+    ForgetTokens { collection: String, token_ids: Vec<String> },
+    UpdateOwnership { new_owner: String, new_pubkey: Binary },
+    ReceiveNft(Cw721ReceiveMsg),
+    Freeze {},
+}

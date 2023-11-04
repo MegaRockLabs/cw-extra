@@ -14,7 +14,7 @@ pub fn construct_label(
 
 pub fn verify_nft_ownership(
     deps: Deps,
-    sender: &String,
+    sender: &str,
     token_info: TokenInfo
 ) -> Result<(), ContractError> {
 
@@ -28,7 +28,7 @@ pub fn verify_nft_ownership(
         }
     )?;
 
-    if owner_res.owner != *sender {
+    if owner_res.owner.as_str() != sender {
         return Err(ContractError::Unauthorized {});
     }
 

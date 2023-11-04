@@ -6,8 +6,8 @@ mod tests {
     use cw22::set_contract_supported_interface;
     use cw82::ValidSignatureResponse;
     use crate::{
-        contract::{instantiate, query, verify_arbitrary},
-        msg::{PayloadInfo, InstantiateMsg, QueryMsg},
+        contract::{instantiate, query},
+        msg::{PayloadInfo, InstantiateMsg, QueryMsg}, query::verify_arbitrary,
     };
 
     const MSG: &str = "dGVzdA==";

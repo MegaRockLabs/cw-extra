@@ -8,9 +8,9 @@ use cw82::Cw82Contract;
 use cw83::CREATE_ACCOUNT_REPLY_ID;
 
 use crate::{
-    state::{LAST_ATTEMPTING, ALLOWED_IDS, ADMIN, TOKEN_TO_CONTRACT},
+    state::{LAST_ATTEMPTING, ALLOWED_IDS, ADMIN, TOKEN_ADDRESSES},
     msg::{InstantiateMsg, ExecuteMsg, QueryMsg}, 
-    error::ContractError, execute::create_account, query::{account_info, collection_accounts}, 
+    error::ContractError, execute::{create_account, update_account_owner}, query::{account_info, collection_accounts}, 
 };
 
 pub const CONTRACT_NAME: &str = "crates:cw83-tba-registry";
@@ -62,7 +62,18 @@ pub fn execute(deps: DepsMut, env : Env, info : MessageInfo, msg : ExecuteMsg)
             }
             ALLOWED_IDS.save(deps.storage, &allowed_ids)?;
             Ok(Response::default())
-        }
+        },
+
+        ExecuteMsg::UpdateAccountOwnership { 
+            token_info, 
+            new_pubkey 
+        } => update_account_owner(
+            deps, 
+            info.sender, 
+            token_info, 
+            new_pubkey, 
+            info.funds
+        )
     }
 }
 
@@ -81,7 +92,7 @@ pub fn reply(deps: DepsMut, _ : Env, msg : Reply)
         let stored = LAST_ATTEMPTING.load(deps.storage)?;
         LAST_ATTEMPTING.remove(deps.storage);
 
-        TOKEN_TO_CONTRACT.save(
+        TOKEN_ADDRESSES.save(
             deps.storage, 
             (stored.contract.as_str(), stored.id.as_str()), 
             &addr        

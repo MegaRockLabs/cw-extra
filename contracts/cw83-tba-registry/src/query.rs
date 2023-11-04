@@ -1,6 +1,6 @@
 use cosmwasm_std::{StdResult, Deps, Order};
 
-use crate::{state::TOKEN_TO_CONTRACT, msg::{AccountInfoResponse, TokenInfo, CollectionAccount, CollectionAccountsResponse}};
+use crate::{state::TOKEN_ADDRESSES, msg::{AccountInfoResponse, TokenInfo, CollectionAccount, CollectionAccountsResponse}};
 
 const DEFAULT_BATCH_SIZE : u32 = 100;
 
@@ -10,7 +10,7 @@ pub fn account_info(
     info: TokenInfo
 ) -> StdResult<AccountInfoResponse> {
             
-    let address = TOKEN_TO_CONTRACT.load(
+    let address = TOKEN_ADDRESSES.load(
         deps.storage, 
         (info.contract.as_str(), info.id.as_str())
     )?;
@@ -27,7 +27,7 @@ pub fn collection_accounts(
     limit: Option<u32>
 ) -> StdResult<CollectionAccountsResponse> {
             
-    TOKEN_TO_CONTRACT
+    TOKEN_ADDRESSES
         .prefix(collection)
         .range(
             deps.storage, 
