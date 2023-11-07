@@ -6,6 +6,18 @@ edition = "2021"
 description = "Example contract showcasing cw82 that uses symmetric secrets for checking execution permissions"
 repository = "https://github.com/MegaRockLabs/cw-plus-plus"
 
+exclude = [
+  "contract.wasm",
+  "hash.txt",
+]
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[features]
+backtraces = ["cosmwasm-std/backtraces"]
+library = []
+
 [dependencies]
 cosmwasm-std    = { git = "https://github.com/scrtlabs/cosmwasm", version = "1.1.11", package = "secret-cosmwasm-std", features = [ "random" ] }
 cosmwasm-storage = { git = "https://github.com/scrtlabs/cosmwasm", package = "secret-cosmwasm-storage" }
@@ -15,12 +27,14 @@ cosmwasm-schema = { workspace = true }
 cw-storage-plus = { workspace = true }
 sha2            = { workspace = true }
 cw2             = { workspace = true }
-cw82            = { workspace = true }
 k256            = { workspace = true }
 thiserror       = { workspace = true }
 schemars        = { workspace = true }
 
-ecies           = { version = "0.2.6", default-features = false, features = ["pure"] }
+ecies = { git = "https://github.com/kromsten/ecies", package = "ecies", default-features = false, features = ["pure"] }
+
+# ecies = { version = "0.2.6", default-features = false, features = ["pure"]  }
+
 rand_chacha     = { version = "0.3.1", default-features = false }
 
 semver = "1.0.18"

@@ -5,8 +5,7 @@ mod tests {
         Binary, from_binary, to_binary
     };
 
-    use cw81::ValidSignatureResponse;
-    use crate::{contract::{instantiate, query}, msg::{InstantiateMsg, QueryMsg}};
+    use crate::{contract::{instantiate, query}, msg::{InstantiateMsg, QueryMsg, ValidSignatureResponse}};
 
 
     #[test]
@@ -30,7 +29,7 @@ mod tests {
         ).unwrap();
 
 
-        let query_msg = QueryMsg::ValidSignature { 
+       let query_msg = QueryMsg::ValidSignature { 
             signature, 
             data: data.clone(), 
             payload: None 

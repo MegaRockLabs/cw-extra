@@ -1,6 +1,6 @@
 [package]
 name = "cw82"
-authors = [ "Kromsten <s@users.noreply.megarock.labs>" ]
+authors = [ "Kromsten <s@noreply.megarock.labs>" ]
 edition = "2021"
 version     = { workspace = true }
 description = "Definition and types for the CosmWasm-82 interface"

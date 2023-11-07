@@ -1,7 +1,6 @@
 
 use cosmwasm_std::{entry_point, Response, DepsMut, MessageInfo, Env, StdResult, Binary, Deps, to_binary};
-use cw81::{ValidSignatureResponse, ValidSignaturesResponse};
-use crate::{msg::{QueryMsg, InstantiateMsg, ContractError}, state::{save_private, read_private}};
+use crate::{msg::{QueryMsg, InstantiateMsg, ContractError, ValidSignatureResponse, ValidSignaturesResponse}, state::{save_private, read_private}};
 
 
 use k256::ecdsa::{
@@ -79,6 +78,6 @@ fn sign(
     let key = SigningKey::from_slice(&key).unwrap();
     let hash = Sha256::new().chain(to_sign.as_slice());
     let signature: Signature = key.sign_digest(hash);
-    let signature : Binary = signature.to_vec().into();
+    let signature : Binary = signature.to_bytes().to_vec().into();
     Ok(signature)
 }

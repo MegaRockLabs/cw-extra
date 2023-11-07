@@ -1,6 +1,5 @@
 use cosmwasm_std::{Binary, StdError};
 use cosmwasm_schema::{cw_serde, QueryResponses};
-use cw81::{valid_signature_query, ValidSignatureResponse, ValidSignaturesResponse};
 use thiserror::Error;
 
 
@@ -8,12 +7,36 @@ use thiserror::Error;
 pub struct InstantiateMsg {}
 
 
-#[valid_signature_query]
+#[cw_serde]
+pub struct ValidSignatureResponse {
+    pub is_valid: bool
+}
+
+#[cw_serde]
+pub struct ValidSignaturesResponse {
+    pub are_valid: Vec<bool>
+}
+
+
 #[cw_serde]
 #[derive(QueryResponses)]
 pub enum QueryMsg {
     #[returns(Binary)]
-    Signature { to_sign : Binary }
+    Signature { to_sign : Binary },
+
+    #[returns(ValidSignatureResponse)]
+    ValidSignature {
+        data: Binary,
+        signature: Binary,
+        payload: Option<Binary>
+    },
+
+    #[returns(ValidSignaturesResponse)]
+    ValidSignatures {
+        data: Vec<Binary>,
+        signatures: Vec<Binary>,
+        payload: Option<Binary>
+    }
 }
 
 

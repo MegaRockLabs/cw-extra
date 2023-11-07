@@ -47,42 +47,6 @@ fn merge_variants(metadata: TokenStream, left: TokenStream, right: TokenStream) 
 
 /// Note: `#[valid_signature_query]` must be applied _before_ `#[cw_serde]`.
 #[proc_macro_attribute]
-pub fn basic_smart_account_query(metadata: TokenStream, input: TokenStream) -> TokenStream {
-    merge_variants(
-        metadata,
-        input,
-        quote! {
-            enum Right {
-
-                /// cw1
-                #[returns(CanExecuteResponse)]
-                CanExecute { sender: String, msg: CosmosMsg },
-
-
-                /// cw81
-                #[returns(ValidSignatureResponse)]
-                ValidSignature {
-                    data: Binary,
-                    signature: Binary,
-                    payload: Option<Binary>
-                },
-
-                #[returns(ValidSignaturesResponse)]
-                ValidSignatures {
-                    data: Vec<Binary>,
-                    signatures: Vec<Binary>,
-                    payload: Option<Binary>
-                }
-            }
-        }
-        .into(),
-    )
-}
-
-
-
-/// Note: `#[valid_signature_query]` must be applied _before_ `#[cw_serde]`.
-#[proc_macro_attribute]
 pub fn smart_account_query(metadata: TokenStream, input: TokenStream) -> TokenStream {
     merge_variants(
         metadata,
@@ -94,61 +58,6 @@ pub fn smart_account_query(metadata: TokenStream, input: TokenStream) -> TokenSt
                 #[returns(CanExecuteResponse)]
                 CanExecute { sender: String, msg: CosmosMsg<T> },
 
-
-                /// cw81
-                #[returns(ValidSignatureResponse)]
-                ValidSignature {
-                    data: Binary,
-                    signature: Binary,
-                    payload: Option<Binary>
-                },
-
-                #[returns(ValidSignaturesResponse)]
-                ValidSignatures {
-                    data: Vec<Binary>,
-                    signatures: Vec<Binary>,
-                    payload: Option<Binary>
-                }
-            }
-        }
-        .into(),
-    )
-}
-
-
-
-
-#[proc_macro_attribute]
-pub fn extended_smart_account_query(metadata: TokenStream, input: TokenStream) -> TokenStream {
-    merge_variants(
-        metadata,
-        input,
-        quote! {
-            enum Right {
-
-                /// cw1
-                #[returns(CanExecuteResponse)]
-                CanExecute { sender: String, msg: CosmosMsg<T> },
-
-                /// cw2 for non-raw
-                /// not necessary since be queried by raw
-                /// useful if raw query not available and
-                /// as syntactic sugar for consistency 
-                #[returns(ContractVersion)]
-                ContractVersion {},
-
-                /// cw22 is not confirmed and still in PR
-                /// this is a custom extended version
-                #[returns(bool)]
-                SupportedInterface {
-                    name: String,
-                    version: Option<String>,
-                },
-
-                #[returns(Vec<bool>)]
-                SupportedInterfaces {
-                    interfaces: Vec<(String, Option<String>)>
-                },
 
                 /// cw81
                 #[returns(ValidSignatureResponse)]

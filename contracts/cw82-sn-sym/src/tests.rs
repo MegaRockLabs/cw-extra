@@ -4,9 +4,8 @@ mod tests {
         testing::{mock_dependencies, mock_env, mock_info}, 
         Binary, from_binary, to_binary, CosmosMsg, BankMsg, coins
     };
-    use cw82::CanExecuteResponse;
 
-    use crate::{contract::{instantiate, query}, msg::{InstantiateMsg, QueryMsg, EncryptedMsg}};
+    use crate::{contract::{instantiate, query}, msg::{InstantiateMsg, QueryMsg, EncryptedMsg, CanExecuteResponse}};
 
     use k256::elliptic_curve::rand_core::OsRng;
     use ecies::{SecretKey, symmetric::sym_encrypt};
@@ -47,7 +46,8 @@ mod tests {
 
         let encrypted_msg : Binary =  sym_encrypt(
             &key_bytes, 
-            &to_binary(&msg).unwrap()
+            &to_binary(&msg).unwrap(),
+            OsRng
         ).unwrap().into();
 
 
