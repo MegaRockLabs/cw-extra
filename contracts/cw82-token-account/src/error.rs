@@ -11,6 +11,9 @@ pub enum ContractError {
     #[error("Unauthorized")]
     Unauthorized {},
 
+    #[error("Not Supported")]
+    NotSupported {},
+
     #[error("Semver parsing error: {0}")]
     SemVer(String),
 

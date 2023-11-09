@@ -1,9 +1,45 @@
 use cosmwasm_std::{
-    Deps, DepsMut, Env, Response, CosmosMsg, Addr, Binary, WasmMsg, to_binary, Coin,
+    Deps, DepsMut, Env, Response, CosmosMsg, Addr, Binary, WasmMsg, to_binary, Coin, StdResult, StdError,
 };
 
 use cw_ownable::{assert_owner, initialize_owner};
 use crate::{error::ContractError, utils::is_factory, state::{KNOWN_TOKENS, PUBKEY, STATUS}, msg::Status};
+
+
+
+fn assert_ok_wasm_msg(
+    msg: &WasmMsg
+) -> StdResult<()> {
+
+    let bad_wasm_error  = StdError::GenericErr { msg: "Not Supported".into() };
+
+    match msg {
+        // todo: add whitelististed messages
+        WasmMsg::Execute { .. } => Err(bad_wasm_error),
+        _ => Err(bad_wasm_error)
+    }
+}
+
+
+fn assert_ok_cosmos_msg(
+    msg: &CosmosMsg
+) -> StdResult<()> {
+
+    let bad_msg_error = StdError::GenericErr { msg: "Not Supported".into() };
+
+    match msg {
+        CosmosMsg::Wasm(msg) => assert_ok_wasm_msg(msg),
+        CosmosMsg::Custom(_) => Err(bad_msg_error),
+        CosmosMsg::Stargate { .. } => Err(bad_msg_error),
+        _ => Ok(())
+    }
+}
+
+fn is_ok_cosmos_msg(
+    msg: &CosmosMsg
+) -> bool {
+    assert_ok_cosmos_msg(msg).is_ok()
+}
 
 
 pub fn try_execute(
@@ -12,6 +48,11 @@ pub fn try_execute(
     msgs: Vec<CosmosMsg>
 ) -> Result<Response, ContractError> {
     assert_owner(deps.storage, &sender)?;
+
+    if !msgs.iter().all(is_ok_cosmos_msg) {
+        return Err(ContractError::NotSupported {})
+    }
+
     Ok(Response::new().add_messages(msgs))
 }
 
@@ -27,6 +68,7 @@ pub fn try_freeze(
     STATUS.save(deps.storage, &Status { frozen: true })?;
     Ok(Response::default())
 }
+
 
 pub fn try_unfreeze(
     deps: DepsMut,

@@ -10,7 +10,7 @@ use cw83::CREATE_ACCOUNT_REPLY_ID;
 use crate::{
     state::{LAST_ATTEMPTING, ALLOWED_IDS, TOKEN_ADDRESSES, ADMINS, AdminList, KNOWN_COLLECTIONS},
     msg::{InstantiateMsg, ExecuteMsg, QueryMsg}, 
-    error::ContractError, execute::{create_account, update_account_owner, freeze_account, unfreeze_account}, query::{account_info, accounts, collections}, 
+    error::ContractError, execute::{create_account, update_account_owner, freeze_account, unfreeze_account}, query::{account_info, accounts, collections, collection_accounts}, 
 };
 
 pub const CONTRACT_NAME: &str = "crates:cw83-tba-registry";
@@ -100,11 +100,13 @@ pub fn reply(deps: DepsMut, _ : Env, msg : Reply)
         let stored = LAST_ATTEMPTING.load(deps.storage)?;
         LAST_ATTEMPTING.remove(deps.storage);
 
-        KNOWN_COLLECTIONS.save(deps.storage, stored.contract.as_str(), &true)?;
+        if !KNOWN_COLLECTIONS.has(deps.storage, stored.collection.as_str()) {
+            KNOWN_COLLECTIONS.save(deps.storage, stored.collection.as_str(), &true)?;
+        }
 
         TOKEN_ADDRESSES.save(
             deps.storage, 
-            (stored.contract.as_str(), stored.id.as_str()), 
+            (stored.collection.as_str(), stored.id.as_str()), 
             &addr        
         )?;
 
@@ -130,10 +132,19 @@ pub fn query(deps: Deps, _ : Env, msg: QueryMsg) -> StdResult<Binary> {
         } => to_binary(&collections(deps, skip, limit)?),
 
         QueryMsg::Accounts { 
-            collection, 
             skip, 
             limit 
         } => to_binary(&accounts(
+            deps, 
+            skip,
+            limit
+        )?),
+
+        QueryMsg::CollectionAccounts { 
+            collection, 
+            skip, 
+            limit 
+        } => to_binary(&collection_accounts(
             deps, 
             &collection,
             skip,

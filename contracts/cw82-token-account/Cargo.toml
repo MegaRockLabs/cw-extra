@@ -26,7 +26,7 @@ thiserror       = { workspace = true }
 k256            = { workspace = true }
 
 cosmwasm-schema = { workspace = true }
-cosmwasm-std    = { workspace = true }
+cosmwasm-std    = { workspace = true, features = ["staking", "stargate" ] }
 cw-storage-plus = { workspace = true }
 cw-utils        = { workspace = true }
 cw2             = { workspace = true }

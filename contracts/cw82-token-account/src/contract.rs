@@ -1,9 +1,10 @@
 use cosmwasm_std::{
     Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult, to_binary,
 };
+use cw_ownable::get_ownership;
+
 #[cfg(not(feature = "library"))]
 use cosmwasm_std::entry_point;
-use cw_ownable::get_ownership;
 
 
 use crate::{
@@ -12,8 +13,11 @@ use crate::{
     error::ContractError, 
     query::{can_execute, valid_signature, valid_signatures, known_tokens, assets}, 
     execute::{try_execute, try_update_ownership, try_update_known_tokens, try_forget_tokens, try_update_known_on_receive, try_transfer_token, try_send_token, try_freeze, try_unfreeze}, 
-    utils::is_factory
 };
+
+#[cfg(target_arch = "wasm32")]
+use crate::utils::is_factory;
+
 pub const CONTRACT_NAME: &str = "crates:cw82-token-account";
 pub const CONTRACT_VERSION: &str = env!("CARGO_PKG_VERSION");
 
@@ -46,6 +50,7 @@ pub fn instantiate(deps: DepsMut, _ : Env, info : MessageInfo, msg : Instantiate
         ]
     )?;
 
+    #[cfg(target_arch = "wasm32")]
     if !is_factory(deps.as_ref(), info.sender.clone())? {
         return Err(ContractError::Unauthorized {})
     };
@@ -126,7 +131,6 @@ pub fn query(deps: Deps, env : Env, msg: QueryMsg) -> StdResult<Binary> {
         QueryMsg::Token {} => to_binary(&TOKEN_INFO.load(deps.storage)?),
         QueryMsg::Status {} => to_binary(&STATUS.load(deps.storage)?),
         QueryMsg::Pubkey {} => to_binary(&PUBKEY.load(deps.storage)?),
-        QueryMsg::Assets {} => to_binary(&assets(deps, env)?),
         QueryMsg::Ownership {} => to_binary(&get_ownership(deps.storage)?),
         QueryMsg::CanExecute { sender, .. } => to_binary(&can_execute(deps, sender)?),
         QueryMsg::ValidSignature { 
@@ -139,7 +143,15 @@ pub fn query(deps: Deps, env : Env, msg: QueryMsg) -> StdResult<Binary> {
             data, 
             payload 
         } => to_binary(&valid_signatures(deps, data, signatures, &payload)?),
-        QueryMsg::KnownTokens {} => to_binary(&known_tokens(deps)?)
+        QueryMsg::KnownTokens {
+            skip,
+            limit
+        } => to_binary(&known_tokens(deps, skip, limit)?),
+        QueryMsg::Assets {
+            skip,
+            limit
+        } => to_binary(&assets(deps, env, skip, limit)?),
+
     }
 }
 

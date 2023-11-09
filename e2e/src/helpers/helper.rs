@@ -36,6 +36,7 @@ pub fn instantiate_registry(
         "registry_instantiate",
         &InstantiateMsg {
             allowed_ids: vec![account_id],
+            admins: None,
         },
         key,
         Some(creator_addr.parse().unwrap()),
@@ -150,7 +151,7 @@ pub fn create_token_account(
     let init_msg = cw83_tba_registry::msg::CreateInitMsg {
         pubkey,
         token_info: TokenInfo {
-            contract: token_contract,
+            collection: token_contract,
             id: token_id,
         },
     };

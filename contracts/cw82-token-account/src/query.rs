@@ -1,19 +1,30 @@
 use cosmwasm_std::{StdResult, Deps, Binary, from_binary, Order, Env};
 use cw82::{CanExecuteResponse, ValidSignatureResponse, ValidSignaturesResponse};
+use cw_ownable::assert_owner;
 use k256::sha2::{Digest, Sha256};
 
 use crate::{
-    state::{OWNER, PUBKEY, KNOWN_TOKENS}, 
+    state::{PUBKEY, KNOWN_TOKENS}, 
     utils::{generate_amino_transaction_string, parse_payload}, msg::{AssetsResponse, TokenInfo}
 };
+
+const DEFAULT_BATCH_SIZE : u32 = 100;
 
 
 pub fn can_execute(
     deps: Deps,
     sender: String
 ) -> StdResult<CanExecuteResponse> {
-    let owner : String = OWNER.load(deps.storage)?;
-    Ok(CanExecuteResponse { can_execute: owner == sender })
+    
+    let validity = deps.api.addr_validate(&sender);
+    if validity.is_err() {
+        return Ok(CanExecuteResponse { can_execute: false })
+    }
+    let res = assert_owner(deps.storage, &validity.unwrap());
+    
+    let can_execute =  res.is_ok();
+
+    Ok(CanExecuteResponse { can_execute })
 }
 
 
@@ -94,11 +105,12 @@ pub fn verify_arbitrary(
 pub fn assets(
     deps: Deps,
     env: Env,
+    skip: Option<u32>,
+    limit: Option<u32>
 ) -> StdResult<AssetsResponse> {
 
-    let nfts = known_tokens(deps)?;
+    let nfts = known_tokens(deps, skip, limit)?;
     let balance = deps.querier.query_all_balances(env.contract.address)?;
-
 
     Ok(AssetsResponse {
         balances: balance,
@@ -109,7 +121,12 @@ pub fn assets(
 
 pub fn known_tokens(
     deps: Deps,
+    skip: Option<u32>,
+    limit: Option<u32>
 ) -> StdResult<Vec<TokenInfo>> {
+
+    let skip  = skip.unwrap_or(0) as usize;
+    let limit = limit.unwrap_or(DEFAULT_BATCH_SIZE) as usize;
 
     let tokens : StdResult<Vec<TokenInfo>> = KNOWN_TOKENS
     .keys(
@@ -118,8 +135,11 @@ pub fn known_tokens(
         None, 
         Order::Ascending
     )
-    .map(|kp| {
-        let kp = kp?;
+    .enumerate()
+    .filter(|(i, _)| *i >= skip)
+    .take(limit)
+    .map(|(_, kt)| {
+        let kp = kt?;
         Ok(TokenInfo { token_contract: kp.0, token_id: kp.1 })
     })
     .collect();

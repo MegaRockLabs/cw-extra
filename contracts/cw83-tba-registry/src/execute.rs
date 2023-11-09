@@ -22,7 +22,7 @@ pub fn create_account(
 
     let init_msg = cw82_token_account::msg::InstantiateMsg {
         owner: sender.clone(),
-        token_contract: token_info.contract.clone(),
+        token_contract: token_info.collection.clone(),
         token_id: token_info.id.clone(),
         pubkey
     };
@@ -58,7 +58,7 @@ pub fn update_account_owner(
 
     let contract_addr = TOKEN_ADDRESSES.load(
         deps.storage, 
-        (token_info.contract.as_str(), token_info.id.as_str())
+        (token_info.collection.as_str(), token_info.id.as_str())
     )?;
 
     let msg = cw82_token_account::msg::ExecuteMsg::<Empty>::UpdateOwnership { 
@@ -90,7 +90,7 @@ pub fn freeze_account(
     
     let contract_addr = TOKEN_ADDRESSES.load(
         deps.storage, 
-        (token_info.contract.as_str(), token_info.id.as_str())
+        (token_info.collection.as_str(), token_info.id.as_str())
     )?;
 
     let msg = cw82_token_account::msg::ExecuteMsg::<Empty>::Freeze {};
@@ -119,7 +119,7 @@ pub fn unfreeze_account(
     
     let contract_addr = TOKEN_ADDRESSES.load(
         deps.storage, 
-        (token_info.contract.as_str(), token_info.id.as_str())
+        (token_info.collection.as_str(), token_info.id.as_str())
     )?;
 
     let msg = cw82_token_account::msg::ExecuteMsg::<Empty>::Unfreeze {};

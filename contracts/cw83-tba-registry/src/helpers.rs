@@ -8,7 +8,7 @@ use crate::{error::ContractError, msg::TokenInfo};
 pub fn construct_label(
     info: &TokenInfo
 ) -> String {
-    format!("{}-{}-account", info.contract, info.id)
+    format!("{}-{}-account", info.collection, info.id)
 }
 
 
@@ -21,7 +21,7 @@ pub fn verify_nft_ownership(
     let owner_res = deps
         .querier
         .query_wasm_smart::<cw721::OwnerOfResponse>(
-            token_info.contract, 
+            token_info.collection, 
         &sg721_base::QueryMsg::OwnerOf {
             token_id: token_info.id,
             include_expired: None
@@ -83,7 +83,7 @@ impl Cw83TokenRegistryContract {
             self.init_binary(
                 owner,
                 pubkey,
-                info.contract.clone(),
+                info.collection.clone(),
                 info.id.clone(),
             )?,
             funds,

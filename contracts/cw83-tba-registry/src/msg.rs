@@ -14,7 +14,7 @@ pub struct InstantiateMsg {
 
 #[cw_serde]
 pub struct TokenInfo {
-    pub contract: String,
+    pub collection: String,
     pub id: String,
 }
 
@@ -31,14 +31,22 @@ pub struct CollectionsResponse {
 }
 
 #[cw_serde]
-pub struct CollectionAccount {
+pub struct Account {
+    pub collection: String,
     pub id: String,
     pub address: String,
 
 }
 
-pub type AccountsResponse = Vec<CollectionAccount>;
+#[cw_serde]
+pub struct CollectionAccount {
+    pub id: String,
+    pub address: String,
+}
 
+
+pub type AccountsResponse = Vec<Account>;
+pub type CollectionAccountsResponse = Vec<CollectionAccount>;
 
 pub type AccountQuery = AccountQueryBase<TokenInfo>;
 pub type AccountInfoResponse = AccountInfoResponseBase<Empty>;
@@ -52,6 +60,12 @@ pub enum QueryMsg {
 
     #[returns(AccountsResponse)]
     Accounts {
+        skip: Option<u32>,
+        limit: Option<u32>,
+    },
+
+    #[returns(CollectionAccountsResponse)]
+    CollectionAccounts {
         collection: String,
         skip: Option<u32>,
         limit: Option<u32>,

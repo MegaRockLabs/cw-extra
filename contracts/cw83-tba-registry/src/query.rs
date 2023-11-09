@@ -1,9 +1,8 @@
 use cosmwasm_std::{StdResult, Deps, Order};
 
-use crate::{state::{TOKEN_ADDRESSES, KNOWN_COLLECTIONS}, msg::{AccountInfoResponse, TokenInfo, CollectionAccount, AccountsResponse, CollectionsResponse}};
+use crate::{state::{TOKEN_ADDRESSES, KNOWN_COLLECTIONS}, msg::{AccountInfoResponse, TokenInfo, CollectionAccount, CollectionAccountsResponse, CollectionsResponse, AccountsResponse, Account}};
 
 const DEFAULT_BATCH_SIZE : u32 = 100;
-
 
 pub fn account_info(
     deps: Deps,
@@ -12,7 +11,7 @@ pub fn account_info(
             
     let address = TOKEN_ADDRESSES.load(
         deps.storage, 
-        (info.contract.as_str(), info.id.as_str())
+        (info.collection.as_str(), info.id.as_str())
     )?;
 
     Ok(AccountInfoResponse {
@@ -45,10 +44,32 @@ pub fn collections(
 
 pub fn accounts(
     deps: Deps,
-    collection: &str,
     skip: Option<u32>,
     limit: Option<u32>
 ) -> StdResult<AccountsResponse> {
+
+    let skip  = skip.unwrap_or(0) as usize;
+    let limit = limit.unwrap_or(DEFAULT_BATCH_SIZE) as usize;
+            
+    TOKEN_ADDRESSES
+        .range(deps.storage, None, None, Order::Descending)
+        .enumerate()
+        .filter(|(i, _)| *i >= skip)
+        .take(limit)
+        .map(|(_,item)| {
+            let (( collection, id  ), address) = item?;
+            Ok(Account { collection, id, address })
+        })
+        .collect()
+}
+
+
+pub fn collection_accounts(
+    deps: Deps,
+    collection: &str,
+    skip: Option<u32>,
+    limit: Option<u32>
+) -> StdResult<CollectionAccountsResponse> {
 
     let skip  = skip.unwrap_or(0) as usize;
     let limit = limit.unwrap_or(DEFAULT_BATCH_SIZE) as usize;

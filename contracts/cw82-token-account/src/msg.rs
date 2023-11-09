@@ -54,7 +54,16 @@ pub enum QueryMsg <T = Empty> {
     Pubkey {},
 
     #[returns(KnownTokenResponse)]
-    KnownTokens {},
+    KnownTokens {
+        skip: Option<u32>,
+        limit: Option<u32>
+    },
+
+    #[returns(PayloadInfo)]
+    Assets {
+        skip: Option<u32>,
+        limit: Option<u32>
+    },
 
     #[returns(Status)]
     Status {},
@@ -62,8 +71,7 @@ pub enum QueryMsg <T = Empty> {
     #[returns(TokenInfo)]
     Token {},
 
-    #[returns(PayloadInfo)]
-    Assets {},
+    
 }
 
 
@@ -77,8 +85,6 @@ pub enum ExecuteMsg<T = Empty> {
     ForgetTokens { collection: String, token_ids: Vec<String> },
     UpdateOwnership { new_owner: String, new_pubkey: Binary },
     ReceiveNft(Cw721ReceiveMsg),
-    Freeze { 
-        // to_revoke: Option<Vec<String>> 
-    },
+    Freeze {},
     Unfreeze {},
 }
