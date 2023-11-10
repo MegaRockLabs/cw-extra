@@ -10,6 +10,9 @@ pub enum ContractError {
     #[error("Unauthorized")]
     Unauthorized {},
 
+    #[error("Not Supported Chain ID")]
+    InvalidChainId {},
+
     #[error("Semver parsing error: {0}")]
     SemVer(String),
 

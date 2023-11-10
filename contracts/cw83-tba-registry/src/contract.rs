@@ -52,6 +52,7 @@ pub fn execute(deps: DepsMut, env : Env, info : MessageInfo, msg : ExecuteMsg)
             deps, 
             env,
             info.sender.to_string(),
+            create.chain_id,
             create.code_id, 
             create.msg.token_info, 
             create.msg.pubkey,

@@ -148,6 +148,8 @@ pub fn create_token_account(
     key: &SigningKey,
 ) -> Result<ExecResponse, ProcessError> {
 
+    let chain_id = chain.cfg.orc_cfg.chain_cfg.chain_id.clone();
+
     let init_msg = cw83_tba_registry::msg::CreateInitMsg {
         pubkey,
         token_info: TokenInfo {
@@ -164,6 +166,7 @@ pub fn create_token_account(
         &cw83_tba_registry::msg::ExecuteMsg::CreateAccount(
             CreateAccountMsg {
                 code_id,
+                chain_id,
                 msg: init_msg,
             }
         ), 

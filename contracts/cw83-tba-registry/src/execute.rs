@@ -11,11 +11,16 @@ pub fn create_account(
     deps: DepsMut,
     env: Env,
     sender: String,
+    chain_id: String,
     code_id: u64,
     token_info: TokenInfo,
     pubkey: Binary,
     funds: Vec<Coin>
 ) -> Result<Response, ContractError> {
+
+    if env.block.chain_id != chain_id {
+        return Err(ContractError::InvalidChainId {})
+    }
 
     verify_nft_ownership(deps.as_ref(), &sender, token_info.clone())?;
     LAST_ATTEMPTING.save(deps.storage, &token_info)?;

@@ -17,6 +17,7 @@ pub struct AccountQuery<T = Empty> {
 #[cw_serde]
 pub struct CreateAccountMsg<T = Binary> {
     pub code_id: u64,
+    pub chain_id: String,
     pub msg: T
 }
 
