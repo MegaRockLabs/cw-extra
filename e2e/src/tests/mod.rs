@@ -1,1 +1,2 @@
-pub mod registry_test;
+pub mod setup_test;
+pub mod token_registry_test;

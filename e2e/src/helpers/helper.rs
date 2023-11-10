@@ -4,13 +4,16 @@ use super::chain::Chain;
 use super::msg::ProxyInstantiateMsg;
 use cosm_orc::orchestrator::cosm_orc::tokio_block;
 use cosm_orc::orchestrator::error::{ProcessError, CosmwasmError};
-use cosm_orc::orchestrator::{Coin as OrcCoin, ExecResponse, Address};
+use cosm_orc::orchestrator::{Coin as OrcCoin, ExecResponse, Address, ChainTxResponse, QueryResponse};
 use cosm_orc::orchestrator::{InstantiateResponse, SigningKey};
 use cosm_tome::chain::request::TxOptions;
 use cosm_tome::modules::bank::model::SendRequest;
-use cosmwasm_std::{Timestamp, Empty, CosmosMsg, WasmMsg, to_binary, Binary, from_binary};
+use cosmrs::crypto::secp256k1;
+use cosmwasm_schema::cw_serde;
+use cosmwasm_std::{Timestamp, Empty, CosmosMsg, WasmMsg, Binary, to_binary, from_binary};
 
 use cw83_tba_registry::msg::{InstantiateMsg, CreateAccountMsg, TokenInfo};
+use serde::Serialize;
 
 // contract names used by cosm-orc to register stored code ids / instantiated addresses:
 pub const REGISTRY_NAME     : &str = "cw83_tba_registry";
@@ -174,8 +177,118 @@ pub fn create_token_account(
         vec![]
     )
 }
+
+
+#[cw_serde]
+pub struct FullSetupData {
+    pub proxy: String,
+    pub registry: String,
+    pub collection: String,
+    pub token_id: String,
+    pub token_account: String,
+}
+
+
+pub fn get_init_address(
+    res: ChainTxResponse
+) -> String {
+    res
+        .find_event_tags(
+            "instantiate".to_string(), 
+            "_contract_address".to_string()
+        )[0].value.clone()
+}
+
+
+pub fn full_setup(
+    chain: &mut Chain,
+) -> Result<FullSetupData, ProcessError> {
+
+    let _start_time = latest_block_time(chain).plus_seconds(60);
+
+
+    let user = chain.cfg.users[0].clone();
+    let user_addr = &user.account.address;
+
+    let reg_init = instantiate_registry(chain, user_addr.to_string(), &user.key).unwrap();
+    
+    let registry = get_init_address(reg_init.res);
+
+
+    let proxy = instantiate_proxy(chain, user.account.address.clone(), &user.key).unwrap().address;
+   
+    let init_res = instantiate_collection(
+        chain, 
+        user.account.address.clone(), 
+        proxy.clone().to_string(),
+        &user.key
+    ).unwrap();
+
+    let collection  = get_init_address(init_res.res);
+
+    
+    let mint_res = mint_token(
+        chain, 
+        collection.clone(), 
+        user.account.address.clone(), 
+        &user.key
+    ).unwrap();
+
+
+    let token_id = mint_res
+                .res
+                .find_event_tags(
+                    "wasm".to_string(), 
+                    "token_id".to_string()
+                )[0].value.clone();
+
+
+    let signing : secp256k1::SigningKey = user.key.clone().try_into().unwrap();
+    let pubkey : Binary = signing.public_key().to_bytes().into();
+    
+
+
+    let create_res = create_token_account(
+        chain, 
+        collection.clone(),
+        token_id.clone(),
+        pubkey.clone(),
+        &user.key
+    ).unwrap();
+
+
+    let token_account = get_init_address(create_res.res);
+    
+
+    Ok(FullSetupData {
+        proxy: proxy.to_string(),
+        registry,
+        collection,
+        token_id,
+        token_account,
+    })
+
+}
  
 
+
+
+pub fn wasm_query<S: Serialize>(
+    chain: &mut Chain,
+    address: &String,
+    msg: &S
+) -> Result<QueryResponse, CosmwasmError> {
+
+    let res = tokio_block(async { 
+        chain.orc.client.wasm_query(
+            Address::from_str(&address)?,
+            msg
+        )
+        .await }
+    );
+
+    res
+}
 
 
 pub fn query_token_owner(
@@ -184,18 +297,16 @@ pub fn query_token_owner(
     token_id: String,
 ) -> Result<cw721::OwnerOfResponse, CosmwasmError> {
 
-    let res = tokio_block(async { 
-        chain.orc.client.wasm_query(
-            Address::from_str(&collection)?,
-            &cw721::Cw721QueryMsg::OwnerOf { 
-                token_id, include_expired: None
-            }
-        )
-        .await }
-    );
+    let res = wasm_query(
+        chain,
+        &collection,
+        &cw721::Cw721QueryMsg::OwnerOf {
+            token_id, include_expired: None
+        }
+    ).unwrap();
 
     let owner_res : cw721::OwnerOfResponse = from_binary(
-        &res.unwrap().res.data.unwrap().into()
+        &res.res.data.unwrap().into()
     ).unwrap();
 
     Ok(owner_res)

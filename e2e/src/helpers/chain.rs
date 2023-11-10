@@ -56,23 +56,6 @@ impl TestContext for Chain {
 }
 
 
-/* 
-#[async_trait::async_trait]
-impl AsyncTestContext for Chain {
-    async fn setup() -> Self {
-         println!("Async CFG INIT ");
-         let cfg = CONFIG.get_or_init(global_setup).clone();
-         println!();
-         let orc = CosmOrc::new(cfg.orc_cfg.clone(), true).unwrap();
-         Self { cfg, orc }
-    }
-
-    async fn teardown(self) {
-        let cfg = CONFIG.get().unwrap();
-        save_gas_report(&self.orc, &cfg.gas_report_dir);
-    }
-}
-*/
 
 // global_setup() runs once before all of the tests:
 // - loads cosm orc / test account config files
