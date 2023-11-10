@@ -12,6 +12,8 @@ use cosmrs::crypto::secp256k1;
 use cosmwasm_schema::cw_serde;
 use cosmwasm_std::{Timestamp, Empty, CosmosMsg, WasmMsg, Binary, to_binary, from_binary};
 
+use cw1::CanExecuteResponse;
+use cw82_token_account::msg::QueryMsg;
 use cw83_tba_registry::msg::{InstantiateMsg, CreateAccountMsg, TokenInfo};
 use serde::Serialize;
 
@@ -186,6 +188,11 @@ pub struct FullSetupData {
     pub collection: String,
     pub token_id: String,
     pub token_account: String,
+
+    pub signer_mnemonic: String,
+    pub public_key: Binary,
+
+    pub user_address: String,
 }
 
 
@@ -207,15 +214,15 @@ pub fn full_setup(
     let _start_time = latest_block_time(chain).plus_seconds(60);
 
 
-    let user = chain.cfg.users[0].clone();
-    let user_addr = &user.account.address;
+    let user: super::chain::SigningAccount = chain.cfg.users[0].clone();
+    let user_address = user.account.address.clone();
 
-    let reg_init = instantiate_registry(chain, user_addr.to_string(), &user.key).unwrap();
+    let reg_init = instantiate_registry(chain, user_address.clone(), &user.key).unwrap();
     
     let registry = get_init_address(reg_init.res);
 
 
-    let proxy = instantiate_proxy(chain, user.account.address.clone(), &user.key).unwrap().address;
+    let proxy = instantiate_proxy(chain, user_address.clone(), &user.key).unwrap().address;
    
     let init_res = instantiate_collection(
         chain, 
@@ -241,12 +248,11 @@ pub fn full_setup(
                     "wasm".to_string(), 
                     "token_id".to_string()
                 )[0].value.clone();
-
+            
 
     let signing : secp256k1::SigningKey = user.key.clone().try_into().unwrap();
     let pubkey : Binary = signing.public_key().to_bytes().into();
     
-
 
     let create_res = create_token_account(
         chain, 
@@ -266,6 +272,11 @@ pub fn full_setup(
         collection,
         token_id,
         token_account,
+
+        signer_mnemonic: user.account.mnemonic,
+        public_key: pubkey,
+
+        user_address
     })
 
 }
@@ -372,4 +383,26 @@ pub fn latest_block_time(chain: &Chain) -> Timestamp {
         .unwrap();
 
     Timestamp::from_seconds(now.seconds.try_into().unwrap())
+}
+
+
+
+pub fn can_execute(
+    chain: &mut Chain, 
+    token_account: &String, 
+    sender: String, 
+    msg: CosmosMsg<Empty>
+) -> CanExecuteResponse {
+    let res = wasm_query(
+        chain, 
+        token_account, 
+        &QueryMsg::CanExecute::<Empty> { 
+            sender: sender, 
+            msg: msg.into(), 
+        }
+    ).unwrap();
+    
+    from_binary(
+        &res.res.data.unwrap().into()
+    ).unwrap()
 }

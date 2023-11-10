@@ -21,8 +21,11 @@ rand           = "0.8"
 async-trait    = "0.1.74"
 tokio = "1.33.0"
 
+k256                 = { workspace = true }
+
 cosmwasm-schema      = { workspace = true }
 cosmwasm-std         = { workspace = true }
+cw-ownable           = { workspace = true }
 cw1                  = { workspace = true }
 cw2                  = { workspace = true }
 cw22                 = { workspace = true }

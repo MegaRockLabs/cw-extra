@@ -25,6 +25,7 @@ schemars                = "0.8.15"
 semver                  = "1.0.20"
 thiserror               = "1.0.50"
 
+cw-ownable              = "0.5.1"
 cw-utils                = "1.0.2"
 cw1                     = "1.1.1"
 cw2                     = "1.1.1"

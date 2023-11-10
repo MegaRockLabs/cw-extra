@@ -28,6 +28,7 @@ k256            = { workspace = true }
 cosmwasm-schema = { workspace = true }
 cosmwasm-std    = { workspace = true, features = ["staking", "stargate" ] }
 cw-storage-plus = { workspace = true }
+cw-ownable      = { workspace = true }
 cw-utils        = { workspace = true }
 cw2             = { workspace = true }
 cw22            = { workspace = true }
@@ -35,4 +36,3 @@ cw82            = { workspace = true }
 cw83            = { workspace = true }
 cw721           = { workspace = true }
 sg721-base      = { workspace = true, features = ["library"] }
-cw-ownable = "0.5.1"

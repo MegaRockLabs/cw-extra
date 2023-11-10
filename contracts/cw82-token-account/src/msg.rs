@@ -1,7 +1,7 @@
 use cosmwasm_std::{Binary, Empty, CosmosMsg, Coin};
 use cosmwasm_schema::{cw_serde, QueryResponses};
 use cw721::Cw721ReceiveMsg;
-use cw82::{
+pub use cw82::{
     smart_account_query, 
     CanExecuteResponse, 
     ValidSignatureResponse, 

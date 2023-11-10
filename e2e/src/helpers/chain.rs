@@ -25,6 +25,7 @@ pub struct SigningAccount {
     pub key: SigningKey,
 }
 
+
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Account {
     pub name: String,
