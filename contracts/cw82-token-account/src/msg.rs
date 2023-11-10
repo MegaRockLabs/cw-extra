@@ -43,7 +43,8 @@ pub struct AssetsResponse {
 }
 
 
-pub type KnownTokenResponse = Vec<(String, String)>;
+pub type KnownTokensResponse = Vec<(String, String)>;
+
 
 #[smart_account_query]
 #[cw_ownable_query]
@@ -53,7 +54,7 @@ pub enum QueryMsg <T = Empty> {
     #[returns(Binary)]
     Pubkey {},
 
-    #[returns(KnownTokenResponse)]
+    #[returns(KnownTokensResponse)]
     KnownTokens {
         skip: Option<u32>,
         limit: Option<u32>
@@ -70,10 +71,8 @@ pub enum QueryMsg <T = Empty> {
 
     #[returns(TokenInfo)]
     Token {},
-
     
 }
-
 
 
 #[cw_serde]
@@ -81,9 +80,10 @@ pub enum ExecuteMsg<T = Empty> {
     Execute { msgs: Vec<CosmosMsg<T>> },
     SendToken { collection: String, token_id: String, contract: String, msg: Binary },
     TransferToken { collection: String, token_id: String, recipient: String  },
-    UpdateKnownTokens { collection: String, start_after: Option<String>, limit: Option<u32> },
     ForgetTokens { collection: String, token_ids: Vec<String> },
+    UpdateKnownTokens { collection: String, start_after: Option<String>, limit: Option<u32> },
     UpdateOwnership { new_owner: String, new_pubkey: Binary },
+    UpdatePubkey { new_pubkey: Binary },
     ReceiveNft(Cw721ReceiveMsg),
     Freeze {},
     Unfreeze {},

@@ -8,12 +8,10 @@ pub fn account_info(
     deps: Deps,
     info: TokenInfo
 ) -> StdResult<AccountInfoResponse> {
-            
     let address = TOKEN_ADDRESSES.load(
         deps.storage, 
         (info.collection.as_str(), info.id.as_str())
     )?;
-
     Ok(AccountInfoResponse {
         address, info: None
     })
@@ -85,5 +83,4 @@ pub fn collection_accounts(
             Ok(CollectionAccount { id, address })
         })
         .collect()
-
 }

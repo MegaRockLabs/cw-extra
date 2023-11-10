@@ -12,7 +12,7 @@ use crate::{
     msg::{QueryMsg, InstantiateMsg, ExecuteMsg, TokenInfo, Status}, 
     error::ContractError, 
     query::{can_execute, valid_signature, valid_signatures, known_tokens, assets}, 
-    execute::{try_execute, try_update_ownership, try_update_known_tokens, try_forget_tokens, try_update_known_on_receive, try_transfer_token, try_send_token, try_freeze, try_unfreeze}, 
+    execute::{try_execute, try_update_ownership, try_update_known_tokens, try_forget_tokens, try_update_known_on_receive, try_transfer_token, try_send_token, try_freeze, try_unfreeze, try_change_pubkey}, 
 };
 
 #[cfg(target_arch = "wasm32")]
@@ -120,7 +120,9 @@ pub fn execute(deps: DepsMut, env : Env, info : MessageInfo, msg : ExecuteMsg)
         ExecuteMsg::UpdateOwnership { 
             new_owner, 
             new_pubkey 
-        } => try_update_ownership(deps, info.sender, new_owner, new_pubkey)
+        } => try_update_ownership(deps, info.sender, new_owner, new_pubkey),
+
+        ExecuteMsg::UpdatePubkey { new_pubkey } => try_change_pubkey(deps, info.sender, new_pubkey),
     }
 }
 
@@ -132,11 +134,15 @@ pub fn query(deps: Deps, env : Env, msg: QueryMsg) -> StdResult<Binary> {
         QueryMsg::Status {} => to_binary(&STATUS.load(deps.storage)?),
         QueryMsg::Pubkey {} => to_binary(&PUBKEY.load(deps.storage)?),
         QueryMsg::Ownership {} => to_binary(&get_ownership(deps.storage)?),
-        QueryMsg::CanExecute { sender, .. } => to_binary(&can_execute(deps, sender)?),
+        QueryMsg::CanExecute { sender, msg } => to_binary(&can_execute(
+            deps, 
+            sender, 
+            &msg
+        )?),
         QueryMsg::ValidSignature { 
             signature, 
             data, 
-            payload 
+            payload ,
         } => to_binary(&valid_signature(deps, data, signature, &payload)?),
         QueryMsg::ValidSignatures { 
             signatures, 

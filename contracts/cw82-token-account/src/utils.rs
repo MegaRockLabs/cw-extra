@@ -1,6 +1,48 @@
-use cosmwasm_std::{Addr, Deps, StdResult, Binary, StdError, from_binary};
+use cosmwasm_std::{Addr, Deps, StdResult, Binary, StdError, from_binary, CosmosMsg, WasmMsg};
+use crate::{msg::PayloadInfo, error::ContractError};
 
-use crate::msg::PayloadInfo;
+
+pub fn assert_ok_wasm_msg(
+    msg: &WasmMsg
+) -> StdResult<()> {
+    let bad_wasm_error  = StdError::GenericErr { msg: "Not Supported".into() };
+    match msg {
+        // todo: add whitelististed messages
+        WasmMsg::Execute { .. } => Err(bad_wasm_error),
+        _ => Err(bad_wasm_error)
+    }
+}
+
+
+pub fn assert_ok_cosmos_msg(
+    msg: &CosmosMsg
+) -> StdResult<()> {
+    let bad_msg_error = StdError::GenericErr { msg: "Not Supported".into() };
+    match msg {
+        CosmosMsg::Wasm(msg) => assert_ok_wasm_msg(msg),
+        CosmosMsg::Custom(_) => Err(bad_msg_error),
+        CosmosMsg::Stargate { .. } => Err(bad_msg_error),
+        _ => Ok(())
+    }
+}
+
+pub fn is_ok_cosmos_msg(
+    msg: &CosmosMsg
+) -> bool {
+    assert_ok_cosmos_msg(msg).is_ok()
+}
+
+
+pub fn assert_factory(
+    deps: Deps,
+    addr: Addr
+) -> Result<(), ContractError> {
+    if is_factory(deps, addr)? {
+        Ok(())
+    } else {
+        Err(ContractError::Unauthorized {})
+    }
+}
 
 pub fn is_factory(
     deps: Deps,

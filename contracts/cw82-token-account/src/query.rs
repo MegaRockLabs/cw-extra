@@ -1,30 +1,35 @@
-use cosmwasm_std::{StdResult, Deps, Binary, from_binary, Order, Env};
+use cosmwasm_std::{StdResult, Deps, Binary, Order, Env, CosmosMsg, from_binary};
 use cw82::{CanExecuteResponse, ValidSignatureResponse, ValidSignaturesResponse};
-use cw_ownable::assert_owner;
 use k256::sha2::{Digest, Sha256};
+use cw_ownable::is_owner;
 
 use crate::{
     state::{PUBKEY, KNOWN_TOKENS}, 
-    utils::{generate_amino_transaction_string, parse_payload}, msg::{AssetsResponse, TokenInfo}
+    utils::{generate_amino_transaction_string, parse_payload, is_ok_cosmos_msg}, 
+    msg::{AssetsResponse, TokenInfo}
 };
+
 
 const DEFAULT_BATCH_SIZE : u32 = 100;
 
 
 pub fn can_execute(
     deps: Deps,
-    sender: String
+    sender: String,
+    msg: &CosmosMsg
 ) -> StdResult<CanExecuteResponse> {
     
-    let validity = deps.api.addr_validate(&sender);
-    if validity.is_err() {
+    let addr_validity = deps.api.addr_validate(&sender);
+    if addr_validity.is_err() {
         return Ok(CanExecuteResponse { can_execute: false })
     }
-    let res = assert_owner(deps.storage, &validity.unwrap());
-    
-    let can_execute =  res.is_ok();
 
-    Ok(CanExecuteResponse { can_execute })
+    let res = is_owner(deps.storage, &addr_validity.unwrap());
+    if res.is_err() || res.unwrap() == false {
+        return Ok(CanExecuteResponse { can_execute: false })
+    }
+
+    Ok(CanExecuteResponse { can_execute: is_ok_cosmos_msg(msg) })
 }
 
 
