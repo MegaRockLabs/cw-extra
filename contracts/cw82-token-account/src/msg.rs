@@ -42,15 +42,13 @@ pub struct AssetsResponse {
     pub tokens: Vec<TokenInfo>
 }
 
-
-pub type KnownTokensResponse = Vec<(String, String)>;
-
+pub type KnownTokensResponse = Vec<TokenInfo>;
 
 #[smart_account_query]
 #[cw_ownable_query]
 #[cw_serde]
 #[derive(QueryResponses)]
-pub enum QueryMsg <T = Empty> {
+pub enum QueryMsgBase <T = Empty> {
     #[returns(Binary)]
     Pubkey {},
 
@@ -71,13 +69,14 @@ pub enum QueryMsg <T = Empty> {
 
     #[returns(TokenInfo)]
     Token {},
-    
 }
+
+pub type QueryMsg = QueryMsgBase<Empty>;
 
 
 #[cw_serde]
-pub enum ExecuteMsg<T = Empty> {
-    Execute { msgs: Vec<CosmosMsg<T>> },
+pub enum ExecuteMsg {
+    Execute { msgs: Vec<CosmosMsg<Empty>> },
     SendToken { collection: String, token_id: String, contract: String, msg: Binary },
     TransferToken { collection: String, token_id: String, recipient: String  },
     ForgetTokens { collection: String, token_ids: Vec<String> },

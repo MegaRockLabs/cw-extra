@@ -16,6 +16,7 @@ use cw1::CanExecuteResponse;
 use cw82_token_account::msg::QueryMsg;
 use cw83_tba_registry::msg::{InstantiateMsg, CreateAccountMsg, TokenInfo};
 use serde::Serialize;
+use serde::de::DeserializeOwned;
 
 // contract names used by cosm-orc to register stored code ids / instantiated addresses:
 pub const REGISTRY_NAME     : &str = "cw83_tba_registry";
@@ -116,12 +117,13 @@ pub fn instantiate_collection(
 pub fn mint_token(
     chain: &mut Chain,
     collection: String,
+    token_id: String,
     owner: String,
     key: &SigningKey,
 ) -> Result<ExecResponse, ProcessError> {
 
     let mint_msg = sg721_base::ExecuteMsg::Mint { 
-        token_id: "1".into(), 
+        token_id, 
         owner, 
         token_uri: None, 
         extension: None
@@ -142,6 +144,31 @@ pub fn mint_token(
         vec![],
     )
 }
+
+
+pub fn send_token(
+    chain: &mut Chain,
+    token_id: String,
+    recipient: String,
+    msg: Binary,
+    key: &SigningKey,
+) -> Result<ExecResponse, ProcessError> {
+
+    let send_msg = sg721_base::ExecuteMsg::SendNft { 
+        contract: recipient, 
+        token_id, 
+        msg
+    };
+
+    chain.orc.execute(
+        COLLECTION_NAME,
+        "send_nft_acknowledge",
+        &send_msg,
+        key,
+        vec![],
+    )
+}
+
 
 
 
@@ -221,7 +248,6 @@ pub fn full_setup(
     
     let registry = get_init_address(reg_init.res);
 
-
     let proxy = instantiate_proxy(chain, user_address.clone(), &user.key).unwrap().address;
    
     let init_res = instantiate_collection(
@@ -232,11 +258,12 @@ pub fn full_setup(
     ).unwrap();
 
     let collection  = get_init_address(init_res.res);
-
+    chain.orc.contract_map.add_address(COLLECTION_NAME, collection.clone()).unwrap();
     
     let mint_res = mint_token(
         chain, 
-        collection.clone(), 
+        collection.clone(),
+        "1".to_string(),
         user.account.address.clone(), 
         &user.key
     ).unwrap();
@@ -264,7 +291,7 @@ pub fn full_setup(
 
 
     let token_account = get_init_address(create_res.res);
-    
+    chain.orc.contract_map.add_address(ACOUNT_NAME, token_account.clone()).unwrap();
 
     Ok(FullSetupData {
         proxy: proxy.to_string(),
@@ -300,6 +327,31 @@ pub fn wasm_query<S: Serialize>(
 
     res
 }
+
+pub fn wasm_query_typed<R, S> (
+    chain: &mut Chain,
+    address: &String,
+    msg: &S
+) -> Result<R, CosmwasmError> 
+where S: Serialize,
+      R: DeserializeOwned
+{
+    let res = tokio_block(async { 
+        chain.orc.client.wasm_query(
+            Address::from_str(&address)?,
+            msg
+        )
+        .await }
+    )?;
+
+
+    let res : R = from_binary(
+        &res.res.data.unwrap().into()
+    ).unwrap();
+
+    Ok(res)
+}
+
 
 
 pub fn query_token_owner(
@@ -396,7 +448,7 @@ pub fn can_execute(
     let res = wasm_query(
         chain, 
         token_account, 
-        &QueryMsg::CanExecute::<Empty> { 
+        &QueryMsg::CanExecute { 
             sender: sender, 
             msg: msg.into(), 
         }

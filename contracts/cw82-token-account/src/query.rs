@@ -5,7 +5,7 @@ use cw_ownable::is_owner;
 
 use crate::{
     state::{PUBKEY, KNOWN_TOKENS}, 
-    utils::{generate_amino_transaction_string, parse_payload, is_ok_cosmos_msg}, 
+    utils::{generate_amino_transaction_string, parse_payload, is_ok_cosmos_msg, status_ok}, 
     msg::{AssetsResponse, TokenInfo}
 };
 
@@ -18,16 +18,16 @@ pub fn can_execute(
     sender: String,
     msg: &CosmosMsg
 ) -> StdResult<CanExecuteResponse> {
-    
+
+    let cant = CanExecuteResponse { can_execute: false };
+
+    if !status_ok(deps.storage) { return Ok(cant) };
+
     let addr_validity = deps.api.addr_validate(&sender);
-    if addr_validity.is_err() {
-        return Ok(CanExecuteResponse { can_execute: false })
-    }
+    if addr_validity.is_err() { return Ok(cant) };
 
     let res = is_owner(deps.storage, &addr_validity.unwrap());
-    if res.is_err() || res.unwrap() == false {
-        return Ok(CanExecuteResponse { can_execute: false })
-    }
+    if res.is_err() || res.unwrap() == false { return Ok(cant) };
 
     Ok(CanExecuteResponse { can_execute: is_ok_cosmos_msg(msg) })
 }

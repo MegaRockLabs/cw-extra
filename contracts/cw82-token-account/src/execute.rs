@@ -1,9 +1,9 @@
 use cosmwasm_std::{
-    Deps, DepsMut, Env, Response, CosmosMsg, Addr, Binary, WasmMsg, to_binary, Coin,
+    Deps, DepsMut, Env, Response, CosmosMsg, Addr, Binary, WasmMsg, to_binary, Coin, StdResult,
 };
 
 use cw_ownable::{assert_owner, initialize_owner};
-use crate::{error::ContractError, utils::{assert_factory, is_ok_cosmos_msg}, state::{KNOWN_TOKENS, PUBKEY, STATUS}, msg::Status};
+use crate::{error::ContractError, utils::{assert_factory, is_ok_cosmos_msg, assert_status}, state::{KNOWN_TOKENS, PUBKEY, STATUS}, msg::Status};
 
 
 
@@ -14,6 +14,7 @@ pub fn try_execute(
     msgs: Vec<CosmosMsg>
 ) -> Result<Response, ContractError> {
     assert_owner(deps.storage, &sender)?;
+    assert_status(deps.storage)?;
     if !msgs.iter().all(is_ok_cosmos_msg) {
         return Err(ContractError::NotSupported {})
     }
@@ -23,8 +24,7 @@ pub fn try_execute(
 
 pub fn try_freeze(
     deps: DepsMut,
-    sender: Addr,
-    //to_revoke: Option<Vec<String>>
+    sender: Addr
 ) -> Result<Response, ContractError> {
     assert_factory(deps.as_ref(), sender)?;
     STATUS.save(deps.storage, &Status { frozen: true })?;
@@ -49,6 +49,7 @@ pub fn try_change_pubkey(
     pubkey: Binary
 ) -> Result<Response, ContractError> {
     assert_owner(deps.storage, &sender)?;
+    assert_status(deps.storage)?;
     PUBKEY.save(deps.storage, &pubkey)?;
     Ok(Response::default())
 }
@@ -62,6 +63,7 @@ pub fn try_update_ownership(
 ) -> Result<Response, ContractError> {
     assert_factory(deps.as_ref(), sender)?;
     initialize_owner(deps.storage, deps.api, Some(&new_owner))?;
+    STATUS.save(deps.storage, &Status { frozen: false })?;
     PUBKEY.save(deps.storage, &new_pubkey)?;
     Ok(Response::default())
 }
@@ -74,8 +76,20 @@ pub fn try_forget_tokens(
     token_ids: Vec<String>
 ) -> Result<Response, ContractError> {
     assert_owner(deps.storage, &sender)?;
+    assert_status(deps.storage)?;
 
-    for id in token_ids {
+    let ids = if token_ids.len() == 0 {
+        KNOWN_TOKENS
+        .prefix(contract_addr.as_str())
+        .keys(deps.storage, None, None, cosmwasm_std::Order::Ascending)
+        .collect::<StdResult<Vec<String>>>()?
+
+    } else {
+        token_ids
+    };
+    
+
+    for id in ids {
         KNOWN_TOKENS.remove(
             deps.storage, 
             (contract_addr.as_str(), id.as_str()), 
@@ -95,6 +109,7 @@ pub fn try_update_known_tokens(
     limit: Option<u32>
 ) -> Result<Response, ContractError> {
     assert_owner(deps.storage, &sender)?;
+    assert_status(deps.storage)?;
 
     let res : cw721::TokensResponse = deps.querier.query_wasm_smart(
         contract_addr.clone(), 
@@ -139,6 +154,7 @@ pub fn try_transfer_token(
     recipient: String,
     funds: Vec<Coin>
 ) -> Result<Response, ContractError> {
+    assert_status(deps.storage)?;
     
     KNOWN_TOKENS.remove(
         deps.storage, 
@@ -167,6 +183,7 @@ pub fn try_send_token(
     msg : Binary,
     funds: Vec<Coin>
 ) -> Result<Response, ContractError> {
+    assert_status(deps.storage)?;
     
     KNOWN_TOKENS.remove(
         deps.storage, 
@@ -185,32 +202,3 @@ pub fn try_send_token(
 
     Ok(Response::default().add_message(msg))
 }
-
-
-/* fn revoke_approvals_msgs(
-    deps: Deps,
-    sender: &str,
-    to_revoke: Vec<String>
- ) -> StdResult<Vec<CosmosMsg>> {
-
-    let mut msgs : Vec<CosmosMsg> = vec![];
-
-    for collection in to_revoke {
-
-        cw721::Cw721Query::approvals(&self, deps, env, token_id, include_expired)
-
-        sg721_base::ExecuteMsg::RevokeAll { operator: () }
-        msgs.push(
-            WasmMsg::Execute {
-                contract_addr: sender.to_string(),
-                msg: to_binary(&sg721_base::ExecuteMsg::RevokeApproval { 
-                    token_id: token_id.clone()
-                })?,
-                funds: vec![]
-            }.into()
-        );
-    }
-
-
-    Ok(msgs)
-} */

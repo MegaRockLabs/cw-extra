@@ -70,7 +70,8 @@ fn test_mint_token(chain: &mut Chain) {
     
     let mint_res = mint_token(
         chain, 
-        col_address.clone(), 
+        col_address.clone(),
+        "1".to_string(),
         user.account.address.clone(), 
         &user.key
     ).unwrap();

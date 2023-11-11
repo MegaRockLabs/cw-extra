@@ -1,4 +1,4 @@
-use cosmwasm_std::{Response, Env, Binary, DepsMut, Coin, SubMsg, ReplyOn, WasmMsg, to_binary, CosmosMsg, Empty, Addr};
+use cosmwasm_std::{Response, Env, Binary, DepsMut, Coin, SubMsg, ReplyOn, WasmMsg, to_binary, CosmosMsg, Addr};
 use cw83::CREATE_ACCOUNT_REPLY_ID;
 
 use crate::{
@@ -66,7 +66,7 @@ pub fn update_account_owner(
         (token_info.collection.as_str(), token_info.id.as_str())
     )?;
 
-    let msg = cw82_token_account::msg::ExecuteMsg::<Empty>::UpdateOwnership { 
+    let msg = cw82_token_account::msg::ExecuteMsg::UpdateOwnership { 
         new_owner: sender.to_string(), 
         new_pubkey
     };
@@ -98,7 +98,7 @@ pub fn freeze_account(
         (token_info.collection.as_str(), token_info.id.as_str())
     )?;
 
-    let msg = cw82_token_account::msg::ExecuteMsg::<Empty>::Freeze {};
+    let msg = cw82_token_account::msg::ExecuteMsg::Freeze {};
 
     let msg = CosmosMsg::Wasm(WasmMsg::Execute { 
         contract_addr, 
@@ -127,7 +127,7 @@ pub fn unfreeze_account(
         (token_info.collection.as_str(), token_info.id.as_str())
     )?;
 
-    let msg = cw82_token_account::msg::ExecuteMsg::<Empty>::Unfreeze {};
+    let msg = cw82_token_account::msg::ExecuteMsg::Unfreeze {};
 
     let msg = CosmosMsg::Wasm(WasmMsg::Execute { 
         contract_addr, 

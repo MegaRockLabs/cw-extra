@@ -1,5 +1,18 @@
-use cosmwasm_std::{Addr, Deps, StdResult, Binary, StdError, from_binary, CosmosMsg, WasmMsg};
-use crate::{msg::PayloadInfo, error::ContractError};
+use cosmwasm_std::{Addr, Deps, StdResult, Binary, StdError, from_binary, CosmosMsg, WasmMsg, Storage};
+use crate::{msg::PayloadInfo, error::ContractError, state::STATUS};
+
+pub fn assert_status(
+    store: &dyn Storage
+) -> StdResult<bool>{
+    let status =STATUS.load(store)?;
+    Ok(!status.frozen)
+}   
+
+pub fn status_ok(
+    store: &dyn Storage
+) -> bool {
+    assert_status(store).is_ok()
+}
 
 
 pub fn assert_ok_wasm_msg(
