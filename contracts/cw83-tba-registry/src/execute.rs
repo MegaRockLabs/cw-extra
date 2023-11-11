@@ -15,7 +15,8 @@ pub fn create_account(
     code_id: u64,
     token_info: TokenInfo,
     pubkey: Binary,
-    funds: Vec<Coin>
+    funds: Vec<Coin>,
+    reset: bool
 ) -> Result<Response, ContractError> {
 
     if env.block.chain_id != chain_id {
@@ -23,6 +24,16 @@ pub fn create_account(
     }
 
     verify_nft_ownership(deps.as_ref(), &sender, token_info.clone())?;
+
+
+    if !reset && TOKEN_ADDRESSES.has(
+        deps.storage, 
+        (token_info.collection.as_str(), token_info.id.as_str())
+    ) {
+        return Err(ContractError::AccountExists {})
+    }
+
+
     LAST_ATTEMPTING.save(deps.storage, &token_info)?;
 
     let init_msg = cw82_token_account::msg::InstantiateMsg {
@@ -134,6 +145,35 @@ pub fn unfreeze_account(
         msg: to_binary(&msg)?, 
         funds: vec![]
     });
+
+    Ok(Response::default()
+       .add_message(msg)
+    )
+}
+
+
+
+pub fn migrate_account(
+    deps: DepsMut,
+    sender: Addr,
+    token_info: TokenInfo,
+    new_code_id: u64,
+) -> Result<Response, ContractError> {
+    verify_nft_ownership(deps.as_ref(), sender.as_str(), token_info.clone())?;
+
+    let contract_addr = TOKEN_ADDRESSES.load(
+        deps.storage, 
+        (token_info.collection.as_str(), token_info.id.as_str())
+    )?;
+
+    let msg = cw82_token_account::msg::MigrateMsg {};
+
+    let msg = CosmosMsg::Wasm(WasmMsg::Migrate { 
+        contract_addr, 
+        new_code_id, 
+        msg: to_binary(&msg)? 
+    });
+    
 
     Ok(Response::default()
        .add_message(msg)

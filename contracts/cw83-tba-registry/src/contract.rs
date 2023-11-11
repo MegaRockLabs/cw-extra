@@ -10,7 +10,7 @@ use cw83::CREATE_ACCOUNT_REPLY_ID;
 use crate::{
     state::{LAST_ATTEMPTING, ALLOWED_IDS, TOKEN_ADDRESSES, ADMINS, AdminList, KNOWN_COLLECTIONS},
     msg::{InstantiateMsg, ExecuteMsg, QueryMsg}, 
-    error::ContractError, execute::{create_account, update_account_owner, freeze_account, unfreeze_account}, query::{account_info, accounts, collections, collection_accounts}, 
+    error::ContractError, execute::{create_account, update_account_owner, freeze_account, unfreeze_account, migrate_account}, query::{account_info, accounts, collections, collection_accounts}, 
 };
 
 pub const CONTRACT_NAME: &str = "crates:cw83-tba-registry";
@@ -56,8 +56,28 @@ pub fn execute(deps: DepsMut, env : Env, info : MessageInfo, msg : ExecuteMsg)
             create.code_id, 
             create.msg.token_info, 
             create.msg.pubkey,
-            info.funds
+            info.funds,
+            false
         ),
+
+        ExecuteMsg::ResetAccount(
+            create
+        ) => create_account(
+            deps, 
+            env,
+            info.sender.to_string(),
+            create.chain_id,
+            create.code_id, 
+            create.msg.token_info, 
+            create.msg.pubkey,
+            info.funds,
+            true
+        ),
+
+        ExecuteMsg::MigrateAccount { 
+            token_info,
+            new_code_id,
+        } => migrate_account(deps, info.sender, token_info, new_code_id),
         
         ExecuteMsg::UpdateAllowedIds { 
             allowed_ids 

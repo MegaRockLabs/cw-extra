@@ -9,7 +9,7 @@ use cosmwasm_std::entry_point;
 
 use crate::{
     state::{REGISTRY_ADDRESS, TOKEN_INFO, PUBKEY, STATUS}, 
-    msg::{QueryMsg, InstantiateMsg, ExecuteMsg, TokenInfo, Status}, 
+    msg::{QueryMsg, InstantiateMsg, ExecuteMsg, TokenInfo, Status, MigrateMsg}, 
     error::ContractError, 
     query::{can_execute, valid_signature, valid_signatures, known_tokens, assets}, 
     execute::{try_execute, try_update_ownership, try_update_known_tokens, try_forget_tokens, try_update_known_on_receive, try_transfer_token, try_send_token, try_freeze, try_unfreeze, try_change_pubkey}, 
@@ -161,3 +161,8 @@ pub fn query(deps: Deps, env : Env, msg: QueryMsg) -> StdResult<Binary> {
     }
 }
 
+
+#[cfg_attr(not(feature = "library"), entry_point)]
+pub fn migrate(_: DepsMut, _: Env, _: MigrateMsg) -> StdResult<Response> {
+    Ok(Response::default())
+}

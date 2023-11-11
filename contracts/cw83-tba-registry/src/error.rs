@@ -13,6 +13,9 @@ pub enum ContractError {
     #[error("Not Supported Chain ID")]
     InvalidChainId {},
 
+    #[error("Account for the given token already exists. Use `reset_account` to overwrite it and `migrate_account` to update it to a newer version")]
+    AccountExists {},
+
     #[error("Semver parsing error: {0}")]
     SemVer(String),
 

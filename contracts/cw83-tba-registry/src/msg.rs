@@ -92,6 +92,13 @@ pub enum ExecuteMsg {
         new_pubkey: Binary 
     },
 
+    ResetAccount(CreateAccountMsg),
+
+    MigrateAccount {
+        token_info: TokenInfo,
+        new_code_id: u64,
+    },
+
     FreezeAccount {
         token_info: TokenInfo
     },

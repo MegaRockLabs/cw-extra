@@ -87,3 +87,7 @@ pub enum ExecuteMsg {
     Freeze {},
     Unfreeze {},
 }
+
+
+#[cw_serde]
+pub struct MigrateMsg {}
