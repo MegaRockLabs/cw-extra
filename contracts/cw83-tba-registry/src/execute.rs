@@ -1,5 +1,4 @@
-use cosmwasm_schema::serde::Serialize;
-use cosmwasm_std::{Response, Env, Binary, DepsMut, Coin, SubMsg, ReplyOn, WasmMsg, to_binary, CosmosMsg, Addr, Empty};
+use cosmwasm_std::{Response, Env, Binary, DepsMut, Coin, SubMsg, ReplyOn, WasmMsg, to_binary, CosmosMsg, Addr};
 use cw83::CREATE_ACCOUNT_REPLY_ID;
 
 use crate::{
@@ -164,15 +163,14 @@ pub fn unfreeze_account(
 
 
 
-pub fn migrate_account<M>
+pub fn migrate_account
 (
     deps: DepsMut,
     sender: Addr,
     token_info: TokenInfo,
     new_code_id: u64,
-    params: Option<Box<M>>
+    msg: Binary
 ) -> Result<Response, ContractError> 
-where M: Serialize + ?Sized + Clone + PartialEq + Default
 {
     verify_nft_ownership(deps.as_ref(), sender.as_str(), token_info.clone())?;
 
@@ -181,14 +179,10 @@ where M: Serialize + ?Sized + Clone + PartialEq + Default
         (token_info.collection.as_str(), token_info.id.as_str())
     )?;
 
-    let msg = cw82_token_account::msg::MigrateMsg {
-        params
-    };
-
     let msg = CosmosMsg::Wasm(WasmMsg::Migrate { 
         contract_addr, 
         new_code_id, 
-        msg: to_binary(&msg)? 
+        msg 
     });
     
 

@@ -77,8 +77,8 @@ pub fn execute(deps: DepsMut, env : Env, info : MessageInfo, msg : ExecuteMsg)
         ExecuteMsg::MigrateAccount { 
             token_info,
             new_code_id,
-            params
-        } => migrate_account(deps, info.sender, token_info, new_code_id, params),
+            msg
+        } => migrate_account(deps, info.sender, token_info, new_code_id, msg),
         
         ExecuteMsg::UpdateAllowedIds { 
             allowed_ids 

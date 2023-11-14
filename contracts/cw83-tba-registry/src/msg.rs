@@ -1,4 +1,4 @@
-use cosmwasm_schema::{cw_serde, QueryResponses, serde::Serialize};
+use cosmwasm_schema::{cw_serde, QueryResponses};
 use cosmwasm_std::{Binary, Empty, Addr};
 use cw83::{registy_execute, registy_query, 
     CreateAccountMsg as CreateAccountMsgBase,
@@ -84,9 +84,7 @@ pub struct MigrateMsg {}
 
 #[registy_execute]
 #[cw_serde]
-pub enum ExecuteMsg<M = Empty> 
-where M: Serialize + ?Sized + Clone + PartialEq + Default
-{
+pub enum ExecuteMsg {
 
     UpdateAllowedIds {
         allowed_ids: Vec<u64>
@@ -103,7 +101,7 @@ where M: Serialize + ?Sized + Clone + PartialEq + Default
     MigrateAccount {
         token_info: TokenInfo,
         new_code_id: u64,
-        params: Option<Box<M>>
+        msg: Binary
     },
 
     FreezeAccount {
