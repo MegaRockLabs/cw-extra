@@ -34,7 +34,6 @@ pub fn instantiate(deps: DepsMut, _ : Env, info : MessageInfo, msg : Instantiate
     ADMINS.save(deps.storage, &AdminList {
         admins: msg.admins.unwrap_or(vec![info.sender])
     })?;
-
     ALLOWED_IDS.save(deps.storage, &msg.allowed_ids)?;
 
     Ok(Response::default())

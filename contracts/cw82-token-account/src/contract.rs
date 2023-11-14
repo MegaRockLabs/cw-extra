@@ -1,7 +1,7 @@
 use cosmwasm_std::{
     Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult, to_binary, Empty,
 };
-use cw_ownable::get_ownership;
+use cw_ownable::{get_ownership, initialize_owner};
 
 #[cfg(not(feature = "library"))]
 use cosmwasm_std::entry_point;
@@ -55,7 +55,7 @@ pub fn instantiate(deps: DepsMut, _ : Env, info : MessageInfo, msg : Instantiate
         return Err(ContractError::Unauthorized {})
     };
 
-    cw_ownable::initialize_owner(deps.storage, deps.api, Some(msg.owner.as_str()))?;
+    initialize_owner(deps.storage, deps.api, Some(msg.owner.as_str()))?;
     
     TOKEN_INFO.save(deps.storage, &TokenInfo {
         token_contract: msg.token_contract,
@@ -133,6 +133,7 @@ pub fn query(deps: Deps, env : Env, msg: QueryMsg) -> StdResult<Binary> {
         QueryMsg::Token {} => to_binary(&TOKEN_INFO.load(deps.storage)?),
         QueryMsg::Status {} => to_binary(&STATUS.load(deps.storage)?),
         QueryMsg::Pubkey {} => to_binary(&PUBKEY.load(deps.storage)?),
+        QueryMsg::Registry {} => to_binary(&REGISTRY_ADDRESS.load(deps.storage)?),
         QueryMsg::Ownership {} => to_binary(&get_ownership(deps.storage)?),
         QueryMsg::CanExecute { sender, msg } => to_binary(&can_execute(
             deps, 

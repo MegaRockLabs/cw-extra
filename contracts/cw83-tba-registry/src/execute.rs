@@ -2,7 +2,7 @@ use cosmwasm_std::{Response, Env, Binary, DepsMut, Coin, SubMsg, ReplyOn, WasmMs
 use cw83::CREATE_ACCOUNT_REPLY_ID;
 
 use crate::{
-    state::{LAST_ATTEMPTING, TOKEN_ADDRESSES, ADMINS},
+    state::{LAST_ATTEMPTING, TOKEN_ADDRESSES, ADMINS, ALLOWED_IDS},
     helpers::{verify_nft_ownership, construct_label}, 
     error::ContractError, msg::TokenInfo
 };
@@ -21,6 +21,10 @@ pub fn create_account(
 
     if env.block.chain_id != chain_id {
         return Err(ContractError::InvalidChainId {})
+    }
+
+    if !ALLOWED_IDS.load(deps.storage)?.contains(&code_id) {
+        return Err(ContractError::InvalidCodeId {})
     }
 
     verify_nft_ownership(deps.as_ref(), &sender, token_info.clone())?;
@@ -88,7 +92,7 @@ pub fn update_account_owner(
     )?;
 
     let msg = cw82_token_account::msg::ExecuteMsg::UpdateOwnership { 
-        new_owner: sender.to_string(), 
+        new_owner: owner.to_string(), 
         new_pubkey
     };
 
@@ -163,15 +167,18 @@ pub fn unfreeze_account(
 
 
 
-pub fn migrate_account
-(
+pub fn migrate_account(
     deps: DepsMut,
     sender: Addr,
     token_info: TokenInfo,
     new_code_id: u64,
     msg: Binary
-) -> Result<Response, ContractError> 
-{
+) -> Result<Response, ContractError> {
+
+    if !ALLOWED_IDS.load(deps.storage)?.contains(&new_code_id) {
+        return Err(ContractError::InvalidCodeId {});
+    }
+
     verify_nft_ownership(deps.as_ref(), sender.as_str(), token_info.clone())?;
 
     let contract_addr = TOKEN_ADDRESSES.load(

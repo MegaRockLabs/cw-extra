@@ -69,6 +69,9 @@ pub enum QueryMsgBase <T = Empty> {
 
     #[returns(TokenInfo)]
     Token {},
+
+    #[returns(String)]
+    Registry {},
 }
 
 pub type QueryMsg = QueryMsgBase<Empty>;

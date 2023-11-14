@@ -13,6 +13,9 @@ pub enum ContractError {
     #[error("Not Supported Chain ID")]
     InvalidChainId {},
 
+    #[error("Code ID not allowed")]
+    InvalidCodeId {},
+
     #[error("Account for the given token already exists. Use `reset_account` to overwrite it and `migrate_account` to update it to a newer version")]
     AccountExists {},
 
