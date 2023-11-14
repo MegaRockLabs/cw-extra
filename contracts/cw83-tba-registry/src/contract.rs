@@ -9,7 +9,7 @@ use cw83::CREATE_ACCOUNT_REPLY_ID;
 
 use crate::{
     state::{LAST_ATTEMPTING, ALLOWED_IDS, TOKEN_ADDRESSES, ADMINS, AdminList, KNOWN_COLLECTIONS},
-    msg::{InstantiateMsg, ExecuteMsg, QueryMsg}, 
+    msg::{InstantiateMsg, ExecuteMsg, QueryMsg, MigrateMsg}, 
     error::ContractError, execute::{create_account, update_account_owner, freeze_account, unfreeze_account, migrate_account}, query::{account_info, accounts, collections, collection_accounts}, 
 };
 
@@ -77,12 +77,13 @@ pub fn execute(deps: DepsMut, env : Env, info : MessageInfo, msg : ExecuteMsg)
         ExecuteMsg::MigrateAccount { 
             token_info,
             new_code_id,
-        } => migrate_account(deps, info.sender, token_info, new_code_id),
+            params
+        } => migrate_account(deps, info.sender, token_info, new_code_id, params),
         
         ExecuteMsg::UpdateAllowedIds { 
             allowed_ids 
         } => {
-            if !ADMINS.load(deps.storage)?.is_admin(info.sender) {
+            if !ADMINS.load(deps.storage)?.is_admin(info.sender.as_ref()) {
                 return Err(ContractError::Unauthorized {})
             }
             ALLOWED_IDS.save(deps.storage, &allowed_ids)?;
@@ -91,13 +92,15 @@ pub fn execute(deps: DepsMut, env : Env, info : MessageInfo, msg : ExecuteMsg)
 
         ExecuteMsg::UpdateAccountOwnership { 
             token_info, 
-            new_pubkey 
+            new_pubkey ,
+            update_for
         } => update_account_owner(
             deps, 
             info.sender, 
             token_info, 
             new_pubkey, 
-            info.funds
+            info.funds,
+            update_for
         ),
 
         ExecuteMsg::FreezeAccount { token_info } => freeze_account(deps, info.sender, token_info),
@@ -172,4 +175,9 @@ pub fn query(deps: Deps, _ : Env, msg: QueryMsg) -> StdResult<Binary> {
             limit
         )?)
     }
+}
+
+#[cfg_attr(not(feature = "library"), entry_point)]
+pub fn migrate(_: DepsMut, _: Env, _: MigrateMsg) -> StdResult<Response> {
+    Ok(Response::default())
 }

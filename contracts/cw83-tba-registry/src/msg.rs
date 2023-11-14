@@ -1,4 +1,4 @@
-use cosmwasm_schema::{cw_serde, QueryResponses};
+use cosmwasm_schema::{cw_serde, QueryResponses, serde::Serialize};
 use cosmwasm_std::{Binary, Empty, Addr};
 use cw83::{registy_execute, registy_query, 
     CreateAccountMsg as CreateAccountMsgBase,
@@ -78,10 +78,15 @@ pub enum QueryMsg {
     },
 }
 
+#[cw_serde]
+pub struct MigrateMsg {}
+
 
 #[registy_execute]
 #[cw_serde]
-pub enum ExecuteMsg {
+pub enum ExecuteMsg<M = Empty> 
+where M: Serialize + ?Sized + Clone + PartialEq + Default
+{
 
     UpdateAllowedIds {
         allowed_ids: Vec<u64>
@@ -89,7 +94,8 @@ pub enum ExecuteMsg {
 
     UpdateAccountOwnership {
         token_info: TokenInfo,
-        new_pubkey: Binary 
+        new_pubkey: Binary,
+        update_for: Option<Addr>,
     },
 
     ResetAccount(CreateAccountMsg),
@@ -97,6 +103,7 @@ pub enum ExecuteMsg {
     MigrateAccount {
         token_info: TokenInfo,
         new_code_id: u64,
+        params: Option<Box<M>>
     },
 
     FreezeAccount {

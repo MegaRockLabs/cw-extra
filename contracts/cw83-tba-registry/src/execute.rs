@@ -1,4 +1,5 @@
-use cosmwasm_std::{Response, Env, Binary, DepsMut, Coin, SubMsg, ReplyOn, WasmMsg, to_binary, CosmosMsg, Addr};
+use cosmwasm_schema::serde::Serialize;
+use cosmwasm_std::{Response, Env, Binary, DepsMut, Coin, SubMsg, ReplyOn, WasmMsg, to_binary, CosmosMsg, Addr, Empty};
 use cw83::CREATE_ACCOUNT_REPLY_ID;
 
 use crate::{
@@ -24,7 +25,6 @@ pub fn create_account(
     }
 
     verify_nft_ownership(deps.as_ref(), &sender, token_info.clone())?;
-
 
     if !reset && TOKEN_ADDRESSES.has(
         deps.storage, 
@@ -68,9 +68,20 @@ pub fn update_account_owner(
     sender: Addr,
     token_info: TokenInfo,
     new_pubkey: Binary,
-    funds: Vec<Coin>
+    funds: Vec<Coin>,
+    update_for: Option<Addr>
 ) -> Result<Response, ContractError> {
-    verify_nft_ownership(deps.as_ref(), sender.as_str(), token_info.clone())?;
+
+    let owner = if update_for.is_some () {
+        if !ADMINS.load(deps.storage)?.is_admin(sender.as_ref()) {
+            return Err(ContractError::Unauthorized {})
+        }
+        update_for.unwrap()
+    } else {
+        sender.clone()
+    };
+
+    verify_nft_ownership(deps.as_ref(), owner.as_str(), token_info.clone())?;
 
     let contract_addr = TOKEN_ADDRESSES.load(
         deps.storage, 
@@ -100,7 +111,7 @@ pub fn freeze_account(
     token_info: TokenInfo,
 ) -> Result<Response, ContractError> {
 
-    if !ADMINS.load(deps.storage)?.is_admin(sender) {
+    if !ADMINS.load(deps.storage)?.is_admin(sender.as_ref()) {
         return Err(ContractError::Unauthorized {})
     }
     
@@ -129,7 +140,7 @@ pub fn unfreeze_account(
     token_info: TokenInfo,
 ) -> Result<Response, ContractError> {
 
-    if !ADMINS.load(deps.storage)?.is_admin(sender) {
+    if !ADMINS.load(deps.storage)?.is_admin(sender.as_ref()) {
         return Err(ContractError::Unauthorized {})
     }
     
@@ -153,12 +164,16 @@ pub fn unfreeze_account(
 
 
 
-pub fn migrate_account(
+pub fn migrate_account<M>
+(
     deps: DepsMut,
     sender: Addr,
     token_info: TokenInfo,
     new_code_id: u64,
-) -> Result<Response, ContractError> {
+    params: Option<Box<M>>
+) -> Result<Response, ContractError> 
+where M: Serialize + ?Sized + Clone + PartialEq + Default
+{
     verify_nft_ownership(deps.as_ref(), sender.as_str(), token_info.clone())?;
 
     let contract_addr = TOKEN_ADDRESSES.load(
@@ -166,7 +181,9 @@ pub fn migrate_account(
         (token_info.collection.as_str(), token_info.id.as_str())
     )?;
 
-    let msg = cw82_token_account::msg::MigrateMsg {};
+    let msg = cw82_token_account::msg::MigrateMsg {
+        params
+    };
 
     let msg = CosmosMsg::Wasm(WasmMsg::Migrate { 
         contract_addr, 

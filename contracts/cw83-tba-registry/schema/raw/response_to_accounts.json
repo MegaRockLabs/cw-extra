@@ -1,0 +1,30 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Array_of_Account",
+  "type": "array",
+  "items": {
+    "$ref": "#/definitions/Account"
+  },
+  "definitions": {
+    "Account": {
+      "type": "object",
+      "required": [
+        "address",
+        "collection",
+        "id"
+      ],
+      "properties": {
+        "address": {
+          "type": "string"
+        },
+        "collection": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

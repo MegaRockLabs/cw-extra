@@ -10,8 +10,7 @@ pub struct AdminList {
 }
 
 impl AdminList {
-    pub fn is_admin(&self, addr: impl AsRef<str>) -> bool {
-        let addr = addr.as_ref();
+    pub fn is_admin(&self, addr: &str) -> bool {
         self.admins.iter().any(|a| a.as_ref() == addr)
     }
 }

@@ -1,5 +1,5 @@
 use cosmwasm_std::{
-    Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult, to_binary,
+    Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult, to_binary, Empty,
 };
 use cw_ownable::get_ownership;
 
@@ -163,6 +163,6 @@ pub fn query(deps: Deps, env : Env, msg: QueryMsg) -> StdResult<Binary> {
 
 
 #[cfg_attr(not(feature = "library"), entry_point)]
-pub fn migrate(_: DepsMut, _: Env, _: MigrateMsg) -> StdResult<Response> {
+pub fn migrate(_: DepsMut, _: Env, _: MigrateMsg<Empty>) -> StdResult<Response> {
     Ok(Response::default())
 }

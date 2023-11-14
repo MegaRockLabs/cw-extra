@@ -1,5 +1,5 @@
 use cosmwasm_std::{Binary, Empty, CosmosMsg, Coin};
-use cosmwasm_schema::{cw_serde, QueryResponses};
+use cosmwasm_schema::{cw_serde, QueryResponses, serde::Serialize};
 use cw721::Cw721ReceiveMsg;
 pub use cw82::{
     smart_account_query, 
@@ -90,4 +90,6 @@ pub enum ExecuteMsg {
 
 
 #[cw_serde]
-pub struct MigrateMsg {}
+pub struct MigrateMsg<T = Empty> {
+    pub params: Option<Box<T>>
+}

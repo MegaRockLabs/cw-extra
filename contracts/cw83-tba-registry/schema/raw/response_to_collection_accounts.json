@@ -1,0 +1,26 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Array_of_CollectionAccount",
+  "type": "array",
+  "items": {
+    "$ref": "#/definitions/CollectionAccount"
+  },
+  "definitions": {
+    "CollectionAccount": {
+      "type": "object",
+      "required": [
+        "address",
+        "id"
+      ],
+      "properties": {
+        "address": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}
