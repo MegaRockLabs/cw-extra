@@ -18,7 +18,8 @@ fn test_queries(chain: &mut Chain) {
         skip: None, 
         limit: None
     }).unwrap();
-    let accounts = from_binary::<RegistryMsg::AccountsResponse>(
+
+    let acc_res = from_binary::<RegistryMsg::AccountsResponse>(
         &res.res.data.unwrap().into()
     ).unwrap();
 
@@ -32,18 +33,19 @@ fn test_queries(chain: &mut Chain) {
             limit: None 
         }
     );
-    let col_accounts = from_binary::<RegistryMsg::CollectionAccountsResponse>(
+    let col_res = from_binary::<RegistryMsg::CollectionAccountsResponse>(
         &res.unwrap().res.data.unwrap().into()
     ).unwrap();
 
 
-
     // 1 account should be registered
-    assert_eq!(accounts.len(), 1);
-    assert_eq!(col_accounts.len(), 1);
+    assert_eq!(acc_res.total, 1);
+    assert_eq!(acc_res.accounts.len(), 1);
+    assert_eq!(col_res.total, 1);
+    assert_eq!(col_res.accounts.len(), 1);
 
-    let first_account = accounts[0].clone();
-    let firt_col_account = col_accounts[0].clone();
+    let first_account = acc_res.accounts.first().clone().unwrap();
+    let firt_col_account = col_res.accounts.first().clone().unwrap();
     assert_eq!(first_account.address, firt_col_account.address);
     assert_eq!(first_account.id, firt_col_account.id);
 

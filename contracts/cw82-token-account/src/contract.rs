@@ -163,6 +163,7 @@ pub fn query(deps: Deps, env : Env, msg: QueryMsg) -> StdResult<Binary> {
 
 
 #[cfg_attr(not(feature = "library"), entry_point)]
-pub fn migrate(_: DepsMut, _: Env, _: MigrateMsg<Empty>) -> StdResult<Response> {
+pub fn migrate(deps: DepsMut, _: Env, _: MigrateMsg<Empty>) -> StdResult<Response> {
+    STATUS.save(deps.storage, &Status { frozen: false })?;
     Ok(Response::default())
 }

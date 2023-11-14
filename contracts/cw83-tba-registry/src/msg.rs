@@ -45,8 +45,17 @@ pub struct CollectionAccount {
 }
 
 
-pub type AccountsResponse = Vec<Account>;
-pub type CollectionAccountsResponse = Vec<CollectionAccount>;
+#[cw_serde]
+pub struct AccountsResponse {
+    pub total: u32,
+    pub accounts: Vec<Account>
+}
+
+#[cw_serde]
+pub struct CollectionAccountsResponse {
+    pub total: u32,
+    pub accounts: Vec<CollectionAccount>
+}
 
 pub type AccountQuery = AccountQueryBase<TokenInfo>;
 pub type AccountInfoResponse = AccountInfoResponseBase<Empty>;

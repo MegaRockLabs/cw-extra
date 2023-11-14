@@ -1,6 +1,6 @@
 use cosmwasm_std::{StdResult, Deps, Order};
 
-use crate::{state::{TOKEN_ADDRESSES, KNOWN_COLLECTIONS}, msg::{AccountInfoResponse, TokenInfo, CollectionAccount, CollectionAccountsResponse, CollectionsResponse, AccountsResponse, Account}};
+use crate::{state::{TOKEN_ADDRESSES, COL_TOKEN_COUNTS}, msg::{AccountInfoResponse, TokenInfo, CollectionAccount, CollectionAccountsResponse, CollectionsResponse, AccountsResponse, Account}};
 
 const DEFAULT_BATCH_SIZE : u32 = 100;
 
@@ -27,7 +27,7 @@ pub fn collections(
     let skip  = skip.unwrap_or(0) as usize;
     let limit = limit.unwrap_or(DEFAULT_BATCH_SIZE) as usize;
 
-    let collections =  KNOWN_COLLECTIONS
+    let collections =  COL_TOKEN_COUNTS
         .keys(deps.storage, None, None, Order::Descending)
         .into_iter()
         .enumerate()
@@ -48,8 +48,14 @@ pub fn accounts(
 
     let skip  = skip.unwrap_or(0) as usize;
     let limit = limit.unwrap_or(DEFAULT_BATCH_SIZE) as usize;
+
+
+    let total = TOKEN_ADDRESSES
+        .keys_raw(deps.storage, None, None, Order::Ascending)
+        .count() as u32;
+
             
-    TOKEN_ADDRESSES
+    let accounts = TOKEN_ADDRESSES
         .range(deps.storage, None, None, Order::Descending)
         .enumerate()
         .filter(|(i, _)| *i >= skip)
@@ -58,7 +64,12 @@ pub fn accounts(
             let (( collection, id  ), address) = item?;
             Ok(Account { collection, id, address })
         })
-        .collect()
+        .collect::<StdResult<Vec<Account>>>()?;
+
+    Ok(AccountsResponse {
+        accounts,
+        total
+    })
 }
 
 
@@ -71,8 +82,10 @@ pub fn collection_accounts(
 
     let skip  = skip.unwrap_or(0) as usize;
     let limit = limit.unwrap_or(DEFAULT_BATCH_SIZE) as usize;
+
+    let total = COL_TOKEN_COUNTS.load(deps.storage, collection)?;
             
-    TOKEN_ADDRESSES
+    let accounts  = TOKEN_ADDRESSES
         .prefix(collection)
         .range(deps.storage, None, None, Order::Descending)
         .enumerate()
@@ -82,5 +95,10 @@ pub fn collection_accounts(
             let (id, address) = item?;
             Ok(CollectionAccount { id, address })
         })
-        .collect()
+        .collect::<StdResult<Vec<CollectionAccount>>>()?;
+
+    Ok(CollectionAccountsResponse { 
+        accounts,
+        total
+    })
 }

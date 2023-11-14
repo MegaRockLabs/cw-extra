@@ -8,7 +8,7 @@ use cw82::Cw82Contract;
 use cw83::CREATE_ACCOUNT_REPLY_ID;
 
 use crate::{
-    state::{LAST_ATTEMPTING, ALLOWED_IDS, TOKEN_ADDRESSES, ADMINS, AdminList, KNOWN_COLLECTIONS},
+    state::{LAST_ATTEMPTING, ALLOWED_IDS, TOKEN_ADDRESSES, ADMINS, AdminList, COL_TOKEN_COUNTS},
     msg::{InstantiateMsg, ExecuteMsg, QueryMsg, MigrateMsg}, 
     error::ContractError, execute::{create_account, update_account_owner, freeze_account, unfreeze_account, migrate_account}, query::{account_info, accounts, collections, collection_accounts}, 
 };
@@ -124,9 +124,17 @@ pub fn reply(deps: DepsMut, _ : Env, msg : Reply)
         let stored = LAST_ATTEMPTING.load(deps.storage)?;
         LAST_ATTEMPTING.remove(deps.storage);
 
-        if !KNOWN_COLLECTIONS.has(deps.storage, stored.collection.as_str()) {
-            KNOWN_COLLECTIONS.save(deps.storage, stored.collection.as_str(), &true)?;
-        }
+
+        COL_TOKEN_COUNTS.update(
+            deps.storage, 
+            stored.collection.as_str(), 
+            |count| -> StdResult<u32> {
+                match count {
+                    Some(c) => Ok(c+1),
+                    None => Ok(1)
+                }
+            }
+        )?;
 
         TOKEN_ADDRESSES.save(
             deps.storage, 
