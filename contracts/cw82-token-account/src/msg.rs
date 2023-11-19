@@ -1,4 +1,4 @@
-use cosmwasm_std::{Binary, Empty, CosmosMsg, Coin};
+use cosmwasm_std::{Binary, Empty, CosmosMsg, Coin, Addr};
 use cosmwasm_schema::{cw_serde, QueryResponses};
 use cw721::Cw721ReceiveMsg;
 pub use cw82::{
@@ -42,6 +42,18 @@ pub struct AssetsResponse {
     pub tokens: Vec<TokenInfo>
 }
 
+
+#[cw_serde]
+pub struct FullInfoResponse {
+    pub ownership: cw_ownable::Ownership<Addr>,
+    pub pubkey: Binary,
+    pub token_info: TokenInfo,
+    pub registry: String,
+    pub balances: Vec<Coin>,
+    pub tokens: Vec<TokenInfo>,
+    pub status: Status
+}
+
 pub type KnownTokensResponse = Vec<TokenInfo>;
 
 #[smart_account_query]
@@ -58,7 +70,7 @@ pub enum QueryMsgBase <T = Empty> {
         limit: Option<u32>
     },
 
-    #[returns(PayloadInfo)]
+    #[returns(AssetsResponse)]
     Assets {
         skip: Option<u32>,
         limit: Option<u32>
@@ -72,6 +84,12 @@ pub enum QueryMsgBase <T = Empty> {
 
     #[returns(String)]
     Registry {},
+
+    #[returns(FullInfoResponse)]
+    FullInfo {
+        skip: Option<u32>,
+        limit: Option<u32>
+    }
 }
 
 pub type QueryMsg = QueryMsgBase<Empty>;

@@ -11,7 +11,7 @@ use crate::{
     state::{REGISTRY_ADDRESS, TOKEN_INFO, PUBKEY, STATUS}, 
     msg::{QueryMsg, InstantiateMsg, ExecuteMsg, TokenInfo, Status, MigrateMsg}, 
     error::ContractError, 
-    query::{can_execute, valid_signature, valid_signatures, known_tokens, assets}, 
+    query::{can_execute, valid_signature, valid_signatures, known_tokens, assets, full_info}, 
     execute::{try_execute, try_update_ownership, try_update_known_tokens, try_forget_tokens, try_update_known_on_receive, try_transfer_token, try_send_token, try_freeze, try_unfreeze, try_change_pubkey}, 
 };
 
@@ -135,11 +135,10 @@ pub fn query(deps: Deps, env : Env, msg: QueryMsg) -> StdResult<Binary> {
         QueryMsg::Pubkey {} => to_binary(&PUBKEY.load(deps.storage)?),
         QueryMsg::Registry {} => to_binary(&REGISTRY_ADDRESS.load(deps.storage)?),
         QueryMsg::Ownership {} => to_binary(&get_ownership(deps.storage)?),
-        QueryMsg::CanExecute { sender, msg } => to_binary(&can_execute(
-            deps, 
+        QueryMsg::CanExecute { 
             sender, 
-            &msg
-        )?),
+            msg 
+        } => to_binary(&can_execute(deps, sender, &msg)?),
         QueryMsg::ValidSignature { 
             signature, 
             data, 
@@ -158,6 +157,10 @@ pub fn query(deps: Deps, env : Env, msg: QueryMsg) -> StdResult<Binary> {
             skip,
             limit
         } => to_binary(&assets(deps, env, skip, limit)?),
+        QueryMsg::FullInfo {
+            skip,
+            limit
+        } => to_binary(&full_info(deps, env, skip, limit)?)
 
     }
 }

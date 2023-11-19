@@ -4,9 +4,9 @@ use k256::sha2::{Digest, Sha256};
 use cw_ownable::is_owner;
 
 use crate::{
-    state::{PUBKEY, KNOWN_TOKENS}, 
+    state::{PUBKEY, KNOWN_TOKENS, TOKEN_INFO, STATUS, REGISTRY_ADDRESS}, 
     utils::{generate_amino_transaction_string, parse_payload, is_ok_cosmos_msg, status_ok}, 
-    msg::{AssetsResponse, TokenInfo}
+    msg::{AssetsResponse, TokenInfo, FullInfoResponse}
 };
 
 
@@ -150,4 +150,27 @@ pub fn known_tokens(
     .collect();
 
     tokens
+}
+
+
+pub fn full_info(
+    deps: Deps,
+    env: Env,
+    skip: Option<u32>,
+    limit: Option<u32>
+) -> StdResult<FullInfoResponse> {
+
+    let tokens = known_tokens(deps, skip, limit)?;
+    let balances = deps.querier.query_all_balances(env.contract.address)?;
+    let ownership = cw_ownable::get_ownership(deps.storage)?;
+
+    Ok(FullInfoResponse {
+        balances,
+        tokens,
+        ownership,
+        registry:   REGISTRY_ADDRESS.load(deps.storage)?,
+        pubkey:     PUBKEY.load(deps.storage)?,
+        token_info: TOKEN_INFO.load(deps.storage)?,
+        status:     STATUS.load(deps.storage)?
+    })
 }

@@ -35,7 +35,6 @@ pub struct Account {
     pub collection: String,
     pub id: String,
     pub address: String,
-
 }
 
 #[cw_serde]
