@@ -1,5 +1,5 @@
-# CW81-Pubkey
+# CW82: Token Account
 
-Using secp256k1 public key provided by contract creator and verifying seignatures using ecdsa schema. Similar to how things works normally off-chain
+A Smart Contract controlled by an owner of an non-fungible token. Relies on [CW83-TBA-Registry](/contracts/cw83-tba-registry) for verifing the ownership and perfoming upgrades. 
 
-Note: Need to add restrictions on who can change the public key
+A contract must have a public key for signatire verification. Signature are checked against the stored public key through [direct sign](https://github.com/cosmos/cosmos-sdk/blob/main/docs/architecture/adr-036-arbitrary-signature.md) method
