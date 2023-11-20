@@ -1,133 +1,122 @@
-# CW81: Signature Verification
+# CW83: Smart Account Registry
 
-With the adoption of smart contract based accounts comes the need to reliably communicate with them. That requires establishing ways to reliably retrieve certain pieces of information that was trivial to get from users using normal cryptographic pair based accounts 
-
-This standard touches on the problem and proposes a standard way to verify that a signature belongs to a contract. Normally users would sign a message with their private keys, but since they are to be secret they can't be securely stored inside storage of a contract on most chains and therefore used for signing.
-
-For that reason, the logic for saying that the signature is valid depends on the internal implementation of a contract. It can check validity based on input from an owner, use any key curve and signature schema, rely on oauth token verification and so on. 
-
-Whatever the logic is we need primitives to verifyably query the results and that's the only thing that the standard is covering.
+An interface for CosmWasm based smart contracts defining interaction with smart account registries used for creating smart contract based account defined in [CW82](/packages/cw82)
 
 
 ## Queries
 
-All CW81-compliant contracts must add the following query variants to their QueryMsg:s and return the corresponding responses:
 
+All CW83-compliant registries must define a message with the following variants in for their query endpoint
 
 ```rust
-pub enum QueryMsg {
+enum QueryMsg {
     ...
 
-    #[returns(ValidSignatureResponse)]
-    ValidSignature {
-        data: Binary,
-        signature: Binary,
-        payload: Option<Binary>
-    },
-
-    #[returns(ValidSignaturesResponse)]
-    ValidSignatures {
-        data: Vec<Binary>,
-        signatures: Vec<Binary>,
-        payload: Option<Binary>
-    }
-
+   #[returns(AccountInfoResponse)]
+   AccountInfo(AccountQuery)
     ...
 }
 ```
 
-### ValidSignature
+Where AccountQuery is defined in the following manner
 
-Used to verify one message and its corresponding signature. Useful in atomic scenarios where a batch of data/transactions is combined together and treated as the same unit with one signature.
-
-#### Fields
-
-`data` that can include any transactional data, cosmos messages, arbitrary text, cryptographic digest or anything else. Unlike ERC-1271 the standard doesn't enforce the input to be pre-hashed but allows it. CosmWasm environment is more optimized for binary inputs and doesn't have as significant performance bottlenecks.
-
-`signature` stands for signed bytes of the data field and doesn't enforce any conditions
-
-`payload` is an optional payload used for passing additional info to the contract. It can be used to pass necessary data like a list of public keys for a multisign contract but also meta information for complex contracts e.g. what signature schema to use, hashing algorithm to select or whether data had been pre-hashed already.
-
-#### Returns
-```Rust 
-struct ValidSignatureResponse {
-  pub is_valid: bool
+```rust
+struct AccountQuery<T = Empty> {
+    pub query: T
 }
 ```
-ERC-1271 introduces a `MAGICVALUE` as a return type instead of a boolean in order to have stricter and simpler verification of a signature. We can follow the same rationale, but instead of arbitrary bytes we can follow the existing conventions and return a struct
+Different implementations are free to customise the query in any desirable manner to link an account to a username, a non-fungible token, credential info and so on.
 
 
-### ValidSignatures
+The response type enforces the contracts implementing the standard to return a smart account **address** corresponsing to the query and leave a room to customize for returning addition info related to the account
 
-In case of the need to verify multiple signatures at the same time, we can reduce the number of RPC requests by allowing them to be batched inside one QueryMsg. Some APIs already have methods for batch verification such as `deps.api.ed25519_batch_verify`in std/crypto library
-
-A great example use-case would be is situation where a querier is satisfied with one of the messages being invalid and can proceed with the rest
-
-
-#### Fields
-
-`data` has identical meaning behind it except for including a list (vector) of messages, the signature of which we are checking
-
-`signatures` contains a list of signatures for each message in the data list. Must have the same length.
-
-`payload` field is identical.
-
-***
-Technically doesn't need a different schema, but semantically works better this way. Since we use Binary (bytes) we even can use one field and serialize it to anything we need, but that doesn't provide additional intuitional utilities
-
-#### Returns
-```Rust 
-struct ValidSignaturesResponse {
-  pub are_valid: Vec<bool>
+```rust
+struct AccountInfoResponse<T = Empty> {
+    pub address: String,
+    pub info: Option<T>
 }
 ```
 
-`are_valid` is a list of booleans that must be of the same length with `data` and `signatures` lists. It tells whether an individual signature for a corresponsing message was valid.
+
+## Messages
+
+The only requred message variant for the execute endpoint is the following:
+
+```rust
+enum ExecuteMsg {
+    ...
+    CreateAccount(CreateAccountMsg)
+    ...
+} 
+```
+
+where CreateAccountMsg is defined in the following manner:
+
+```rust
+struct CreateAccountMsg<T = Binary> {
+    pub code_id: u64,
+    pub chain_id: String,
+    pub msg: T
+}
+```
+allowing contracts to define payload needed for validation in the registry and also for generating an instantiation message for smart account contracts
 
 
 ## Usage
-A contract that wishes to follow the standard must add the variants described above to their query messages. This package exposes a helper macro attribute `valid_signature_query` that injects it automatically:
+
+A contract that wishes to follow the standard must add the variants described above to their query and execute messages. This package exposes a helper macro attribute `registy_query` that injects it automatically:
 
 ```Rust
-#[valid_signature_query] // <- Must be before #[cw_serde]
+#[registy_query] // <- Must be before #[cw_serde]
 #[cw_serde]
 #[derive(QueryResponses)]
 enum QueryMsg {}
 ```
 
-This will make it equivavlent to
+The module where the message is defined must ether import `AccountQuery` from cw83 package or to define it manually. Here is an example of customising it from token bound account registry:
+
 ```Rust
+use cw83::AccountQuery as AccountQueryBase;
+
 #[cw_serde]
-#[derive(QueryResponses)]
-enum QueryMsg {
-    #[returns(ValidSignatureResponse)]
-    ValidSignature {
-        data: Binary,
-        signature: Binary,
-        payload: Option<Binary>
-    },
-
-    #[returns(ValidSignaturesResponse)]
-    ValidSignatures {
-        data: Vec<Binary>,
-        signatures: Vec<Binary>,
-        payload: Option<Binary>
-    }
+pub struct TokenInfo {
+    pub collection: String,
+    pub id: String,
 }
+
+pub type AccountQuery = AccountQueryBase<TokenInfo>;
 ```
 
 
-The response types must be imported as well for it to work
+Defining execute message can also happen through a helper
+
 ```Rust
-use cw81::{valid_signature_query, ValidSignatureResponse, ValidSignaturesResponse};
+#[registy_execute]
+#[cw_serde]
+pub enum Cw83ExecuteMsg {}
 ```
+
+In similar manner `CreateAccountMsg` must also be imported. An example of customizing a message from the tba-registry:
+
+```rust
+use cw83::CreateAccountMsg as CreateAccountMsgBase
+
+#[cw_serde]
+pub struct CreateInitMsg {
+    pub token_info: TokenInfo,
+    pub pubkey: Binary,
+}
+
+pub type CreateAccountMsg = CreateAccountMsgBase<CreateInitMsg>;
+```
+
+
+If a contract doesn't define additional variants it can directly use  `Cw83QueryMsg` and `Cw83ExecuteMsg` from the package directly
 
 ## Examples
-Example contracts can be found in this repository and are prefixed with `cw81-`  
+Example contracts can be found in this repository and are prefixed with `cw83-`  
 
 | Contract                                                         | Description                                                  |
 | ---------------------------------------------------------------- | ------------------------------------------------------------ |
-| [`cw-81-last-signature`](/contracts/cw81-last-signature/)       | Contract owner stores a exprirable signaturen and verifications happens against it |
-| [`cw-81-pubkey`](/contracts/cw81-pubkey/)                       | Using secp256k1 public key provided by contract creator and verifying using ecdsa  |
-| [`cw-81-sn-ks`](/contracts/cw81-sn-ks/)                         | SecretWasm based contract that uses a secp256k1 private key for signature generation and verification |
+| [`cw83-tba-registry`](contracts/cw83-tba-registry)               | A Registry of token bound accounts                           |
 
