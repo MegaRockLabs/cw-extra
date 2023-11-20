@@ -1,5 +1,8 @@
-# CW81: Secret Network Key Simple
+# CW82: Secret Network Symmetric Key
 
-A simple contract using private key for both signature genration and verification. Can only work inside a secure enclave where external users can't read the private key. Not the most logical example showcasing CW81 since technically signature comes from the contract and it will be verified by the it. Advantage is that the API stays the same
+Secret Network specifc contract implementing cw that only allow cosmos messages that were encrypted by a secret key provided to the contract by instantiator. 
 
-Note: Shouldn't be used for sensitive data. One can add a method for reseting the private key
+Normal cosmos messages aren't supported by default and must be given as a payload to defined custom cosmos message
+Signatures must be coming from a separate key generated inside the contract
+
+Note: Doesn't protect against replay attacks and isn't suitabale for production
