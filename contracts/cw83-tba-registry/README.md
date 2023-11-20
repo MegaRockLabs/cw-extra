@@ -1,5 +1,3 @@
-# CW81-Pubkey
+# CW83-TBA-Registy
 
-Using secp256k1 public key provided by contract creator and verifying seignatures using ecdsa schema. Similar to how things works normally off-chain
-
-Note: Need to add restrictions on who can change the public key
+A registry contract for token bounded accounts. Provides endpoints for reseting a contract, migrating it a newer contract version, temprorally freezing/unfreezing while it is in escrow and updating ownership when a token is transferred
