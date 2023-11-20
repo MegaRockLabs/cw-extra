@@ -1,9 +1,9 @@
 use cosmwasm_std::{
-    Deps, DepsMut, Env, Response, CosmosMsg, Addr, Binary, WasmMsg, to_binary, Coin, StdResult,
+    Deps, DepsMut, Env, Response, CosmosMsg, Addr, Binary, WasmMsg, to_binary, Coin, StdResult, SubMsg, ReplyOn,
 };
 
-use cw_ownable::{assert_owner, initialize_owner};
-use crate::{error::ContractError, utils::{assert_factory, is_ok_cosmos_msg, assert_status}, state::{KNOWN_TOKENS, PUBKEY, STATUS}, msg::Status};
+use cw_ownable::{assert_owner, initialize_owner, is_owner};
+use crate::{error::ContractError, utils::{assert_factory, is_ok_cosmos_msg, assert_status}, state::{KNOWN_TOKENS, PUBKEY, STATUS, MINT_CACHE}, msg::Status, contract::MINT_REPLY_ID};
 
 
 
@@ -19,6 +19,29 @@ pub fn try_execute(
         return Err(ContractError::NotSupported {})
     }
     Ok(Response::new().add_messages(msgs))
+}
+
+pub fn try_mint_token(
+    deps: DepsMut,
+    sender: Addr,
+    collection: String,
+    funds: Vec<Coin>
+) -> Result<Response, ContractError> {
+    assert_owner(deps.storage, &sender)?;
+    assert_status(deps.storage)?;
+
+    MINT_CACHE.save(deps.storage, &collection)?;
+
+    Ok(Response::new().add_submessage(SubMsg {
+        msg: WasmMsg::Execute { 
+            contract_addr: collection, 
+            msg: to_binary(&vending_minter::msg::ExecuteMsg::Mint {})?, 
+            funds
+        }.into(),
+        reply_on: ReplyOn::Success,
+        id: MINT_REPLY_ID,
+        gas_limit: None,
+    }))
 }
 
 
@@ -108,8 +131,11 @@ pub fn try_update_known_tokens(
     start_after: Option<String>,
     limit: Option<u32>
 ) -> Result<Response, ContractError> {
-    assert_owner(deps.storage, &sender)?;
     assert_status(deps.storage)?;
+    if !is_owner(deps.storage, &sender)? 
+        && env.contract.address != sender  {
+        return Err(ContractError::Ownership(cw_ownable::OwnershipError::NotOwner))
+    }
 
     let res : cw721::TokensResponse = deps.querier.query_wasm_smart(
         contract_addr.clone(), 

@@ -36,9 +36,9 @@ cw22                    = { git = "https://github.com/aura-nw/cw-plus", package 
 cw721                   = "0.18.0"
 sg721                   = "3.3.0"
 sg721-base              = "3.3.0"
+vending-minter          = { version = "3.3.0", default-features = false, features = ["library"] }
 cw82-token-account      = { path = "contracts/cw82-token-account" }
 cw83-tba-registry       = { path = "contracts/cw83-tba-registry" }
-
 
 [profile.release.package.cw81]
 codegen-units = 1

@@ -1,5 +1,5 @@
 use cosmwasm_std::{
-    Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult, to_binary, Empty,
+    Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult, to_binary, Empty, Reply,
 };
 use cw_ownable::{get_ownership, initialize_owner};
 
@@ -8,11 +8,11 @@ use cosmwasm_std::entry_point;
 
 
 use crate::{
-    state::{REGISTRY_ADDRESS, TOKEN_INFO, PUBKEY, STATUS}, 
+    state::{REGISTRY_ADDRESS, TOKEN_INFO, PUBKEY, STATUS, MINT_CACHE}, 
     msg::{QueryMsg, InstantiateMsg, ExecuteMsg, TokenInfo, Status, MigrateMsg}, 
     error::ContractError, 
     query::{can_execute, valid_signature, valid_signatures, known_tokens, assets, full_info}, 
-    execute::{try_execute, try_update_ownership, try_update_known_tokens, try_forget_tokens, try_update_known_on_receive, try_transfer_token, try_send_token, try_freeze, try_unfreeze, try_change_pubkey}, 
+    execute::{try_execute, try_update_ownership, try_update_known_tokens, try_forget_tokens, try_update_known_on_receive, try_transfer_token, try_send_token, try_freeze, try_unfreeze, try_change_pubkey, try_mint_token}, 
 };
 
 #[cfg(target_arch = "wasm32")]
@@ -20,6 +20,8 @@ use crate::utils::is_factory;
 
 pub const CONTRACT_NAME: &str = "crates:cw82-token-account";
 pub const CONTRACT_VERSION: &str = env!("CARGO_PKG_VERSION");
+
+pub const MINT_REPLY_ID: u64 = 1;
 
 
 #[cfg_attr(not(feature = "library"), entry_point)]
@@ -76,6 +78,13 @@ pub fn execute(deps: DepsMut, env : Env, info : MessageInfo, msg : ExecuteMsg)
 -> Result<Response, ContractError> {
     match msg {
         ExecuteMsg::Execute { msgs } => try_execute(deps.as_ref(), info.sender, msgs),
+
+        ExecuteMsg::MintToken { collection } => try_mint_token(
+            deps,
+            info.sender,
+            collection, 
+            info.funds
+        ),
         
         ExecuteMsg::TransferToken { 
             collection, 
@@ -170,4 +179,26 @@ pub fn query(deps: Deps, env : Env, msg: QueryMsg) -> StdResult<Binary> {
 pub fn migrate(deps: DepsMut, _: Env, _: MigrateMsg<Empty>) -> StdResult<Response> {
     STATUS.save(deps.storage, &Status { frozen: false })?;
     Ok(Response::default())
+}
+
+
+#[cfg_attr(not(feature = "library"), entry_point)]
+pub fn reply(deps: DepsMut, env: Env, msg: Reply) -> Result<Response, ContractError> {
+    match msg.id {
+        MINT_REPLY_ID => {
+            let collection = MINT_CACHE.load(deps.storage)?;
+            MINT_CACHE.remove(deps.storage);
+
+            try_update_known_tokens(
+                deps, 
+                env.clone(), 
+                env.contract.address, 
+                collection.to_string(), 
+                None, 
+                None
+            )
+        }
+
+        _ => Err(ContractError::NotSupported {})
+    }
 }

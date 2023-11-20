@@ -36,3 +36,5 @@ cw82            = { workspace = true }
 cw83            = { workspace = true }
 cw721           = { workspace = true }
 sg721-base      = { workspace = true, features = ["library"] }
+vending-minter  = { workspace = true, features = ["library"] }
+
