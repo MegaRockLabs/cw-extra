@@ -2,8 +2,6 @@
 mod tests {
     use cosmwasm_std::{Binary, to_binary};
     use cosmwasm_crypto::{secp256k1_verify, ed25519_batch_verify};
-    use cosmwasm_schema::{cw_serde, QueryResponses};
-    use cw81_derive::valid_signature_query;
     
     use k256::{
         ecdsa::{
@@ -23,15 +21,10 @@ mod tests {
         digest::{Update, Digest}
     };
 
-    use crate::msg::{ValidSignatureResponse, ValidSignaturesResponse};
+    use crate::msg::Cw81QueryMsg;
 
+    
     const MSG: &str = "Testing String!";
-
-    // adding ValidSignature variant
-    #[valid_signature_query]
-    #[cw_serde]
-    #[derive(QueryResponses)]
-    enum QueryMsg {}
 
 
     #[test]
@@ -45,7 +38,7 @@ mod tests {
 
         let public_key = VerifyingKey::from(&secret_key);
 
-        let msg = QueryMsg::ValidSignature { 
+        let msg = Cw81QueryMsg::ValidSignature { 
             data: data, 
             signature: signature.to_bytes().as_slice().into(), 
             payload: Some(public_key.to_encoded_point(false).as_bytes().into()) 
@@ -53,7 +46,7 @@ mod tests {
 
 
         match msg {
-            QueryMsg::ValidSignature { 
+            Cw81QueryMsg::ValidSignature { 
                 data, 
                 signature, 
                 payload 
@@ -97,9 +90,9 @@ mod tests {
 
         let data = vec![msg, another_msg];
         let signatures = vec![signature, another_signature];
+   
 
-
-        let msg = QueryMsg::ValidSignatures { 
+        let msg = Cw81QueryMsg::ValidSignatures { 
             data, 
             signatures,
             payload: Some(pub_key_binary) 
@@ -107,7 +100,7 @@ mod tests {
 
 
         match msg {
-            QueryMsg::ValidSignatures { 
+            Cw81QueryMsg::ValidSignatures { 
                 data, 
                 signatures, 
                 payload 

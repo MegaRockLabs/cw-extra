@@ -32,4 +32,4 @@ artifacts/
 tarpaulin-report.*
 
 # integration tests
-gas_reports/%
+e2e/gas_reports/*

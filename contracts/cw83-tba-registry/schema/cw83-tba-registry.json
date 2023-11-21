@@ -1,0 +1,556 @@
+{
+  "contract_name": "cw83-tba-registry",
+  "contract_version": "0.2.0",
+  "idl_version": "1.0.0",
+  "instantiate": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "InstantiateMsg",
+    "type": "object",
+    "required": [
+      "allowed_ids"
+    ],
+    "properties": {
+      "admins": {
+        "type": [
+          "array",
+          "null"
+        ],
+        "items": {
+          "$ref": "#/definitions/Addr"
+        }
+      },
+      "allowed_ids": {
+        "type": "array",
+        "items": {
+          "type": "integer",
+          "format": "uint64",
+          "minimum": 0.0
+        }
+      }
+    },
+    "additionalProperties": false,
+    "definitions": {
+      "Addr": {
+        "description": "A human readable address.\n\nIn Cosmos, this is typically bech32 encoded. But for multi-chain smart contracts no assumptions should be made other than being UTF-8 encoded and of reasonable length.\n\nThis type represents a validated address. It can be created in the following ways 1. Use `Addr::unchecked(input)` 2. Use `let checked: Addr = deps.api.addr_validate(input)?` 3. Use `let checked: Addr = deps.api.addr_humanize(canonical_addr)?` 4. Deserialize from JSON. This must only be done from JSON that was validated before such as a contract's state. `Addr` must not be used in messages sent by the user because this would result in unvalidated instances.\n\nThis type is immutable. If you really need to mutate it (Really? Are you sure?), create a mutable copy using `let mut mutable = Addr::to_string()` and operate on that `String` instance.",
+        "type": "string"
+      }
+    }
+  },
+  "execute": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "ExecuteMsg",
+    "oneOf": [
+      {
+        "type": "object",
+        "required": [
+          "update_allowed_ids"
+        ],
+        "properties": {
+          "update_allowed_ids": {
+            "type": "object",
+            "required": [
+              "allowed_ids"
+            ],
+            "properties": {
+              "allowed_ids": {
+                "type": "array",
+                "items": {
+                  "type": "integer",
+                  "format": "uint64",
+                  "minimum": 0.0
+                }
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "required": [
+          "update_account_ownership"
+        ],
+        "properties": {
+          "update_account_ownership": {
+            "type": "object",
+            "required": [
+              "new_pubkey",
+              "token_info"
+            ],
+            "properties": {
+              "new_pubkey": {
+                "$ref": "#/definitions/Binary"
+              },
+              "token_info": {
+                "$ref": "#/definitions/TokenInfo"
+              },
+              "update_for": {
+                "anyOf": [
+                  {
+                    "$ref": "#/definitions/Addr"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "required": [
+          "reset_account"
+        ],
+        "properties": {
+          "reset_account": {
+            "$ref": "#/definitions/CreateAccountMsg_for_CreateInitMsg"
+          }
+        },
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "required": [
+          "migrate_account"
+        ],
+        "properties": {
+          "migrate_account": {
+            "type": "object",
+            "required": [
+              "msg",
+              "new_code_id",
+              "token_info"
+            ],
+            "properties": {
+              "msg": {
+                "$ref": "#/definitions/Binary"
+              },
+              "new_code_id": {
+                "type": "integer",
+                "format": "uint64",
+                "minimum": 0.0
+              },
+              "token_info": {
+                "$ref": "#/definitions/TokenInfo"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "required": [
+          "freeze_account"
+        ],
+        "properties": {
+          "freeze_account": {
+            "type": "object",
+            "required": [
+              "token_info"
+            ],
+            "properties": {
+              "token_info": {
+                "$ref": "#/definitions/TokenInfo"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "required": [
+          "unfreeze_account"
+        ],
+        "properties": {
+          "unfreeze_account": {
+            "type": "object",
+            "required": [
+              "token_info"
+            ],
+            "properties": {
+              "token_info": {
+                "$ref": "#/definitions/TokenInfo"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "required": [
+          "create_account"
+        ],
+        "properties": {
+          "create_account": {
+            "$ref": "#/definitions/CreateAccountMsg_for_CreateInitMsg"
+          }
+        },
+        "additionalProperties": false
+      }
+    ],
+    "definitions": {
+      "Addr": {
+        "description": "A human readable address.\n\nIn Cosmos, this is typically bech32 encoded. But for multi-chain smart contracts no assumptions should be made other than being UTF-8 encoded and of reasonable length.\n\nThis type represents a validated address. It can be created in the following ways 1. Use `Addr::unchecked(input)` 2. Use `let checked: Addr = deps.api.addr_validate(input)?` 3. Use `let checked: Addr = deps.api.addr_humanize(canonical_addr)?` 4. Deserialize from JSON. This must only be done from JSON that was validated before such as a contract's state. `Addr` must not be used in messages sent by the user because this would result in unvalidated instances.\n\nThis type is immutable. If you really need to mutate it (Really? Are you sure?), create a mutable copy using `let mut mutable = Addr::to_string()` and operate on that `String` instance.",
+        "type": "string"
+      },
+      "Binary": {
+        "description": "Binary is a wrapper around Vec<u8> to add base64 de/serialization with serde. It also adds some helper methods to help encode inline.\n\nThis is only needed as serde-json-{core,wasm} has a horrible encoding for Vec<u8>. See also <https://github.com/CosmWasm/cosmwasm/blob/main/docs/MESSAGE_TYPES.md>.",
+        "type": "string"
+      },
+      "CreateAccountMsg_for_CreateInitMsg": {
+        "type": "object",
+        "required": [
+          "chain_id",
+          "code_id",
+          "msg"
+        ],
+        "properties": {
+          "chain_id": {
+            "type": "string"
+          },
+          "code_id": {
+            "type": "integer",
+            "format": "uint64",
+            "minimum": 0.0
+          },
+          "msg": {
+            "$ref": "#/definitions/CreateInitMsg"
+          }
+        },
+        "additionalProperties": false
+      },
+      "CreateInitMsg": {
+        "type": "object",
+        "required": [
+          "pubkey",
+          "token_info"
+        ],
+        "properties": {
+          "pubkey": {
+            "$ref": "#/definitions/Binary"
+          },
+          "token_info": {
+            "$ref": "#/definitions/TokenInfo"
+          }
+        },
+        "additionalProperties": false
+      },
+      "TokenInfo": {
+        "type": "object",
+        "required": [
+          "collection",
+          "id"
+        ],
+        "properties": {
+          "collection": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "query": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "QueryMsg",
+    "oneOf": [
+      {
+        "type": "object",
+        "required": [
+          "accounts"
+        ],
+        "properties": {
+          "accounts": {
+            "type": "object",
+            "properties": {
+              "limit": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "format": "uint32",
+                "minimum": 0.0
+              },
+              "skip": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "format": "uint32",
+                "minimum": 0.0
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "required": [
+          "collection_accounts"
+        ],
+        "properties": {
+          "collection_accounts": {
+            "type": "object",
+            "required": [
+              "collection"
+            ],
+            "properties": {
+              "collection": {
+                "type": "string"
+              },
+              "limit": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "format": "uint32",
+                "minimum": 0.0
+              },
+              "skip": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "format": "uint32",
+                "minimum": 0.0
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "required": [
+          "collections"
+        ],
+        "properties": {
+          "collections": {
+            "type": "object",
+            "properties": {
+              "limit": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "format": "uint32",
+                "minimum": 0.0
+              },
+              "skip": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "format": "uint32",
+                "minimum": 0.0
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "required": [
+          "account_info"
+        ],
+        "properties": {
+          "account_info": {
+            "$ref": "#/definitions/AccountQuery_for_TokenInfo"
+          }
+        },
+        "additionalProperties": false
+      }
+    ],
+    "definitions": {
+      "AccountQuery_for_TokenInfo": {
+        "type": "object",
+        "required": [
+          "query"
+        ],
+        "properties": {
+          "query": {
+            "$ref": "#/definitions/TokenInfo"
+          }
+        },
+        "additionalProperties": false
+      },
+      "TokenInfo": {
+        "type": "object",
+        "required": [
+          "collection",
+          "id"
+        ],
+        "properties": {
+          "collection": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "migrate": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "MigrateMsg",
+    "type": "object",
+    "additionalProperties": false
+  },
+  "sudo": null,
+  "responses": {
+    "account_info": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "AccountInfoResponse_for_Empty",
+      "type": "object",
+      "required": [
+        "address"
+      ],
+      "properties": {
+        "address": {
+          "type": "string"
+        },
+        "info": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Empty"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "definitions": {
+        "Empty": {
+          "description": "An empty struct that serves as a placeholder in different places, such as contracts that don't set a custom message.\n\nIt is designed to be expressable in correct JSON and JSON Schema but contains no meaningful data. Previously we used enums without cases, but those cannot represented as valid JSON Schema (https://github.com/CosmWasm/cosmwasm/issues/451)",
+          "type": "object"
+        }
+      }
+    },
+    "accounts": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "AccountsResponse",
+      "type": "object",
+      "required": [
+        "accounts",
+        "total"
+      ],
+      "properties": {
+        "accounts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Account"
+          }
+        },
+        "total": {
+          "type": "integer",
+          "format": "uint32",
+          "minimum": 0.0
+        }
+      },
+      "additionalProperties": false,
+      "definitions": {
+        "Account": {
+          "type": "object",
+          "required": [
+            "address",
+            "collection",
+            "id"
+          ],
+          "properties": {
+            "address": {
+              "type": "string"
+            },
+            "collection": {
+              "type": "string"
+            },
+            "id": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        }
+      }
+    },
+    "collection_accounts": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "CollectionAccountsResponse",
+      "type": "object",
+      "required": [
+        "accounts",
+        "total"
+      ],
+      "properties": {
+        "accounts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/CollectionAccount"
+          }
+        },
+        "total": {
+          "type": "integer",
+          "format": "uint32",
+          "minimum": 0.0
+        }
+      },
+      "additionalProperties": false,
+      "definitions": {
+        "CollectionAccount": {
+          "type": "object",
+          "required": [
+            "address",
+            "id"
+          ],
+          "properties": {
+            "address": {
+              "type": "string"
+            },
+            "id": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        }
+      }
+    },
+    "collections": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "CollectionsResponse",
+      "type": "object",
+      "required": [
+        "collections"
+      ],
+      "properties": {
+        "collections": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

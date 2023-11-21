@@ -1,10 +1,22 @@
 [package]
 name = "cw81-pubkey"
 version = "0.1.0"
-authors = [ "Kromsten <s@users.noreply.megarock.labs>" ]
+authors = [ "Kromsten <s@noreply.megarock.labs>" ]
 edition = "2021"
 description = "Example contract showcasing cw81 that uses the last signature in the storage for verification"
-repository = "https://github.com/MegaRockLabs/cw-plus-plus"
+repository = "https://github.com/MegaRockLabs/cw-extra"
+
+exclude = [
+  "contract.wasm",
+  "hash.txt",
+]
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[features]
+backtraces = ["cosmwasm-std/backtraces"]
+library = []
 
 [dependencies]
 cosmwasm-schema = { workspace = true }
@@ -12,5 +24,6 @@ cosmwasm-std    = { workspace = true }
 cw-storage-plus = { workspace = true }
 sha2            = { workspace = true }
 cw2             = { workspace = true }
+cw22            = { workspace = true }
 cw81            = { workspace = true }
 k256            = { workspace = true }

@@ -17,7 +17,14 @@ use sha2::{
 pub fn instantiate(deps: DepsMut, _ : Env, _ : MessageInfo, msg : InstantiateMsg,) 
 -> StdResult<Response> {
     cw2::set_contract_version(deps.storage, CONTRACT_NAME, CONTRACT_VERSION)?;
-    PUBKEY.save(deps.storage, &msg.pub_key)?;
+    cw22::set_contract_supported_interface(
+        deps.storage, 
+        &[cw22::ContractSupportedInterface {
+            supported_interface: cw81::INTERFACE_NAME.into(),
+            version: CONTRACT_VERSION.into()
+        }]
+    )?;
+    PUBKEY.save(deps.storage, &msg.pubkey)?;
     Ok(Response::default())
 }
 

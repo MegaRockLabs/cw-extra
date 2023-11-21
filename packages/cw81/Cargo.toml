@@ -1,15 +1,17 @@
 [package]
 name = "cw81"
-version = "0.1.0"
 authors = [ "Kromsten <s@users.noreply.megarock.labs>" ]
 edition = "2021"
+version     = { workspace = true }
 description = "Definition and types for the CosmWasm-81 interface"
-repository = "https://github.com/MegaRockLabs/cw-plus-plus"
+repository = "https://github.com/MegaRockLabs/cw-extra"
 
 [dependencies]
 cosmwasm-schema = { workspace = true }
 cosmwasm-std    = { workspace = true }
+cw22            = { workspace = true }
 cw81-derive     = { path = "./derive", version = "0.1.0" }
+
 
 [dev-dependencies]
 sha2            = { workspace = true }

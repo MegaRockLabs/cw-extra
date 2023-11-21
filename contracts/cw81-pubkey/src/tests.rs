@@ -23,7 +23,7 @@ mod tests {
 
 
     #[test]
-    fn simple_test() {
+    fn valid_signature_test() {
 
         let mut deps = mock_dependencies();
         let env = mock_env();
@@ -33,17 +33,12 @@ mod tests {
         let secret_key = SigningKey::random(&mut OsRng);
         let public_key = VerifyingKey::from(&secret_key);
 
-
         let another_key = SigningKey::random(&mut OsRng);
-
 
         // user store public key
         instantiate(deps.as_mut(), env.clone(), info.clone(), InstantiateMsg {
-            pub_key: public_key.to_encoded_point(false).as_bytes().into()
+            pubkey: public_key.to_encoded_point(false).as_bytes().into()
         }).unwrap();
-
-
-
 
         // dapp asks user to sign message
         let data : Binary = to_binary("message").unwrap();
