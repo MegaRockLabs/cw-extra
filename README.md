@@ -2,7 +2,6 @@
 Experimental CosmWasm based contracts, packages and protocols 
 
 
-
 ## Standards
 
 
@@ -37,7 +36,6 @@ Example contracts showcasing usage of the proposed protocols and standards
 | Contract                                                         | Description                                                  |
 | ---------------------------------------------------------------- | ------------------------------------------------------------ |
 | [`cw83-tba-registry`](contracts/cw83-tba-registry)               | A Registry of token (NFT) bound accounts                     |
-
 
 <br/>
 
