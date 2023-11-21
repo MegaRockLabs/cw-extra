@@ -36,7 +36,7 @@ Example contracts showcasing usage of the proposed protocols and standards
 ### CW83
 | Contract                                                         | Description                                                  |
 | ---------------------------------------------------------------- | ------------------------------------------------------------ |
-| [`cw83-tba-registry`](contracts/cw83-tba-registry)               | A Registry of token (BFT) bound accounts                     |
+| [`cw83-tba-registry`](contracts/cw83-tba-registry)               | A Registry of token (NFT) bound accounts                     |
 
 
 <br/>
