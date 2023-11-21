@@ -99,7 +99,6 @@ pub type QueryMsg = QueryMsgBase<Empty>;
 pub enum ExecuteMsg {
     Execute { msgs: Vec<CosmosMsg<Empty>> },
     SendToken { collection: String, token_id: String, contract: String, msg: Binary },
-    MintToken { collection: String },
     TransferToken { collection: String, token_id: String, recipient: String  },
     ForgetTokens { collection: String, token_ids: Vec<String> },
     UpdateKnownTokens { collection: String, start_after: Option<String>, limit: Option<u32> },
