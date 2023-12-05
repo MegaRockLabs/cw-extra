@@ -61,7 +61,7 @@ pub fn is_factory(
     deps: Deps,
     addr: Addr
 ) -> StdResult<bool> {
-    cw83::Cw83RegistryBase(addr).supports_interface(deps)
+    cw83::Cw83RegistryBase(addr).supports_interface(&deps.querier)
 }
 
 pub fn parse_payload(

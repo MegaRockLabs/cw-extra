@@ -1,5 +1,5 @@
 use cosmwasm_schema::cw_serde;
-use cosmwasm_std::{Deps, to_binary, Binary, Addr, Coin, StdResult, CosmosMsg, SubMsg, ReplyOn};
+use cosmwasm_std::{Deps, to_binary, Binary, Addr, Coin, StdResult, CosmosMsg, SubMsg, ReplyOn, QuerierWrapper};
 use cw83::{Cw83RegistryBase, CREATE_ACCOUNT_REPLY_ID};
 
 use crate::{error::ContractError, msg::TokenInfo};
@@ -116,9 +116,9 @@ impl Cw83TokenRegistryContract {
     
     pub fn supports_interface(
         &self,
-        deps: Deps,
+        querier: &QuerierWrapper,
     ) -> StdResult<bool> {
-        self.cw83_wrap().supports_interface(deps)
+        self.cw83_wrap().supports_interface(querier)
     }
 
 }

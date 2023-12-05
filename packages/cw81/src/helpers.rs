@@ -1,5 +1,5 @@
 use cosmwasm_schema::cw_serde;
-use cosmwasm_std::{Addr, StdResult, Binary, Deps, WasmQuery, to_binary, QueryRequest, from_binary};
+use cosmwasm_std::{Addr, StdResult, Binary, Deps, WasmQuery, to_binary, QueryRequest, from_binary, QuerierWrapper};
 
 use crate::{ValidSignatureResponse, Cw81QueryMsg, ValidSignaturesResponse};
 
@@ -16,7 +16,7 @@ impl Cw81Contract {
 
     pub fn valid_signature(
         &self, 
-        deps: Deps,
+        querier: &QuerierWrapper,
         data : Binary, 
         signature: Binary,
         payload: Option<Binary>
@@ -29,14 +29,14 @@ impl Cw81Contract {
                 payload
             })?
         };
-        let binary_res = deps.querier.query(&QueryRequest::Wasm(wasm_query))?;
+        let binary_res = querier.query(&QueryRequest::Wasm(wasm_query))?;
         from_binary(&binary_res)
     }
 
 
     pub fn valid_signatures(
         &self, 
-        deps: Deps,
+        querier: &QuerierWrapper,
         data : Vec<Binary>, 
         signatures: Vec<Binary>,
         payload: Option<Binary>
@@ -49,13 +49,13 @@ impl Cw81Contract {
                 payload
             })?
         };
-        let binary_res = deps.querier.query(&QueryRequest::Wasm(wasm_query))?;
+        let binary_res = querier.query(&QueryRequest::Wasm(wasm_query))?;
         from_binary(&binary_res)
     }
 
     pub fn supports_interface(
         &self,
-        deps: Deps,
+        querier: &QuerierWrapper,
     ) -> StdResult<bool> {
 
         let key = cosmwasm_std::storage_keys::namespace_with_key(
@@ -68,7 +68,7 @@ impl Cw81Contract {
             key: key.into()
         };
 
-        let version : Option<String> = deps.querier.query(&QueryRequest::Wasm(raw_query))?;
+        let version : Option<String> = querier.query(&QueryRequest::Wasm(raw_query))?;
         Ok(version.is_some())
     }
 }
