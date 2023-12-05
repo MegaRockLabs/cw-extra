@@ -1,6 +1,6 @@
 use cosmwasm_schema::{cw_serde, QueryResponses};
 use cosmwasm_std::{Binary, Empty, Addr};
-use cw83::{registy_execute, registy_query, 
+use cw83::{registry_execute, registry_query, 
     CreateAccountMsg as CreateAccountMsgBase,
     AccountQuery as AccountQueryBase,
     AccountInfoResponse as AccountInfoResponseBase,
@@ -61,7 +61,7 @@ pub type AccountInfoResponse = AccountInfoResponseBase<Empty>;
 pub type CreateAccountMsg = CreateAccountMsgBase<CreateInitMsg>;
 
 
-#[registy_query]
+#[registry_query]
 #[cw_serde]
 #[derive(QueryResponses)]
 pub enum QueryMsg {
@@ -90,7 +90,7 @@ pub enum QueryMsg {
 pub struct MigrateMsg {}
 
 
-#[registy_execute]
+#[registry_execute]
 #[cw_serde]
 pub enum ExecuteMsg {
 
