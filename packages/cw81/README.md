@@ -117,10 +117,7 @@ enum QueryMsg {
 ```
 
 
-The response types must be imported as well for it to work
-```Rust
-use cw81::{valid_signature_query, ValidSignatureResponse, ValidSignaturesResponse};
-```
+Note: `cosmwasm_std`must be imported for definition of `Binary`
 
 ## Examples
 Example contracts can be found in this repository and are prefixed with `cw81-`  
