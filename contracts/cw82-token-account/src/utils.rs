@@ -1,5 +1,5 @@
-use cosmwasm_std::{Addr, Deps, StdResult, Binary, StdError, from_binary, CosmosMsg, WasmMsg, Storage};
-use crate::{msg::PayloadInfo, error::ContractError, state::STATUS};
+use cosmwasm_std::{Addr, Deps, StdResult, Binary, StdError, from_binary, CosmosMsg, WasmMsg, Storage, QuerierWrapper};
+use crate::{msg::PayloadInfo, error::ContractError, state::{STATUS, REGISTRY_ADDRESS}};
 
 pub fn assert_status(
     store: &dyn Storage
@@ -46,23 +46,33 @@ pub fn is_ok_cosmos_msg(
 }
 
 
-pub fn assert_factory(
-    deps: Deps,
+pub fn query_if_registry(
+    querier: &QuerierWrapper,
+    addr: Addr
+) -> StdResult<bool> {
+    cw83::Cw83RegistryBase(addr).supports_interface(querier)
+}
+
+
+
+pub fn assert_registry(
+    store: &dyn Storage,
     addr: Addr
 ) -> Result<(), ContractError> {
-    if is_factory(deps, addr)? {
+    if is_registry(store, addr)? {
         Ok(())
     } else {
         Err(ContractError::Unauthorized {})
     }
 }
 
-pub fn is_factory(
-    deps: Deps,
+pub fn is_registry(
+    store: &dyn Storage,
     addr: Addr
 ) -> StdResult<bool> {
-    cw83::Cw83RegistryBase(addr).supports_interface(&deps.querier)
+    REGISTRY_ADDRESS.load(store).map(|a| a == addr)
 }
+
 
 pub fn parse_payload(
     payload: &Option<Binary>
