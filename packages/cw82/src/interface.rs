@@ -1,5 +1,5 @@
 use cosmwasm_schema::cw_serde;
-use cosmwasm_std::{CosmosMsg, Addr, StdResult, WasmMsg, to_binary, Binary, Deps, QueryRequest, WasmQuery, from_binary, Empty, QuerierWrapper};
+use cosmwasm_std::{CosmosMsg, Addr, StdResult, WasmMsg, to_binary, Binary, QueryRequest, WasmQuery, from_binary, Empty, QuerierWrapper};
 use cw1::CanExecuteResponse;
 use cw81::{ValidSignatureResponse, ValidSignaturesResponse};
 

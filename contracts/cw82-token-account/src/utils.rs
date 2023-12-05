@@ -1,5 +1,8 @@
-use cosmwasm_std::{Addr, Deps, StdResult, Binary, StdError, from_binary, CosmosMsg, WasmMsg, Storage, QuerierWrapper};
+use cosmwasm_std::{Addr, StdResult, Binary, StdError, from_binary, CosmosMsg, WasmMsg, Storage};
 use crate::{msg::PayloadInfo, error::ContractError, state::{STATUS, REGISTRY_ADDRESS}};
+
+#[cfg(target_arch = "wasm32")]
+use cosmwasm_std::QuerierWrapper;
 
 pub fn assert_status(
     store: &dyn Storage
@@ -46,6 +49,7 @@ pub fn is_ok_cosmos_msg(
 }
 
 
+#[cfg(target_arch = "wasm32")]
 pub fn query_if_registry(
     querier: &QuerierWrapper,
     addr: Addr

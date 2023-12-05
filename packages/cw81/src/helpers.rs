@@ -1,5 +1,5 @@
 use cosmwasm_schema::cw_serde;
-use cosmwasm_std::{Addr, StdResult, Binary, Deps, WasmQuery, to_binary, QueryRequest, from_binary, QuerierWrapper};
+use cosmwasm_std::{Addr, StdResult, Binary, WasmQuery, to_binary, QueryRequest, from_binary, QuerierWrapper};
 
 use crate::{ValidSignatureResponse, Cw81QueryMsg, ValidSignaturesResponse};
 

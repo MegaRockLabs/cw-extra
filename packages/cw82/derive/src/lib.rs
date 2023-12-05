@@ -90,23 +90,25 @@ pub fn smart_account_query(metadata: TokenStream, input: TokenStream) -> TokenSt
             enum Right {
 
                 /// cw1
-                #[returns(CanExecuteResponse)]
-                CanExecute { sender: String, msg: CosmosMsg<T> },
-
-
-                /// cw81
-                #[returns(ValidSignatureResponse)]
-                ValidSignature {
-                    data: Binary,
-                    signature: Binary,
-                    payload: Option<Binary>
+                #[returns(::cw82::CanExecuteResponse)]
+                CanExecute { 
+                    sender: String, 
+                    msg: ::cosmwasm_std::CosmosMsg<T> 
                 },
 
-                #[returns(ValidSignaturesResponse)]
+                /// cw81
+                #[returns(::cw82::ValidSignatureResponse)]
+                ValidSignature {
+                    data: ::cosmwasm_std::Binary,
+                    signature: ::cosmwasm_std::Binary,
+                    payload: Option<::cosmwasm_std::Binary>
+                },
+
+                #[returns(::cw82::ValidSignaturesResponse)]
                 ValidSignatures {
-                    data: Vec<Binary>,
-                    signatures: Vec<Binary>,
-                    payload: Option<Binary>
+                    data: Vec<::cosmwasm_std::Binary>,
+                    signatures: Vec<::cosmwasm_std::Binary>,
+                    payload: Option<::cosmwasm_std::Binary>
                 }
             }
         }
