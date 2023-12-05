@@ -40,7 +40,7 @@ struct AccountInfoResponse<T = Empty> {
 
 ## Messages
 
-The only requred message variant for the execute endpoint is the following:
+The only required message variant for the execute endpoint is `CreateAccount``:
 
 ```rust
 enum ExecuteMsg {
@@ -64,16 +64,16 @@ allowing contracts to define payload needed for validation in the registry and a
 
 ## Usage
 
-A contract that wishes to follow the standard must add the variants described above to their query and execute messages. This package exposes a helper macro attribute `registy_query` that injects it automatically:
+A contract that wishes to follow the standard must add the variants described above to their query and execute messages. This package exposes a helper macro attribute `registry_query` that injects it automatically:
 
 ```Rust
-#[registy_query] // <- Must be before #[cw_serde]
+#[registry_query] // <- Must be before #[cw_serde]
 #[cw_serde]
 #[derive(QueryResponses)]
 enum QueryMsg {}
 ```
 
-The module where the message is defined must ether import `AccountQuery` from cw83 package or to define it manually. Here is an example of customising it from token bound account registry:
+Modules using the message must ether import `AccountQuery` from cw83 package or to define it manually. Here is an example of customising it from token bound account registry:
 
 ```Rust
 use cw83::AccountQuery as AccountQueryBase;
@@ -91,12 +91,14 @@ pub type AccountQuery = AccountQueryBase<TokenInfo>;
 Defining execute message can also happen through a helper
 
 ```Rust
-#[registy_execute]
+#[registry_execute]
 #[cw_serde]
 pub enum Cw83ExecuteMsg {}
 ```
+Note: `AccountQuery` must also be imported
 
-In similar manner `CreateAccountMsg` must also be imported. An example of customizing a message from the tba-registry:
+
+Same scenario must be repeated for `CreateAccountMsg`. An example of customizing a message from the tba-registry:
 
 ```rust
 use cw83::CreateAccountMsg as CreateAccountMsgBase

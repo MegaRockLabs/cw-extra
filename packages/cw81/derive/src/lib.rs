@@ -56,18 +56,18 @@ pub fn valid_signature_query(metadata: TokenStream, input: TokenStream) -> Token
         input,
         quote! {
             enum Right {
-                #[returns(ValidSignatureResponse)]
+                #[returns(::cw81::ValidSignatureResponse)]
                 ValidSignature {
-                    data: Binary,
-                    signature: Binary,
-                    payload: Option<Binary>
+                    data: ::cosmwasm_std::Binary,
+                    signature: ::cosmwasm_std::Binary,
+                    payload: Option<::cosmwasm_std::Binary>
                 },
 
-                #[returns(ValidSignaturesResponse)]
+                #[returns(::cw81::ValidSignaturesResponse)]
                 ValidSignatures {
-                    data: Vec<Binary>,
-                    signatures: Vec<Binary>,
-                    payload: Option<Binary>
+                    data: Vec<::cosmwasm_std::Binary>,
+                    signatures: Vec<::cosmwasm_std::Binary>,
+                    payload: Option<::cosmwasm_std::Binary>
                 }
             }
         }

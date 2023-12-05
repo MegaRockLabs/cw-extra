@@ -1,6 +1,5 @@
 use cosmwasm_schema::{cw_serde, QueryResponses};
 use cosmwasm_std::{Empty, Binary};
-use cw83_derive::{registy_query, registy_execute};
 
 
 #[cw_serde]
@@ -22,12 +21,15 @@ pub struct CreateAccountMsg<T = Binary> {
 }
 
 
-#[registy_query]
 #[cw_serde]
 #[derive(QueryResponses)]
-pub enum Cw83QueryMsg {}
+pub enum Cw83QueryMsg {
+    #[returns(AccountInfoResponse)]
+    AccountInfo(AccountQuery)
+}
 
 
-#[registy_execute]
 #[cw_serde]
-pub enum Cw83ExecuteMsg {}
+pub enum Cw83ExecuteMsg {
+    CreateAccount(CreateAccountMsg)
+}

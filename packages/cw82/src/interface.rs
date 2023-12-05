@@ -1,5 +1,5 @@
 use cosmwasm_schema::cw_serde;
-use cosmwasm_std::{CosmosMsg, Addr, StdResult, WasmMsg, to_binary, Binary, Deps, QueryRequest, WasmQuery, from_binary, Empty};
+use cosmwasm_std::{CosmosMsg, Addr, StdResult, WasmMsg, to_binary, Binary, QueryRequest, WasmQuery, from_binary, Empty, QuerierWrapper};
 use cw1::CanExecuteResponse;
 use cw81::{ValidSignatureResponse, ValidSignaturesResponse};
 
@@ -28,7 +28,7 @@ impl Cw82Contract {
 
     pub fn valid_signature(
         &self, 
-        deps: Deps,
+        querier: &QuerierWrapper,
         data : Binary, 
         signature: Binary,
         payload: Option<Binary>
@@ -41,14 +41,14 @@ impl Cw82Contract {
                 payload
             })?
         };
-        let binary_res = deps.querier.query(&QueryRequest::Wasm(wasm_query))?;
+        let binary_res = querier.query(&QueryRequest::Wasm(wasm_query))?;
         from_binary(&binary_res)
     }
 
 
     pub fn valid_signatures(
         &self, 
-        deps: Deps,
+        querier: &QuerierWrapper,
         data : Vec<Binary>, 
         signatures: Vec<Binary>,
         payload: Option<Binary>
@@ -61,14 +61,14 @@ impl Cw82Contract {
                 payload
             })?
         };
-        let binary_res = deps.querier.query(&QueryRequest::Wasm(wasm_query))?;
+        let binary_res = querier.query(&QueryRequest::Wasm(wasm_query))?;
         from_binary(&binary_res)
     }
 
 
     pub fn can_execute(
         &self, 
-        deps: Deps,
+        querier: &QuerierWrapper,
         sender : String, 
         msg: impl Into<CosmosMsg>,
     ) -> StdResult<CanExecuteResponse> {
@@ -79,14 +79,14 @@ impl Cw82Contract {
                 msg: msg.into()
             })?
         };
-        let binary_res = deps.querier.query(&QueryRequest::Wasm(wasm_query))?;
+        let binary_res = querier.query(&QueryRequest::Wasm(wasm_query))?;
         from_binary(&binary_res)
     }
 
 
     pub fn supports_interface(
-        &self,
-        deps: Deps,
+        &self,        
+        querier: &QuerierWrapper,
     ) -> StdResult<bool> {
 
         let key = cosmwasm_std::storage_keys::namespace_with_key(
@@ -99,7 +99,7 @@ impl Cw82Contract {
             key: key.into()
         };
 
-        let version : Option<String> = deps.querier.query(&QueryRequest::Wasm(raw_query))?;
+        let version : Option<String> = querier.query(&QueryRequest::Wasm(raw_query))?;
         Ok(version.is_some())
     }
 

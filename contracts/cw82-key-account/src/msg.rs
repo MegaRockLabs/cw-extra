@@ -2,9 +2,7 @@ use cosmwasm_std::{Binary, Empty, CosmosMsg};
 use cosmwasm_schema::{cw_serde, QueryResponses};
 use cw82::{
     smart_account_query, 
-    CanExecuteResponse, 
-    ValidSignatureResponse, 
-    ValidSignaturesResponse, Cw82ExecuteMsg
+    Cw82ExecuteMsg
 };
 
 #[cw_serde]

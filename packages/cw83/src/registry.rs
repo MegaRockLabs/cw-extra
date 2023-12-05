@@ -1,29 +1,11 @@
 use cosmwasm_schema::cw_serde;
-use cosmwasm_std::{CosmosMsg, Addr, StdResult, WasmMsg, Coin, Binary, SubMsg, ReplyOn, Deps, WasmQuery, QueryRequest};
+use cosmwasm_std::{CosmosMsg, Addr, StdResult, WasmMsg, Coin, Binary, SubMsg, ReplyOn, WasmQuery, QueryRequest, QuerierWrapper};
 
 
 pub const CREATE_ACCOUNT_REPLY_ID : u64 = 82;
 pub const INTERFACE_NAME: &str = "crates:cw83";
 
 
-/* trait Cw83Registry<T> {
-    fn addr(&self) -> Addr;
-    fn create_account_init_msg(
-        &self, 
-        code_id: u64, 
-        init_msg: Binary, 
-        funds: Vec<Coin>,
-        label: String
-    ) -> StdResult<CosmosMsg<T>>;
-    fn create_account_sub_msg(
-        &self,
-        code_id: u64, 
-        init_msg: Binary, 
-        funds: Vec<Coin>,
-        label: String
-    ) -> StdResult<SubMsg<T>>;
-}
- */
 
 #[cw_serde]
 pub struct Cw83RegistryBase (pub Addr);
@@ -77,7 +59,7 @@ impl Cw83RegistryBase {
     
     pub fn supports_interface(
         &self,
-        deps: Deps,
+        querier: &QuerierWrapper,
     ) -> StdResult<bool> {
 
         let key = cosmwasm_std::storage_keys::namespace_with_key(
@@ -90,7 +72,7 @@ impl Cw83RegistryBase {
             key: key.into()
         };
 
-        let version : Option<String> = deps.querier.query(&QueryRequest::Wasm(raw_query))?;
+        let version : Option<String> = querier.query(&QueryRequest::Wasm(raw_query))?;
         Ok(version.is_some())
     }
 

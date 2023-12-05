@@ -46,41 +46,7 @@ fn merge_variants(metadata: TokenStream, left: TokenStream, right: TokenStream) 
 
 
 #[proc_macro_attribute]
-pub fn smart_account_query(metadata: TokenStream, input: TokenStream) -> TokenStream {
-    merge_variants(
-        metadata,
-        input,
-        quote! {
-            enum Right {
-
-                /// cw1
-                #[returns(CanExecuteResponse)]
-                CanExecute { sender: String, msg: CosmosMsg<T> },
-
-
-                /// cw81
-                #[returns(ValidSignatureResponse)]
-                ValidSignature {
-                    data: Binary,
-                    signature: Binary,
-                    payload: Option<Binary>
-                },
-
-                #[returns(ValidSignaturesResponse)]
-                ValidSignatures {
-                    data: Vec<Binary>,
-                    signatures: Vec<Binary>,
-                    payload: Option<Binary>
-                }
-            }
-        }
-        .into(),
-    )
-}
-
-
-#[proc_macro_attribute]
-pub fn registy_query(metadata: TokenStream, input: TokenStream) -> TokenStream {
+pub fn registry_query(metadata: TokenStream, input: TokenStream) -> TokenStream {
     merge_variants(
         metadata,
         input,
@@ -96,7 +62,7 @@ pub fn registy_query(metadata: TokenStream, input: TokenStream) -> TokenStream {
 
 
  #[proc_macro_attribute]
-pub fn registy_execute(metadata: TokenStream, input: TokenStream) -> TokenStream {
+pub fn registry_execute(metadata: TokenStream, input: TokenStream) -> TokenStream {
     merge_variants(
         metadata,
         input,

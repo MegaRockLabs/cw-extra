@@ -3,7 +3,7 @@ use cosmwasm_std::{
 };
 
 use cw_ownable::{assert_owner, initialize_owner, is_owner};
-use crate::{error::ContractError, utils::{assert_factory, is_ok_cosmos_msg, assert_status}, state::{KNOWN_TOKENS, PUBKEY, STATUS}, msg::Status};
+use crate::{error::ContractError, utils::{assert_registry, is_ok_cosmos_msg, assert_status}, state::{KNOWN_TOKENS, PUBKEY, STATUS}, msg::Status};
 
 
 
@@ -26,7 +26,7 @@ pub fn try_freeze(
     deps: DepsMut,
     sender: Addr
 ) -> Result<Response, ContractError> {
-    assert_factory(deps.as_ref(), sender)?;
+    assert_registry(deps.storage, sender)?;
     STATUS.save(deps.storage, &Status { frozen: true })?;
     Ok(Response::default())
 }
@@ -36,7 +36,7 @@ pub fn try_unfreeze(
     deps: DepsMut,
     sender: Addr,
 ) -> Result<Response, ContractError> {
-    assert_factory(deps.as_ref(), sender)?;
+    assert_registry(deps.storage, sender)?;
     STATUS.save(deps.storage, &Status { frozen: false })?;
     Ok(Response::default())
 }
@@ -61,7 +61,7 @@ pub fn try_update_ownership(
     new_owner: String,
     new_pubkey: Binary
 ) -> Result<Response, ContractError> {
-    assert_factory(deps.as_ref(), sender)?;
+    assert_registry(deps.storage, sender)?;
     initialize_owner(deps.storage, deps.api, Some(&new_owner))?;
     STATUS.save(deps.storage, &Status { frozen: false })?;
     PUBKEY.save(deps.storage, &new_pubkey)?;

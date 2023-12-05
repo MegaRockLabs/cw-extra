@@ -23,11 +23,11 @@ use crate::{
         try_freeze, 
         try_unfreeze, 
         try_change_pubkey
-    }, 
+    } 
 };
 
 #[cfg(target_arch = "wasm32")]
-use crate::utils::is_factory;
+use crate::utils::query_if_registry;
 
 pub const CONTRACT_NAME: &str = "crates:cw82-token-account";
 pub const CONTRACT_VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -64,7 +64,7 @@ pub fn instantiate(deps: DepsMut, _ : Env, info : MessageInfo, msg : Instantiate
     )?;
 
     #[cfg(target_arch = "wasm32")]
-    if !is_factory(deps.as_ref(), info.sender.clone())? {
+    if !query_if_registry(&deps.querier, info.sender.clone())? {
         return Err(ContractError::Unauthorized {})
     };
 

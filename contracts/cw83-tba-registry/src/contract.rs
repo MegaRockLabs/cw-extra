@@ -118,7 +118,7 @@ pub fn reply(deps: DepsMut, _ : Env, msg : Reply)
         let addr = res.contract_address;
         let ver_addr = deps.api.addr_validate(addr.as_str())?;
 
-        Cw82Contract(ver_addr).supports_interface(deps.as_ref())?;
+        Cw82Contract(ver_addr).supports_interface(&deps.querier)?;
         
         let stored = LAST_ATTEMPTING.load(deps.storage)?;
         LAST_ATTEMPTING.remove(deps.storage);
