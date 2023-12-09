@@ -761,7 +761,7 @@ dependencies = [
 
 [[package]]
 name = "cw81"
-version = "1.0.0"
+version = "1.0.1"
 dependencies = [
  "cosmwasm-crypto",
  "cosmwasm-schema",
@@ -812,7 +812,7 @@ dependencies = [
 
 [[package]]
 name = "cw82"
-version = "1.0.0"
+version = "1.0.1"
 dependencies = [
  "cosmwasm-crypto",
  "cosmwasm-schema",
@@ -840,7 +840,7 @@ dependencies = [
 
 [[package]]
 name = "cw82-key-account"
-version = "1.0.0"
+version = "1.0.1"
 dependencies = [
  "cosmwasm-schema",
  "cosmwasm-std",
@@ -855,7 +855,7 @@ dependencies = [
 
 [[package]]
 name = "cw82-token-account"
-version = "1.0.0"
+version = "1.0.1"
 dependencies = [
  "cosmwasm-schema",
  "cosmwasm-std",
@@ -876,7 +876,7 @@ dependencies = [
 
 [[package]]
 name = "cw83"
-version = "1.0.0"
+version = "1.0.1"
 dependencies = [
  "cosmwasm-crypto",
  "cosmwasm-schema",
@@ -904,7 +904,7 @@ dependencies = [
 
 [[package]]
 name = "cw83-tba-registry"
-version = "1.0.0"
+version = "1.0.1"
 dependencies = [
  "cosmwasm-schema",
  "cosmwasm-std",
@@ -996,7 +996,7 @@ checksum = "23d2f3407d9a573d666de4b5bdf10569d73ca9478087346697dcbae6244bfbcd"
 
 [[package]]
 name = "e2e"
-version = "1.0.0"
+version = "1.0.1"
 dependencies = [
  "assert_matches",
  "async-trait",
