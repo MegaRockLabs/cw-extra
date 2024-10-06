@@ -10,7 +10,7 @@ repository  = { workspace = true }
 cosmwasm-schema = { workspace = true }
 cosmwasm-std    = { workspace = true }
 cw22            = { workspace = true }
-cw81-derive     = { path = "./derive", version = "0.1.0" }
+cw81-derive     = { path = "./derive" }
 
 
 [dev-dependencies]
