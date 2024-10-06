@@ -5,6 +5,7 @@ authors     = [ "Kromsten <s@noreply.megarock.labs>" ]
 version     = { workspace = true }
 edition     = { workspace = true }
 repository  = { workspace = true }
+license     = { workspace = true }
 
 [lib]
 doctest    = false # disable doc tests

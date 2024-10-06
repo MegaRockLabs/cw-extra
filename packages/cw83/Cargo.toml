@@ -4,6 +4,7 @@ authors = [ "Kromsten <s@users.noreply.megarock.labs>" ]
 description = "Definition and types for the CosmWasm-83 interface"
 version     = { workspace = true }
 edition     = { workspace = true }
+license     = { workspace = true }
 repository  = { workspace = true }
 
 [dependencies]

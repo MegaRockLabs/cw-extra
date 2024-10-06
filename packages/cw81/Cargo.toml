@@ -5,6 +5,7 @@ description = "Definition and types for the CosmWasm-81 interface"
 version     = { workspace = true }
 edition     = { workspace = true }
 repository  = { workspace = true }
+license     = { workspace = true }
 
 [dependencies]
 cosmwasm-schema = { workspace = true }
