@@ -8,7 +8,7 @@ members = [
 resolver = "2"
 
 [workspace.package]
-version    = "1.0.1"
+version    = "1.1.0"
 edition    = "2021"
 repository = "https://github.com/MegaRockLabs/cw-extra"
 
@@ -32,7 +32,7 @@ cw2                     = "1.1.1"
 cw81                    = { path = "packages/cw81" }
 cw82                    = { path = "packages/cw82" }
 cw83                    = { path = "packages/cw83" }
-cw22                    = { git = "https://github.com/aura-nw/cw-plus", package = "cw22" }
+cw22                    = "0.2.0"
 cw721                   = "0.18.0"
 sg721                   = "3.3.0"
 sg721-base              = "3.3.0"

@@ -1,10 +1,10 @@
 [package]
 name = "cw83"
 authors = [ "Kromsten <s@users.noreply.megarock.labs>" ]
-edition = "2021"
-version     = { workspace = true }
 description = "Definition and types for the CosmWasm-83 interface"
-repository = "https://github.com/MegaRockLabs/cw-extra"
+version     = { workspace = true }
+edition     = { workspace = true }
+repository  = { workspace = true }
 
 [dependencies]
 cosmwasm-schema = { workspace = true }

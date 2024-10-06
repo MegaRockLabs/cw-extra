@@ -1,9 +1,10 @@
 [package]
 name        = "cw81-derive"
-version     = "0.1.0"
 description = "Macros for generating code used by the `cw81` package"
 authors     = [ "Kromsten <s@users.noreply.megarock.labs>" ]
+version     = { workspace = true }
 edition     = { workspace = true }
+repository  = { workspace = true }
 
 [lib]
 doctest    = false # disable doc tests

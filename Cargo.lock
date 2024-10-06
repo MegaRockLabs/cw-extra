@@ -196,6 +196,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8c3c1a368f70d6cf7302d78f8f7093da241fb8e8807c05cc9e51a125895a6d5b"
 
 [[package]]
+name = "bech32"
+version = "0.9.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d86b93f97252c47b41663388e6d155714a9d0c398b99f1005cbc5f978b29f445"
+
+[[package]]
 name = "bip32"
 version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -245,9 +251,9 @@ dependencies = [
 
 [[package]]
 name = "bnum"
-version = "0.8.0"
+version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "128a44527fc0d6abf05f9eda748b9027536e12dff93f5acc8449f51583309350"
+checksum = "56953345e39537a3e18bdaeba4cb0c58a78c1f61f361dc0fa7c5c7340ae87c5f"
 
 [[package]]
 name = "bs58"
@@ -401,22 +407,22 @@ dependencies = [
 
 [[package]]
 name = "cosmwasm-crypto"
-version = "1.4.1"
+version = "1.5.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a6fb22494cf7d23d0c348740e06e5c742070b2991fd41db77bba0bcfbae1a723"
+checksum = "58535cbcd599b3c193e3967c8292fe1dbbb5de7c2a2d87380661091dd4744044"
 dependencies = [
  "digest 0.10.7",
  "ed25519-zebra 3.1.0",
- "k256 0.13.1",
+ "k256 0.13.4",
  "rand_core 0.6.4",
  "thiserror",
 ]
 
 [[package]]
 name = "cosmwasm-derive"
-version = "1.4.1"
+version = "1.5.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6e199424486ea97d6b211db6387fd72e26b4a439d40cc23140b2d8305728055b"
+checksum = "a8e07de16c800ac82fd188d055ecdb923ead0cf33960d3350089260bb982c09f"
 dependencies = [
  "syn 1.0.109",
 ]
@@ -447,11 +453,12 @@ dependencies = [
 
 [[package]]
 name = "cosmwasm-std"
-version = "1.4.1"
+version = "1.5.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7d89d680fb60439b7c5947b15f9c84b961b88d1f8a3b20c4bd178a3f87db8bae"
+checksum = "c21fde95ccd20044a23c0ac6fd8c941f3e8c158169dc94b5aa6491a2d9551a8d"
 dependencies = [
  "base64 0.21.4",
+ "bech32",
  "bnum",
  "cosmwasm-crypto",
  "cosmwasm-derive",
@@ -462,6 +469,7 @@ dependencies = [
  "serde",
  "serde-json-wasm",
  "sha2 0.10.8",
+ "static_assertions",
  "thiserror",
 ]
 
@@ -686,8 +694,9 @@ dependencies = [
 
 [[package]]
 name = "cw22"
-version = "0.1.0"
-source = "git+https://github.com/aura-nw/cw-plus#fb37be3babe26e3ddfe05f04bc447c4970af4803"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3c3817775ca6bbbe70dc4c540f664c316551c7be06406e74cd4671407a9d2096"
 dependencies = [
  "cosmwasm-schema",
  "cosmwasm-std",
@@ -769,7 +778,7 @@ dependencies = [
  "cw22",
  "cw81-derive",
  "ed25519-zebra 4.0.3",
- "k256 0.13.1",
+ "k256 0.13.4",
  "rand_chacha",
  "sha2 0.10.8",
 ]
@@ -806,7 +815,7 @@ dependencies = [
  "cw2 1.1.1",
  "cw22",
  "cw81",
- "k256 0.13.1",
+ "k256 0.13.4",
  "sha2 0.10.8",
 ]
 
@@ -823,7 +832,7 @@ dependencies = [
  "cw81",
  "cw82-derive",
  "ed25519-zebra 4.0.3",
- "k256 0.13.1",
+ "k256 0.13.4",
  "rand_chacha",
  "schemars",
  "sha2 0.10.8",
@@ -849,7 +858,7 @@ dependencies = [
  "cw2 1.1.1",
  "cw22",
  "cw82",
- "k256 0.13.1",
+ "k256 0.13.4",
  "sha2 0.10.8",
 ]
 
@@ -867,7 +876,7 @@ dependencies = [
  "cw721 0.18.0",
  "cw82",
  "cw83",
- "k256 0.13.1",
+ "k256 0.13.4",
  "semver",
  "sg721-base",
  "sha2 0.10.8",
@@ -887,7 +896,7 @@ dependencies = [
  "cw82",
  "cw83-derive",
  "ed25519-zebra 4.0.3",
- "k256 0.13.1",
+ "k256 0.13.4",
  "rand_chacha",
  "schemars",
  "sha2 0.10.8",
@@ -1016,7 +1025,7 @@ dependencies = [
  "cw83",
  "cw83-tba-registry",
  "env_logger",
- "k256 0.13.1",
+ "k256 0.13.4",
  "once_cell",
  "rand",
  "serde",
@@ -1047,7 +1056,7 @@ checksum = "a4b1e0c257a9e9f25f90ff76d7a68360ed497ee519c8e428d1825ef0000799d4"
 dependencies = [
  "der 0.7.8",
  "digest 0.10.7",
- "elliptic-curve 0.13.6",
+ "elliptic-curve 0.13.8",
  "rfc6979 0.4.0",
  "signature 2.1.0",
  "spki 0.7.2",
@@ -1144,9 +1153,9 @@ dependencies = [
 
 [[package]]
 name = "elliptic-curve"
-version = "0.13.6"
+version = "0.13.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d97ca172ae9dc9f9b779a6e3a65d308f2af74e5b8c921299075bdb4a0370e914"
+checksum = "b5e6043086bf7973472e0c7dff2142ea0b680d30e18d9cc40f267efbf222bd47"
 dependencies = [
  "base16ct 0.2.0",
  "crypto-bigint 0.5.3",
@@ -1684,13 +1693,13 @@ dependencies = [
 
 [[package]]
 name = "k256"
-version = "0.13.1"
+version = "0.13.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cadb76004ed8e97623117f3df85b17aaa6626ab0b0831e6573f104df16cd1bcc"
+checksum = "f6e3919bbaa2945715f0bb6d3934a173d1e9a59ac23767fbaaef277265a7411b"
 dependencies = [
  "cfg-if",
  "ecdsa 0.16.8",
- "elliptic-curve 0.13.6",
+ "elliptic-curve 0.13.8",
  "once_cell",
  "sha2 0.10.8",
  "signature 2.1.0",
@@ -1830,9 +1839,9 @@ dependencies = [
 
 [[package]]
 name = "once_cell"
-version = "1.18.0"
+version = "1.20.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dd8b5dd2ae5ed71462c540258bedcb51965123ad7e7ccf4b9a8cafaa4a63576d"
+checksum = "1261fe7e33c73b354eab43b1273a57c8f967d0391e80353e51f764ac02cf6775"
 
 [[package]]
 name = "opaque-debug"
@@ -2402,9 +2411,9 @@ dependencies = [
 
 [[package]]
 name = "serde-json-wasm"
-version = "0.5.1"
+version = "0.5.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "16a62a1fad1e1828b24acac8f2b468971dade7b8c3c2e672bcadefefb1f8c137"
+checksum = "9e9213a07d53faa0b8dd81e767a54a8188a242fdb9be99ab75ec576a774bfdd7"
 dependencies = [
  "serde",
 ]
@@ -2632,6 +2641,12 @@ dependencies = [
  "base64ct",
  "der 0.7.8",
 ]
+
+[[package]]
+name = "static_assertions"
+version = "1.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a2eb9349b6444b326872e140eb1cf5e7c522154d69e7a0ffb0fb81c06b37543f"
 
 [[package]]
 name = "subtle"
@@ -3338,9 +3353,9 @@ dependencies = [
 
 [[package]]
 name = "zeroize"
-version = "1.6.0"
+version = "1.8.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2a0956f1ba7c7909bfb66c2e9e4124ab6f6482560f6628b5aaeba39207c9aad9"
+checksum = "ced3678a2879b30306d323f4542626697a464a97c0a07c9aebf7ebca65cd4dde"
 dependencies = [
  "zeroize_derive",
 ]
