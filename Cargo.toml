@@ -29,9 +29,9 @@ cw-ownable              = "0.5.1"
 cw-utils                = "1.0.2"
 cw1                     = "1.1.1"
 cw2                     = "1.1.1"
-cw81                    = { path = "packages/cw81" }
-cw82                    = { path = "packages/cw82" }
-cw83                    = { path = "packages/cw83" }
+cw81                    = { path = "packages/cw81", version = "1.1.0" }
+cw82                    = { path = "packages/cw82", version = "1.1.0" }
+cw83                    = { path = "packages/cw83", version = "1.1.0" }
 cw22                    = "0.2.0"
 cw721                   = "0.18.0"
 sg721                   = "3.3.0"
