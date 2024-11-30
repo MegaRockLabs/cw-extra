@@ -34,6 +34,6 @@ impl From<semver::Error> for ContractError {
 
 impl From<ParseReplyError> for ContractError {
     fn from(err: ParseReplyError) -> Self {
-        Self::Std(StdError::GenericErr { msg: err.to_string() })
+        Self::Std(StdError::generic_err(err.to_string()))
     }
 }

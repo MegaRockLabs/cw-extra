@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod tests {
-    use cosmwasm_std::{Binary, to_binary};
+    use cosmwasm_std::{Binary, to_json_binary};
     use cosmwasm_crypto::{secp256k1_verify, ed25519_batch_verify};
     
     use k256::{
@@ -30,7 +30,7 @@ mod tests {
     #[test]
     fn simple_secp256k1() {
 
-        let data : Binary = to_binary(&MSG).unwrap();
+        let data : Binary = to_json_binary(&MSG).unwrap();
         let data_digest = Sha256::new().chain(&data);
 
         let secret_key = SigningKey::random(&mut OsRng);
@@ -74,7 +74,7 @@ mod tests {
     #[test]
     fn batch_ed25519() {
 
-        let msg : Binary = to_binary(&MSG).unwrap();
+        let msg : Binary = to_json_binary(&MSG).unwrap();
         let msg_digest = Sha256::new().chain(&msg).finalize();
 
         let secret_key = Ed25519SigningKey::new(OsRng);
@@ -84,7 +84,7 @@ mod tests {
         let signature = secret_key.sign(&msg_digest);
         let signature : Binary = signature.to_bytes().as_slice().into();
         
-        let another_msg : Binary = to_binary("another msg").unwrap();
+        let another_msg : Binary = to_json_binary("another msg").unwrap();
         let another_digest = Sha256::new().chain(&another_msg).finalize();
         let another_signature : Binary = secret_key.sign(&another_digest).to_bytes().as_slice().into();
 

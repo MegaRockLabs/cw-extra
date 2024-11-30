@@ -1,4 +1,4 @@
-use cosmwasm_std::from_binary;
+use cosmwasm_std::from_json;
 use test_context::test_context;
 use cw83_tba_registry::msg::{self as RegistryMsg, TokenInfo};
 use RegistryMsg::QueryMsg as RegistryQuery;
@@ -19,8 +19,8 @@ fn basic_queries(chain: &mut Chain) {
         limit: None
     }).unwrap();
 
-    let acc_res = from_binary::<RegistryMsg::AccountsResponse>(
-        &res.res.data.unwrap().into()
+    let acc_res = from_json::<RegistryMsg::AccountsResponse>(
+        &res.res.data.unwrap()
     ).unwrap();
 
 
@@ -33,8 +33,8 @@ fn basic_queries(chain: &mut Chain) {
             limit: None 
         }
     );
-    let col_res = from_binary::<RegistryMsg::CollectionAccountsResponse>(
-        &res.unwrap().res.data.unwrap().into()
+    let col_res = from_json::<RegistryMsg::CollectionAccountsResponse>(
+        &res.unwrap().res.data.unwrap()
     ).unwrap();
 
 
@@ -63,8 +63,8 @@ fn basic_queries(chain: &mut Chain) {
         )
     ).unwrap();
 
-    let info = from_binary::<RegistryMsg::AccountInfoResponse>(
-        &res.res.data.unwrap().into()
+    let info = from_json::<RegistryMsg::AccountInfoResponse>(
+        &res.res.data.unwrap()
     ).unwrap();
 
     assert_eq!(info.address, data.token_account);
@@ -80,8 +80,8 @@ fn basic_queries(chain: &mut Chain) {
         }
     );
 
-    let res = from_binary::<RegistryMsg::CollectionsResponse>(
-        &res.unwrap().res.data.unwrap().into()
+    let res = from_json::<RegistryMsg::CollectionsResponse>(
+        &res.unwrap().res.data.unwrap()
     ).unwrap();
 
     assert_eq!(res.collections.len(), 1);
@@ -117,8 +117,8 @@ fn account_skip_limits(chain: &mut Chain) {
         limit: None
     }).unwrap();
 
-    let acc_res = from_binary::<RegistryMsg::AccountsResponse>(
-        &res.res.data.unwrap().into()
+    let acc_res = from_json::<RegistryMsg::AccountsResponse>(
+        &res.res.data.unwrap()
     ).unwrap();
 
 
@@ -131,8 +131,8 @@ fn account_skip_limits(chain: &mut Chain) {
             limit: None 
         }
     );
-    let col_res = from_binary::<RegistryMsg::CollectionAccountsResponse>(
-        &res.unwrap().res.data.unwrap().into()
+    let col_res = from_json::<RegistryMsg::CollectionAccountsResponse>(
+        &res.unwrap().res.data.unwrap()
     ).unwrap();
 
 
@@ -161,8 +161,8 @@ fn account_skip_limits(chain: &mut Chain) {
         )
     ).unwrap();
 
-    let info = from_binary::<RegistryMsg::AccountInfoResponse>(
-        &res.res.data.unwrap().into()
+    let info = from_json::<RegistryMsg::AccountInfoResponse>(
+        &res.res.data.unwrap()
     ).unwrap();
 
     assert_eq!(info.address, data.token_account);
@@ -178,8 +178,8 @@ fn account_skip_limits(chain: &mut Chain) {
         }
     );
 
-    let res = from_binary::<RegistryMsg::CollectionsResponse>(
-        &res.unwrap().res.data.unwrap().into()
+    let res = from_json::<RegistryMsg::CollectionsResponse>(
+        &res.unwrap().res.data.unwrap()
     ).unwrap();
 
     assert_eq!(res.collections.len(), 1);

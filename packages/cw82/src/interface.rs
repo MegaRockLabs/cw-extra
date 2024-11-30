@@ -1,5 +1,5 @@
 use cosmwasm_schema::cw_serde;
-use cosmwasm_std::{CosmosMsg, Addr, StdResult, WasmMsg, to_binary, Binary, QueryRequest, WasmQuery, from_binary, Empty, QuerierWrapper};
+use cosmwasm_std::{CosmosMsg, Addr, StdResult, WasmMsg, to_json_binary, Binary, QueryRequest, WasmQuery, from_json, Empty, QuerierWrapper};
 use cw1::CanExecuteResponse;
 use cw81::{ValidSignatureResponse, ValidSignaturesResponse};
 
@@ -20,7 +20,7 @@ impl Cw82Contract {
         let msg = Cw82ExecuteMsg::Execute { msgs: msgs.into() };
         Ok(WasmMsg::Execute {
             contract_addr: self.addr().into(),
-            msg: to_binary(&msg)?,
+            msg: to_json_binary(&msg)?,
             funds: vec![],
         }
         .into())
@@ -35,14 +35,14 @@ impl Cw82Contract {
     ) -> StdResult<ValidSignatureResponse> {
         let wasm_query =  WasmQuery::Smart {
             contract_addr: self.addr().into(),
-            msg: to_binary(&Cw82QueryMsg::<Empty>::ValidSignature {
+            msg: to_json_binary(&Cw82QueryMsg::<Empty>::ValidSignature {
                 data,
                 signature,
                 payload
             })?
         };
-        let binary_res = querier.query(&QueryRequest::Wasm(wasm_query))?;
-        from_binary(&binary_res)
+        let binary_res : Binary = querier.query(&QueryRequest::Wasm(wasm_query))?;
+        from_json(&binary_res)
     }
 
 
@@ -55,14 +55,14 @@ impl Cw82Contract {
     ) -> StdResult<ValidSignaturesResponse> {
         let wasm_query =  WasmQuery::Smart {
             contract_addr: self.addr().into(),
-            msg: to_binary(&Cw82QueryMsg::<Empty>::ValidSignatures {
+            msg: to_json_binary(&Cw82QueryMsg::<Empty>::ValidSignatures {
                 data,
                 signatures,
                 payload
             })?
         };
-        let binary_res = querier.query(&QueryRequest::Wasm(wasm_query))?;
-        from_binary(&binary_res)
+        let binary_res : Binary = querier.query(&QueryRequest::Wasm(wasm_query))?;
+        from_json(&binary_res)
     }
 
 
@@ -74,33 +74,14 @@ impl Cw82Contract {
     ) -> StdResult<CanExecuteResponse> {
         let wasm_query =  WasmQuery::Smart {
             contract_addr: self.addr().into(),
-            msg: to_binary(&Cw82QueryMsg::<Empty>::CanExecute {
+            msg: to_json_binary(&Cw82QueryMsg::<Empty>::CanExecute {
                 sender,
                 msg: msg.into()
             })?
         };
-        let binary_res = querier.query(&QueryRequest::Wasm(wasm_query))?;
-        from_binary(&binary_res)
+        let binary_res : Binary = querier.query(&QueryRequest::Wasm(wasm_query))?;
+        from_json(&binary_res)
     }
 
-
-    pub fn supports_interface(
-        &self,        
-        querier: &QuerierWrapper,
-    ) -> StdResult<bool> {
-
-        let key = cosmwasm_std::storage_keys::namespace_with_key(
-            &[cw22::SUPPORTED_INTERFACES.namespace()], 
-            INTERFACE_NAME.as_bytes()
-        );
-
-        let raw_query = WasmQuery::Raw { 
-            contract_addr: self.addr().into(),
-            key: key.into()
-        };
-
-        let version : Option<String> = querier.query(&QueryRequest::Wasm(raw_query))?;
-        Ok(version.is_some())
-    }
 
 }

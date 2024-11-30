@@ -1,5 +1,5 @@
 use cosmwasm_std::{
-    Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult, to_binary, Empty,
+    Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult, to_json_binary, Empty,
 };
 use cw_ownable::{get_ownership, initialize_owner};
 
@@ -143,37 +143,37 @@ pub fn execute(deps: DepsMut, env : Env, info : MessageInfo, msg : ExecuteMsg)
 #[cfg_attr(not(feature = "library"), entry_point)]
 pub fn query(deps: Deps, env : Env, msg: QueryMsg) -> StdResult<Binary> {
     match msg {
-        QueryMsg::Token {} => to_binary(&TOKEN_INFO.load(deps.storage)?),
-        QueryMsg::Status {} => to_binary(&STATUS.load(deps.storage)?),
-        QueryMsg::Pubkey {} => to_binary(&PUBKEY.load(deps.storage)?),
-        QueryMsg::Registry {} => to_binary(&REGISTRY_ADDRESS.load(deps.storage)?),
-        QueryMsg::Ownership {} => to_binary(&get_ownership(deps.storage)?),
+        QueryMsg::Token {} => to_json_binary(&TOKEN_INFO.load(deps.storage)?),
+        QueryMsg::Status {} => to_json_binary(&STATUS.load(deps.storage)?),
+        QueryMsg::Pubkey {} => to_json_binary(&PUBKEY.load(deps.storage)?),
+        QueryMsg::Registry {} => to_json_binary(&REGISTRY_ADDRESS.load(deps.storage)?),
+        QueryMsg::Ownership {} => to_json_binary(&get_ownership(deps.storage)?),
         QueryMsg::CanExecute { 
             sender, 
             msg 
-        } => to_binary(&can_execute(deps, sender, &msg)?),
+        } => to_json_binary(&can_execute(deps, sender, &msg)?),
         QueryMsg::ValidSignature { 
             signature, 
             data, 
             payload ,
-        } => to_binary(&valid_signature(deps, data, signature, &payload)?),
+        } => to_json_binary(&valid_signature(deps, data, signature, &payload)?),
         QueryMsg::ValidSignatures { 
             signatures, 
             data, 
             payload 
-        } => to_binary(&valid_signatures(deps, data, signatures, &payload)?),
+        } => to_json_binary(&valid_signatures(deps, data, signatures, &payload)?),
         QueryMsg::KnownTokens {
             skip,
             limit
-        } => to_binary(&known_tokens(deps, skip, limit)?),
+        } => to_json_binary(&known_tokens(deps, skip, limit)?),
         QueryMsg::Assets {
             skip,
             limit
-        } => to_binary(&assets(deps, env, skip, limit)?),
+        } => to_json_binary(&assets(deps, env, skip, limit)?),
         QueryMsg::FullInfo {
             skip,
             limit
-        } => to_binary(&full_info(deps, env, skip, limit)?)
+        } => to_json_binary(&full_info(deps, env, skip, limit)?)
 
     }
 }

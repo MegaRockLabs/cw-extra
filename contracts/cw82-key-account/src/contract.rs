@@ -1,5 +1,5 @@
 use cosmwasm_std::{
-    entry_point, Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult, to_binary, CosmosMsg,
+    entry_point, Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult, to_json_binary, CosmosMsg,
 };
 use cw82::{ValidSignaturesResponse, ValidSignatureResponse, CanExecuteResponse};
 
@@ -67,7 +67,7 @@ pub fn execute(deps: DepsMut, _ : Env, _ : MessageInfo, msg : ExecuteMsg)
 #[entry_point]
 pub fn query(deps: Deps, _: Env, msg: QueryMsg) -> StdResult<Binary> {
     match msg {
-        QueryMsg::PubKey {} => to_binary(&PUBKEY.load(deps.storage)?),
+        QueryMsg::PubKey {} => to_json_binary(&PUBKEY.load(deps.storage)?),
 
         QueryMsg::CanExecute { msg, .. } => {
             let key: Binary = PUBKEY.load(deps.storage)?;
@@ -77,7 +77,7 @@ pub fn query(deps: Deps, _: Env, msg: QueryMsg) -> StdResult<Binary> {
                 } else {
                     false
                 };
-            to_binary(&CanExecuteResponse { can_execute })
+            to_json_binary(&CanExecuteResponse { can_execute })
         },
 
 
@@ -85,7 +85,7 @@ pub fn query(deps: Deps, _: Env, msg: QueryMsg) -> StdResult<Binary> {
             let hash = Sha256::new().chain(&data).finalize();
             let pk: Binary = PUBKEY.load(deps.storage)?;
 
-            to_binary(&ValidSignatureResponse {
+            to_json_binary(&ValidSignatureResponse {
                 is_valid: deps.api.secp256k1_verify(
                     &hash, 
                     &signature, 
@@ -115,7 +115,7 @@ pub fn query(deps: Deps, _: Env, msg: QueryMsg) -> StdResult<Binary> {
                 })
                 .collect(); 
 
-            to_binary(&ValidSignaturesResponse {
+            to_json_binary(&ValidSignaturesResponse {
                 are_valid
             })
 
@@ -134,7 +134,7 @@ fn validate_signed(
     match msg {
         CosmosMsg::Custom(msg) => {
             let hash = Sha256::new()
-                .chain(&to_binary(&msg.msg)?)
+                .chain(&to_json_binary(&msg.msg)?)
                 .finalize();
             
             deps.api.secp256k1_verify(
@@ -146,9 +146,7 @@ fn validate_signed(
             Ok(msg.msg.clone())
         },
 
-        _ => Err(cosmwasm_std::StdError::GenericErr { 
-            msg: "Only SignedMsg is supported".into() 
-        })
+        _ => Err(cosmwasm_std::StdError::generic_err("Only SignedMsg is supported"))
         
     }
 

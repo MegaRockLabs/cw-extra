@@ -1,8 +1,7 @@
 #[cfg(test)]
 mod tests {
     use cosmwasm_std::{
-        testing::{mock_dependencies, mock_env, mock_info}, 
-        Binary, from_binary, to_binary
+        from_json, testing::{message_info, mock_dependencies, mock_env}, to_json_binary, Addr, Binary
     };
 
     use k256::{
@@ -27,7 +26,7 @@ mod tests {
 
         let mut deps = mock_dependencies();
         let env = mock_env();
-        let info = mock_info("creator", &[]);
+        let info = message_info(&Addr::unchecked("creator"), &[]);
 
      
         let secret_key = SigningKey::random(&mut OsRng);
@@ -41,7 +40,7 @@ mod tests {
         }).unwrap();
 
         // dapp asks user to sign message
-        let data : Binary = to_binary("message").unwrap();
+        let data : Binary = to_json_binary("message").unwrap();
         let data_digest = Sha256::new().chain(&data);
 
         // user signs message
@@ -56,7 +55,7 @@ mod tests {
 
         // dapp verifies signature from the contract
         let query_res = query(deps.as_ref(), env.clone(), query_msg.clone()).unwrap();
-        let res : ValidSignatureResponse = from_binary(&query_res).unwrap();
+        let res : ValidSignatureResponse = from_json(&query_res).unwrap();
         assert_eq!(res.is_valid, true);
 
 
@@ -70,7 +69,7 @@ mod tests {
             payload: None 
         };      
         let query_res = query(deps.as_ref(), env.clone(), another_msg).unwrap();
-        let res : ValidSignatureResponse = from_binary(&query_res).unwrap();
+        let res : ValidSignatureResponse = from_json(&query_res).unwrap();
         assert_eq!(res.is_valid, false);
     }
 

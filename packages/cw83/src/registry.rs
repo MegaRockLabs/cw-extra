@@ -1,5 +1,5 @@
 use cosmwasm_schema::cw_serde;
-use cosmwasm_std::{CosmosMsg, Addr, StdResult, WasmMsg, Coin, Binary, SubMsg, ReplyOn, WasmQuery, QueryRequest, QuerierWrapper};
+use cosmwasm_std::{CosmosMsg, Addr, StdResult, WasmMsg, Coin, Binary, SubMsg, ReplyOn};
 
 
 pub const CREATE_ACCOUNT_REPLY_ID : u64 = 82;
@@ -41,7 +41,8 @@ impl Cw83RegistryBase {
         code_id: u64, 
         init_msg: Binary, 
         funds: Vec<Coin>,
-        label: String
+        label: String,
+        payload: Binary
     ) -> StdResult<SubMsg<T>> {
 
         Ok(SubMsg {
@@ -53,27 +54,10 @@ impl Cw83RegistryBase {
                 label
             )?, 
             reply_on: ReplyOn::Success,
-            gas_limit: None
+            gas_limit: None,
+            payload,
         })
     }
     
-    pub fn supports_interface(
-        &self,
-        querier: &QuerierWrapper,
-    ) -> StdResult<bool> {
-
-        let key = cosmwasm_std::storage_keys::namespace_with_key(
-            &[cw22::SUPPORTED_INTERFACES.namespace()], 
-            INTERFACE_NAME.as_bytes()
-        );
-
-        let raw_query = WasmQuery::Raw { 
-            contract_addr: self.addr().into(),
-            key: key.into()
-        };
-
-        let version : Option<String> = querier.query(&QueryRequest::Wasm(raw_query))?;
-        Ok(version.is_some())
-    }
 
 }

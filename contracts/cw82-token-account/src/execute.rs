@@ -1,5 +1,5 @@
 use cosmwasm_std::{
-    Deps, DepsMut, Env, Response, CosmosMsg, Addr, Binary, WasmMsg, to_binary, Coin, StdResult,
+    Deps, DepsMut, Env, Response, CosmosMsg, Addr, Binary, WasmMsg, to_json_binary, Coin, StdResult,
 };
 
 use cw_ownable::{assert_owner, initialize_owner, is_owner};
@@ -166,7 +166,7 @@ pub fn try_transfer_token(
 
     let msg : CosmosMsg = WasmMsg::Execute { 
         contract_addr: collection, 
-        msg: to_binary(&sg721_base::ExecuteMsg::TransferNft { 
+        msg: to_json_binary(&sg721_base::ExecuteMsg::TransferNft { 
             recipient, 
             token_id, 
         })?, 
@@ -195,10 +195,10 @@ pub fn try_send_token(
 
     let msg : CosmosMsg = WasmMsg::Execute { 
         contract_addr: collection, 
-        msg: to_binary(&sg721_base::ExecuteMsg::SendNft { 
+        msg: to_json_binary(&sg721_base::ExecuteMsg::SendNft { 
             contract, 
             token_id, 
-            msg
+            msg: msg.to_vec().into()
         })?, 
         funds
     }.into();

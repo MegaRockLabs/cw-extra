@@ -10,7 +10,7 @@ use cosm_tome::chain::request::TxOptions;
 use cosm_tome::modules::bank::model::SendRequest;
 use cosmrs::crypto::secp256k1;
 use cosmwasm_schema::cw_serde;
-use cosmwasm_std::{Timestamp, Empty, CosmosMsg, WasmMsg, Binary, to_binary, from_binary};
+use cosmwasm_std::{Timestamp, Empty, CosmosMsg, WasmMsg, Binary, to_json_binary, from_json};
 
 use cw1::CanExecuteResponse;
 use cw82_token_account::msg::QueryMsg;
@@ -83,7 +83,7 @@ pub fn instantiate_collection(
     let init_msg : CosmosMsg::<Empty> = CosmosMsg::Wasm(WasmMsg::Instantiate { 
         admin: Some(minter.clone().to_string()), 
         code_id, 
-        msg: to_binary(&sg721::InstantiateMsg {
+        msg: to_json_binary(&sg721::InstantiateMsg {
             name: "test".into(),
             symbol: "test".into(),
             minter: minter,
@@ -136,7 +136,7 @@ pub fn mint_token(
         &cw1::Cw1ExecuteMsg::<Empty>::Execute { 
             msgs: vec![WasmMsg::Execute { 
                 contract_addr: collection, 
-                msg: to_binary(&mint_msg).unwrap(), 
+                msg: to_json_binary(&mint_msg).unwrap(), 
                 funds: vec![]
             }.into()] 
         },
@@ -157,7 +157,7 @@ pub fn send_token(
     let send_msg = sg721_base::ExecuteMsg::SendNft { 
         contract: recipient, 
         token_id, 
-        msg
+        msg: msg.to_vec().into()
     };
 
     chain.orc.execute(
@@ -345,8 +345,8 @@ where S: Serialize,
     )?;
 
 
-    let res : R = from_binary(
-        &res.res.data.unwrap().into()
+    let res : R = from_json(
+        &res.res.data.unwrap()
     ).unwrap();
 
     Ok(res)
@@ -368,8 +368,8 @@ pub fn query_token_owner(
         }
     ).unwrap();
 
-    let owner_res : cw721::OwnerOfResponse = from_binary(
-        &res.res.data.unwrap().into()
+    let owner_res : cw721::OwnerOfResponse = from_json(
+        &res.res.data.unwrap()
     ).unwrap();
 
     Ok(owner_res)
@@ -454,7 +454,7 @@ pub fn can_execute(
         }
     ).unwrap();
     
-    from_binary(
-        &res.res.data.unwrap().into()
+    from_json(
+        &res.res.data.unwrap()
     ).unwrap()
 }

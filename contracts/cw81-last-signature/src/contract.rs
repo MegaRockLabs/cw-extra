@@ -1,5 +1,5 @@
 use cosmwasm_std::{
-    entry_point, Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult, to_binary, BlockInfo, StdError,
+    entry_point, Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult, to_json_binary, BlockInfo, StdError,
 };
 use cw81::{ValidSignatureResponse, ValidSignaturesResponse};
 use cw_utils::Expiration;
@@ -55,23 +55,21 @@ pub fn query(deps: Deps, env: Env, msg: QueryMsg) -> StdResult<Binary> {
     match msg {
         QueryMsg::LastSignature { } => {
             let state = SIGNATURE_STATE.load(deps.storage)?;
-            to_binary(&state.signature)
+            to_json_binary(&state.signature)
         },
 
         QueryMsg::ValidSignature { signature, .. } => {
-            to_binary(&ValidSignatureResponse {
+            to_json_binary(&ValidSignatureResponse {
                 is_valid: check_signature_state(deps, &env.block, &signature),
             })
         },
 
         QueryMsg::ValidSignatures { signatures, .. } => {
             if signatures.len() != 1 {
-                return Err(StdError::GenericErr { 
-                    msg: String::from("Only one signature is supported") 
-                });
+                return Err(StdError::generic_err("Only one signature is supported"));
             }
             let signature = signatures.get(0).unwrap();
-            to_binary(&ValidSignaturesResponse {
+            to_json_binary(&ValidSignaturesResponse {
                 are_valid: vec![check_signature_state(deps, &env.block, &signature)],
             })
 

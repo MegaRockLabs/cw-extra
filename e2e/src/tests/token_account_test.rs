@@ -1,7 +1,7 @@
-use cosm_orc::orchestrator::{cosm_orc::tokio_block};
+use cosm_orc::orchestrator::cosm_orc::tokio_block;
 use cosm_tome::{modules::bank::model::SendRequest, chain::request::TxOptions};
 use cosm_tome::chain::coin::Coin;
-use cosmwasm_std::{Binary, CosmosMsg, BankMsg, WasmMsg, from_binary};
+use cosmwasm_std::{from_json, AnyMsg, BankMsg, Binary, CosmosMsg, WasmMsg};
 use cw_ownable::Ownership;
 use test_context::test_context;
 
@@ -69,10 +69,10 @@ fn can_execute_test(chain: &mut Chain) {
         chain, 
         &data.token_account, 
         data.user_address.clone(), 
-        CosmosMsg::Stargate { 
+        CosmosMsg::Any( AnyMsg { 
             type_url: String::default(), 
             value: Binary::default() 
-        }
+        })
     ).can_execute);
 
 
@@ -92,8 +92,8 @@ fn general_queries(chain: &mut Chain) {
         &data.token_account, 
         &QueryMsg::Pubkey {}
     );
-    let pubkey = from_binary::<Binary>(
-        &res.unwrap().res.data.unwrap().into()
+    let pubkey = from_json::<Binary>(
+        &res.unwrap().res.data.unwrap()
     ).unwrap();
 
     assert_eq!(pubkey, data.public_key);
@@ -105,8 +105,8 @@ fn general_queries(chain: &mut Chain) {
         &data.token_account, 
         &QueryMsg::Status {} 
     );
-    let status = from_binary::<Status>(
-        &res.unwrap().res.data.unwrap().into()
+    let status = from_json::<Status>(
+        &res.unwrap().res.data.unwrap()
     ).unwrap();
 
     assert_eq!(status, Status { frozen: false });
@@ -119,8 +119,8 @@ fn general_queries(chain: &mut Chain) {
         &data.token_account, 
         &QueryMsg::Ownership {} 
     );
-    let ownership = from_binary::<Ownership<String>>(
-        &res.unwrap().res.data.unwrap().into()
+    let ownership = from_json::<Ownership<String>>(
+        &res.unwrap().res.data.unwrap()
     ).unwrap();
 
     assert_eq!(ownership.owner, Some(data.user_address));
@@ -133,8 +133,8 @@ fn general_queries(chain: &mut Chain) {
         &data.token_account, 
         &QueryMsg::Token {} 
     );
-    let info = from_binary::<TokenInfo>(
-        &res.unwrap().res.data.unwrap().into()
+    let info = from_json::<TokenInfo>(
+        &res.unwrap().res.data.unwrap()
     ).unwrap();
 
     assert_eq!(info, TokenInfo {
@@ -148,8 +148,8 @@ fn general_queries(chain: &mut Chain) {
         &data.token_account, 
         &QueryMsg::Assets { skip: None, limit: None }
     );
-    let assets = from_binary::<AssetsResponse>(
-        &res.unwrap().res.data.unwrap().into()
+    let assets = from_json::<AssetsResponse>(
+        &res.unwrap().res.data.unwrap()
     ).unwrap();
 
     assert_eq!(assets.balances, vec![]);

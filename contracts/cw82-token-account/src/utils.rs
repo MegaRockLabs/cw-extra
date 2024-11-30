@@ -1,4 +1,4 @@
-use cosmwasm_std::{Addr, StdResult, Binary, StdError, from_binary, CosmosMsg, WasmMsg, Storage};
+use cosmwasm_std::{Addr, StdResult, Binary, StdError, from_json, CosmosMsg, WasmMsg, Storage};
 use crate::{msg::PayloadInfo, error::ContractError, state::{STATUS, REGISTRY_ADDRESS}};
 
 #[cfg(target_arch = "wasm32")]
@@ -21,7 +21,7 @@ pub fn status_ok(
 pub fn assert_ok_wasm_msg(
     msg: &WasmMsg
 ) -> StdResult<()> {
-    let bad_wasm_error  = StdError::GenericErr { msg: "Not Supported".into() };
+    let bad_wasm_error  = StdError::generic_err("Not Supported");
     match msg {
         // todo: add whitelististed messages
         WasmMsg::Execute { .. } => Err(bad_wasm_error),
@@ -33,11 +33,11 @@ pub fn assert_ok_wasm_msg(
 pub fn assert_ok_cosmos_msg(
     msg: &CosmosMsg
 ) -> StdResult<()> {
-    let bad_msg_error = StdError::GenericErr { msg: "Not Supported".into() };
+    let bad_msg_error = StdError::generic_err("Not Supported");
     match msg {
         CosmosMsg::Wasm(msg) => assert_ok_wasm_msg(msg),
         CosmosMsg::Custom(_) => Err(bad_msg_error),
-        CosmosMsg::Stargate { .. } => Err(bad_msg_error),
+        CosmosMsg::Any { .. } => Err(bad_msg_error),
         _ => Ok(())
     }
 }
@@ -74,7 +74,7 @@ pub fn is_registry(
     store: &dyn Storage,
     addr: Addr
 ) -> StdResult<bool> {
-    REGISTRY_ADDRESS.load(store).map(|a| a == addr)
+    REGISTRY_ADDRESS.load(store).map(|a| a == addr.to_string())
 }
 
 
@@ -83,17 +83,17 @@ pub fn parse_payload(
 ) -> StdResult<PayloadInfo> {
 
     if payload.is_none() {
-        return Err(StdError::GenericErr { 
-            msg: "Invalid payload. Must have an 'account' address and 'algo' must be 'amino_direct'".into() 
-        })
+        return Err(StdError::generic_err(
+            "Invalid payload. Must have an 'account' address and 'algo' must be 'amino_direct'"
+        ))
     }
 
-    let payload : PayloadInfo = from_binary(payload.as_ref().unwrap())?;
+    let payload : PayloadInfo = from_json(payload.as_ref().unwrap())?;
     
     if payload.account.len() < 1 || payload.algo != "amino" {
-        return Err(StdError::GenericErr { 
-            msg: "Invalid payload. Must have an 'account' address and 'algo' must be 'amino'".into() 
-        })
+        return Err(StdError::generic_err(
+            "Invalid payload. Must have an 'account' address and 'algo' must be 'amino'"
+        ))
     }
 
     Ok(payload)

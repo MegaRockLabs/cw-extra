@@ -1,8 +1,8 @@
-use cosmwasm_std::{Response, Env, Binary, DepsMut, Coin, SubMsg, ReplyOn, WasmMsg, to_binary, CosmosMsg, Addr};
+use cosmwasm_std::{Response, Env, Binary, DepsMut, Coin, SubMsg, ReplyOn, WasmMsg, to_json_binary, CosmosMsg, Addr};
 use cw83::CREATE_ACCOUNT_REPLY_ID;
 
 use crate::{
-    state::{LAST_ATTEMPTING, TOKEN_ADDRESSES, ADMINS, ALLOWED_IDS},
+    state::{TOKEN_ADDRESSES, ADMINS, ALLOWED_IDS},
     helpers::{verify_nft_ownership, construct_label}, 
     error::ContractError, msg::TokenInfo
 };
@@ -37,8 +37,6 @@ pub fn create_account(
     }
 
 
-    LAST_ATTEMPTING.save(deps.storage, &token_info)?;
-
     let init_msg = cw82_token_account::msg::InstantiateMsg {
         owner: sender.clone(),
         token_contract: token_info.collection.clone(),
@@ -54,13 +52,14 @@ pub fn create_account(
                 WasmMsg::Instantiate { 
                     admin: Some(env.contract.address.to_string()), 
                     code_id, 
-                    msg: to_binary(&init_msg)?, 
+                    msg: to_json_binary(&init_msg)?, 
                     funds, 
                     label: construct_label(&token_info) 
                 }
             ),
             reply_on: ReplyOn::Success,
-            gas_limit: None
+            gas_limit: None,
+            payload: to_json_binary(&token_info)?,
         })
     )
 }
@@ -98,7 +97,7 @@ pub fn update_account_owner(
 
     let msg = CosmosMsg::Wasm(WasmMsg::Execute { 
         contract_addr, 
-        msg: to_binary(&msg)?, 
+        msg: to_json_binary(&msg)?, 
         funds 
     });
 
@@ -127,7 +126,7 @@ pub fn freeze_account(
 
     let msg = CosmosMsg::Wasm(WasmMsg::Execute { 
         contract_addr, 
-        msg: to_binary(&msg)?, 
+        msg: to_json_binary(&msg)?, 
         funds: vec![]
     });
 
@@ -156,7 +155,7 @@ pub fn unfreeze_account(
 
     let msg = CosmosMsg::Wasm(WasmMsg::Execute { 
         contract_addr, 
-        msg: to_binary(&msg)?, 
+        msg: to_json_binary(&msg)?, 
         funds: vec![]
     });
 
