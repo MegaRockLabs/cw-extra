@@ -1096,7 +1096,7 @@ dependencies = [
 
 [[package]]
 name = "cw81"
-version = "1.1.0"
+version = "1.2.1"
 dependencies = [
  "cosmwasm-crypto 1.5.8",
  "cosmwasm-schema 2.1.4",
@@ -1111,7 +1111,7 @@ dependencies = [
 
 [[package]]
 name = "cw81-derive"
-version = "1.1.0"
+version = "1.2.1"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -1147,7 +1147,7 @@ dependencies = [
 
 [[package]]
 name = "cw82"
-version = "1.1.0"
+version = "1.2.1"
 dependencies = [
  "cosmwasm-crypto 1.5.8",
  "cosmwasm-schema 2.1.4",
@@ -1166,7 +1166,7 @@ dependencies = [
 
 [[package]]
 name = "cw82-derive"
-version = "1.1.0"
+version = "1.2.1"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -1175,7 +1175,7 @@ dependencies = [
 
 [[package]]
 name = "cw82-key-account"
-version = "1.1.0"
+version = "1.2.1"
 dependencies = [
  "cosmwasm-schema 2.1.4",
  "cosmwasm-std 2.1.4",
@@ -1190,7 +1190,7 @@ dependencies = [
 
 [[package]]
 name = "cw82-token-account"
-version = "1.1.0"
+version = "1.2.1"
 dependencies = [
  "cosmwasm-schema 2.1.4",
  "cosmwasm-std 2.1.4",
@@ -1210,7 +1210,7 @@ dependencies = [
 
 [[package]]
 name = "cw83"
-version = "1.1.0"
+version = "1.2.1"
 dependencies = [
  "cosmwasm-crypto 1.5.8",
  "cosmwasm-schema 2.1.4",
@@ -1229,7 +1229,7 @@ dependencies = [
 
 [[package]]
 name = "cw83-derive"
-version = "1.1.0"
+version = "1.2.1"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -1238,7 +1238,7 @@ dependencies = [
 
 [[package]]
 name = "cw83-tba-registry"
-version = "1.1.0"
+version = "1.2.1"
 dependencies = [
  "cosmwasm-schema 2.1.4",
  "cosmwasm-std 2.1.4",
@@ -1362,7 +1362,7 @@ checksum = "0d6ef0072f8a535281e4876be788938b528e9a1d43900b82c2569af7da799125"
 
 [[package]]
 name = "e2e"
-version = "1.1.0"
+version = "1.2.1"
 dependencies = [
  "assert_matches",
  "async-trait",

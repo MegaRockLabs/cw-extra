@@ -114,7 +114,6 @@ pub fn reply(deps: DepsMut, _ : Env,  reply : Reply) -> Result<Response, Contrac
         } else {
             return Err(ContractError::Unauthorized {})
         };
-
         
         let res = cw_utils::parse_instantiate_response_data(data.value.as_slice())?;
 

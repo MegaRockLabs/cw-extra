@@ -1,5 +1,5 @@
 use cosmwasm_schema::cw_serde;
-use cosmwasm_std::{CosmosMsg, Addr, StdResult, WasmMsg, Coin, Binary, SubMsg, ReplyOn};
+use cosmwasm_std::{Addr, Binary, Coin, CosmosMsg, QuerierWrapper, ReplyOn, StdResult, SubMsg, WasmMsg};
 
 
 pub const CREATE_ACCOUNT_REPLY_ID : u64 = 82;
@@ -57,6 +57,18 @@ impl Cw83RegistryBase {
             gas_limit: None,
             payload,
         })
+    }
+
+    pub fn supports_interface(
+        &self,
+        querier: &QuerierWrapper,
+    ) -> StdResult<bool> {
+        let version =  cw22::query_supported_interface_version(
+            querier, 
+            self.addr().as_str(),
+             INTERFACE_NAME
+        )?;
+        Ok(version.is_some())
     }
     
 

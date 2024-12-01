@@ -83,5 +83,18 @@ impl Cw82Contract {
         from_json(&binary_res)
     }
 
+    
+    pub fn supports_interface(
+        &self,
+        querier: &QuerierWrapper,
+    ) -> StdResult<bool> {
+        let version =  cw22::query_supported_interface_version(
+            querier, 
+            self.addr().as_str(),
+             INTERFACE_NAME
+        )?;
+        Ok(version.is_some())
+    }
+
 
 }
