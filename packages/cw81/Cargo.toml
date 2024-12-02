@@ -17,7 +17,7 @@ cw81-derive     = { path = "./derive", version = "1.2.3" }
 [dev-dependencies]
 sha2            = { workspace = true }
 k256            = { workspace = true }
+cosmwasm-crypto = { version = "1.5.8" }
 
-cosmwasm-crypto = "1.4.1"
 ed25519-zebra = "4.0.3"
 rand_chacha = "0.3.1"

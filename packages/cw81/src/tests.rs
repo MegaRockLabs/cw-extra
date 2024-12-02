@@ -136,11 +136,10 @@ mod tests {
                         &signatures,
                         &keys
                     ).unwrap()
-                );
-
+                ); 
             },
 
-            _ => { /* QueryMsg::ValidSignature */ }
+            _ => {  }
         }
 
         
