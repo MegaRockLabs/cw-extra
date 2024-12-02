@@ -17,7 +17,7 @@ cw1             = { workspace = true }
 cw2             = { workspace = true }
 cw22            = { workspace = true }
 cw81            = { workspace = true }
-cw82-derive     = { path = "./derive", version = "1.1.0" }
+cw82-derive     = { path = "./derive", version = "1.2.3" }
 
 [dev-dependencies]
 sha2            = { workspace = true }
