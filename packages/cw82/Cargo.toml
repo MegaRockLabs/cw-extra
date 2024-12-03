@@ -11,17 +11,11 @@ license     = { workspace = true }
 cosmwasm-schema = { workspace = true }
 cosmwasm-std    = { workspace = true }
 schemars        = { workspace = true }
-
 cw1             = { workspace = true }
 cw2             = { workspace = true }
 cw22            = { workspace = true }
 cw81            = { workspace = true }
 cw82-derive     = { path = "./derive", version = "1.2.3" }
-
-[features]
-default         = ["cosmwasm_2_1"]
-cosmwasm_2_0    = ["cw81/cosmwasm_2_0"]
-cosmwasm_2_1    = ["cw81/cosmwasm_2_1"]
 
 
 [dev-dependencies]

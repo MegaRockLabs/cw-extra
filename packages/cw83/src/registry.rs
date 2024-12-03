@@ -42,7 +42,6 @@ impl Cw83RegistryBase {
         init_msg: Binary, 
         funds: Vec<Coin>,
         label: String,
-        payload: Binary
     ) -> StdResult<SubMsg<T>> {
 
         Ok(SubMsg {
@@ -55,7 +54,6 @@ impl Cw83RegistryBase {
             )?, 
             reply_on: ReplyOn::Success,
             gas_limit: None,
-            payload,
         })
     }
 

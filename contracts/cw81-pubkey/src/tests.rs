@@ -1,7 +1,7 @@
 #[cfg(test)]
 mod tests {
     use cosmwasm_std::{
-        from_json, testing::{message_info, mock_dependencies, mock_env}, to_json_binary, Addr, Binary
+        from_json, testing::{mock_info, mock_dependencies, mock_env}, to_json_binary, Binary
     };
 
     use k256::{
@@ -26,7 +26,7 @@ mod tests {
 
         let mut deps = mock_dependencies();
         let env = mock_env();
-        let info = message_info(&Addr::unchecked("creator"), &[]);
+        let info = mock_info("creator", &[]);
 
      
         let secret_key = SigningKey::random(&mut OsRng);

@@ -2,8 +2,8 @@
 mod tests {
     use cosmwasm_std::{
         coins, from_json, testing::{
-            message_info, mock_dependencies, mock_env
-        }, to_json_binary, Addr, BankMsg, Binary, CosmosMsg
+            mock_info, mock_dependencies, mock_env
+        }, to_json_binary, BankMsg, Binary, CosmosMsg
     };
 
     use cw82::{CanExecuteResponse, ValidSignatureResponse};
@@ -31,7 +31,7 @@ mod tests {
 
         let mut deps = mock_dependencies();
         let env = mock_env();
-        let info = message_info(&Addr::unchecked("creator"), &[]);
+        let info = mock_info("creator", &[]);
 
         let secret_key = SigningKey::random(&mut OsRng);
         let public_key = VerifyingKey::from(&secret_key);
@@ -87,7 +87,7 @@ mod tests {
 
         let mut deps = mock_dependencies();
         let env = mock_env();
-        let info = message_info(&Addr::unchecked("creator"), &[]);
+        let info = mock_info("creator", &[]);
 
      
         let secret_key = SigningKey::random(&mut OsRng);

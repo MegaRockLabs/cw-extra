@@ -2,45 +2,39 @@
 members = [
     "packages/*", 
     "contracts/*",
-    "e2e"
 ]
 
 resolver = "2"
 
 [workspace.package]
-version    = "1.2.6"
+version    = "1.3.0"
 edition    = "2021"
 repository = "https://github.com/MegaRockLabs/cw-extra"
 license    = "MIT"
 
 
 [workspace.dependencies]
-cw-storage-plus         = "2.0.0"
-cosmwasm-schema         = "2.1.4"
-cosmwasm-std            = { version = "2.1.4" }
-
-
+cw-storage-plus         = "1.2.0"
+cosmwasm-schema         = "1.5.8"
+cosmwasm-std            = { version = "1.5.8", default-features = false, features = [] }
 k256                    = { version = "0.13.4", default-features = false, features = ["ecdsa"] }
 sha2                    = { version = "0.10.8", default-features = false }
 
-
 schemars                = "0.8.21"
 semver                  = "1.0.20"
-thiserror               = "2.0.3"
+thiserror               = "2.0.4"
 
-cw-ownable              = "2.1.0"
-cw-utils                = "2.0.0"
-cw1                     = "2.0.0"
-cw2                     = "2.0.0"
-cw22                    = "0.4.0"
+cw-ownable              = { version = "0.5.1" }
+cw-utils                = "1.0.3"
+cw1                     = "1.1.2"
+cw2                     = "1.1.2"
+cw22                    = "1.5.9"
 cw721                   = "0.18.0"
 sg721                   = "3.15.0"
 sg721-base              = "3.15.0"
-cw81                    = { path = "packages/cw81", version = "1.2.6" }
-cw82                    = { path = "packages/cw82", version = "1.2.6" }
-cw83                    = { path = "packages/cw83", version = "1.2.6" }
-cw82-token-account      = { path = "contracts/cw82-token-account" }
-cw83-tba-registry       = { path = "contracts/cw83-tba-registry" }
+cw81                    = { path = "packages/cw81", version = "1.3.0" }
+cw82                    = { path = "packages/cw82", version = "1.3.0" }
+cw83                    = { path = "packages/cw83", version = "1.3.0" }
 
 [profile.release.package.cw81]
 codegen-units = 1

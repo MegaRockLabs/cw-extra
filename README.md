@@ -31,14 +31,14 @@ Example contracts showcasing usage of the proposed protocols and standards
 | Contract                                                         | Description                                                  |
 | ---------------------------------------------------------------- | ------------------------------------------------------------ |
 | [`cw82-key-account`](/contracts/cw82-key-account/)               | Signatures are verified against secp256k1 public key and all executable cosmos message must be signed by a corresponding private key |
-| [`cw82-token-account`](/contracts/cw82-token-account/)           | Only an NFT owner can execute some cosmos messages. Signature are checked against the stored public key through [direct sign](https://github.com/cosmos/cosmos-sdk/blob/main/docs/architecture/adr-036-arbitrary-signature.md)    |
 | [`cw82-sn-sym`](https://github.com/MegaRockLabs/cw-extra/tree/secret-network/contracts/cw82-sn-sym)      | Secret Network specifc contract that only allow cosmos messages that had been encrypted by a secret (symmetric) key provided to the contract by instantiator. Signatures must be coming from a separate key generated inside the contract  to be valid |
+| [`cw82-tba-base`](https://github.com/MegaRockLabs/cw-tba/tree/main/contracts/cw82-tba-base)           | Only an NFT owner can execute some cosmos messages. Signature are checked against the stored public key through [direct sign](https://github.com/cosmos/cosmos-sdk/blob/main/docs/architecture/adr-036-arbitrary-signature.md)    |
 
 
 ### CW83
 | Contract                                                         | Description                                                  |
 | ---------------------------------------------------------------- | ------------------------------------------------------------ |
-| [`cw83-tba-registry`](contracts/cw83-tba-registry)               | A Registry of token (NFT) bound accounts                     |
+| [`cw83-tba-registry`](https://github.com/MegaRockLabs/cw-tba/tree/main/contracts/cw83-tba-registry)               | A Registry of token (NFT) bound accounts                     |
 
 <br/>
 
