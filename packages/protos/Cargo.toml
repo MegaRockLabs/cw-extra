@@ -1,11 +1,11 @@
 [package]
-name        = "cw83-derive"
-description = "Macros for generating code used by the `cw83` package"
-authors     = [ "Kromsten <s@noreply.megarock.labs>" ]
+name        = "cw-extra-protos"
+description = "Macros for generating code used by the `cw-extra` packages"
 version     = { workspace = true }
 edition     = { workspace = true }
 repository  = { workspace = true }
 license     = { workspace = true }
+authors     = { workspace = true }
 
 [lib]
 doctest    = false # disable doc tests

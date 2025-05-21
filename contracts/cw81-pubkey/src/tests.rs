@@ -1,7 +1,9 @@
 #[cfg(test)]
 mod tests {
+    #![allow(deprecated)]
+    use types::wasm::testing::{mock_info, mock_dependencies, mock_env};
     use cosmwasm_std::{
-        from_json, testing::{mock_info, mock_dependencies, mock_env}, to_json_binary, Binary
+        from_json, to_json_binary, Binary
     };
 
     use k256::{

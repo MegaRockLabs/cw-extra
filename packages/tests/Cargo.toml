@@ -1,0 +1,21 @@
+[package]
+name = "cw-extra-tests"
+description = "Unit tests for cw-extra"
+version     = { workspace = true }
+edition     = { workspace = true }
+repository  = { workspace = true }
+license     = { workspace = true }
+authors     = { workspace = true }
+
+
+[dev-dependencies]
+cw81            = { workspace = true, features = ["multi"] }
+types           = { workspace = true }
+
+sha2            = { workspace = true }
+k256            = { workspace = true }
+cosmwasm-std    = { workspace = true }
+
+cosmwasm-crypto = { version = "1.5.11" }
+ed25519-zebra   = "4.0.3"
+rand_chacha     = "0.9.0"

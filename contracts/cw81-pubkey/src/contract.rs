@@ -1,4 +1,4 @@
-use cosmwasm_std::{
+use types::wasm::{
     entry_point, Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult, to_json_binary,
 };
 use cw81::{ValidSignatureResponse, ValidSignaturesResponse};
@@ -16,7 +16,7 @@ use sha2::{
 #[entry_point]
 pub fn instantiate(deps: DepsMut, _ : Env, _ : MessageInfo, msg : InstantiateMsg,) 
 -> StdResult<Response> {
-    cw2::set_contract_version(deps.storage, CONTRACT_NAME, CONTRACT_VERSION)?;
+    //cw2::set_contract_version(deps.storage, CONTRACT_NAME, CONTRACT_VERSION)?;
     cw22::set_contract_supported_interface(
         deps.storage, 
         &[cw22::ContractSupportedInterface {

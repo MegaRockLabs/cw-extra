@@ -1,24 +1,21 @@
 [package]
 name = "cw81"
-authors = [ "Kromsten <s@users.noreply.megarock.labs>" ]
 description = "Definition and types for the CosmWasm-81 interface"
 version     = { workspace = true }
 edition     = { workspace = true }
 repository  = { workspace = true }
 license     = { workspace = true }
+authors     = { workspace = true }
 
 
 [dependencies]
-cosmwasm-std    = { workspace = true }
+types           = { workspace = true }
 cosmwasm-schema = { workspace = true }
-cw22            = { workspace = true }
-cw81-derive     = { path = "./derive", version = "1.2.3" }
 
 
-
-[dev-dependencies]
-sha2            = { workspace = true }
-k256            = { workspace = true }
-cosmwasm-crypto = { version = "1.5.8" }
-ed25519-zebra = "4.0.3"
-rand_chacha = "0.3.1"
+[features]
+default         =   ["cosmwasm"]
+cosmwasm        =   ["types/cosmwasm"]
+cosmwasm_1      =   ["types/cosmwasm_1"]
+secretwasm      =   ["types/secretwasm"]
+multi           =   ["types/account_multi"]

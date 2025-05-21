@@ -10,31 +10,33 @@ resolver = "2"
 version    = "1.3.0"
 edition    = "2021"
 repository = "https://github.com/MegaRockLabs/cw-extra"
+authors    = [ "Kromsten <kromsten@megarock.app>" ]
 license    = "MIT"
 
 
 [workspace.dependencies]
 cw-storage-plus         = "1.2.0"
-cosmwasm-schema         = "1.5.8"
-cosmwasm-std            = { version = "1.5.8", default-features = false, features = [] }
+cosmwasm-schema         = "1.5.11"
+cosmwasm-std            = { version = "1.5.11", default-features = false }
 k256                    = { version = "0.13.4", default-features = false, features = ["ecdsa"] }
-sha2                    = { version = "0.10.8", default-features = false }
+sha2                    = { version = "0.10.9", default-features = false }
 
-schemars                = "0.8.21"
-semver                  = "1.0.20"
-thiserror               = "2.0.4"
+serde                   = { version = "1.0.219", default-features = false, features = ["derive"] }
+schemars                = { version = "0.8.22" }
+thiserror               = "2.0.12"
+semver                  = "1.0.26"
 
-cw-ownable              = { version = "0.5.1" }
 cw-utils                = "1.0.3"
-cw1                     = "1.1.2"
 cw2                     = "1.1.2"
-cw22                    = "1.5.9"
-cw721                   = "0.18.0"
-sg721                   = "3.15.0"
-sg721-base              = "3.15.0"
-cw81                    = { path = "packages/cw81", version = "1.3.0" }
-cw82                    = { path = "packages/cw82", version = "1.3.0" }
-cw83                    = { path = "packages/cw83", version = "1.3.0" }
+
+cw22                    = { path = "packages/cw22", version = "1.6.0", default-features = false, features = ["cosmwasm_1"] }
+cw81                    = { path = "packages/cw81", version = "1.3.0", default-features = false, features = ["cosmwasm_1"] }
+cw82                    = { path = "packages/cw82", version = "1.3.0", default-features = false, features = ["cosmwasm_1"] }
+cw83                    = { path = "packages/cw83", version = "1.3.0", default-features = false, features = ["cosmwasm_1"] }
+
+types                   = { path = "packages/types", version = "1.3.0", default-features = false, features = ["cosmwasm_1"], package = "cw-extra-types" }
+protos                  = { path = "packages/protos", version = "1.3.0", package = "cw-extra-protos" }
+
 
 [profile.release.package.cw81]
 codegen-units = 1
@@ -48,13 +50,6 @@ incremental = false
 codegen-units = 1
 incremental = false
 
-[profile.release.package.cw82-token-account]
-codegen-units = 1
-incremental   = false
-
-[profile.release.package.cw83-tba-registry]
-codegen-units = 1
-incremental = false
 
 
 [profile.release]

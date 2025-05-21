@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod tests {
-    use cosmwasm_std::{Binary, to_json_binary};
+    use types::wasm::{Binary, to_json_binary};
     use cosmwasm_crypto::{secp256k1_verify, ed25519_batch_verify};
     
     use k256::{
@@ -21,7 +21,7 @@ mod tests {
         digest::{Update, Digest}
     };
 
-    use crate::msg::Cw81QueryMsg;
+    use cw81::Cw81QueryMsg;
 
     
     const MSG: &str = "Testing String!";

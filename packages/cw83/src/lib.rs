@@ -1,6 +1,7 @@
 mod msg;
-mod registry;
 
-pub use cw83_derive::{registry_execute, registry_query};
-pub use registry::{Cw83RegistryBase, INTERFACE_NAME, CREATE_ACCOUNT_REPLY_ID};
-pub use msg::{Cw83ExecuteMsg, Cw83QueryMsg, CreateAccountMsg, AccountInfoResponse, AccountQuery};
+pub const CREATE_ACCOUNT_REPLY_ID : u64 = 82;
+pub const INTERFACE_NAME: &str = "crates:cw83";
+
+pub use types::{registry_execute, registry_query};
+pub use msg::*;

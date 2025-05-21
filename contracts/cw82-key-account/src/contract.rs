@@ -1,8 +1,7 @@
-use cosmwasm_std::{
-    entry_point, Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult, to_json_binary, CosmosMsg,
+use types::wasm::{
+    entry_point, to_json_binary, Binary, CosmosMsg, Deps, DepsMut, Env, MessageInfo, Response, StdError, StdResult
 };
 use cw82::{ValidSignaturesResponse, ValidSignatureResponse, CanExecuteResponse};
-
 use crate::{msg::{QueryMsg, InstantiateMsg, ExecuteMsg, SignedMsg}, state::PUBKEY};
 
 pub const CONTRACT_NAME: &str = "crates:cw82-key-account";
@@ -16,7 +15,7 @@ use sha2::{
 #[entry_point]
 pub fn instantiate(deps: DepsMut, _ : Env, _ : MessageInfo, msg : InstantiateMsg,) 
 -> StdResult<Response> {
-    cw2::set_contract_version(deps.storage, CONTRACT_NAME, CONTRACT_VERSION)?;
+    //cw2::set_contract_version(deps.storage, CONTRACT_NAME, CONTRACT_VERSION)?;
     cw22::set_contract_supported_interface(
         deps.storage, 
         &[
@@ -126,13 +125,13 @@ pub fn query(deps: Deps, _: Env, msg: QueryMsg) -> StdResult<Binary> {
 
 fn validate_signed(
     deps: Deps,
-    msg: &CosmosMsg<SignedMsg>,
+    msg: &cosmwasm_std::CosmosMsg<SignedMsg>,
     key: &[u8],
 ) -> StdResult<CosmosMsg> {
 
 
     match msg {
-        CosmosMsg::Custom(msg) => {
+        cosmwasm_std::CosmosMsg::Custom(msg) => {
             let hash = Sha256::new()
                 .chain(&to_json_binary(&msg.msg)?)
                 .finalize();
@@ -146,7 +145,7 @@ fn validate_signed(
             Ok(msg.msg.clone())
         },
 
-        _ => Err(cosmwasm_std::StdError::generic_err("Only SignedMsg is supported"))
+        _ => Err(StdError::generic_err("Only SignedMsg is supported"))
         
     }
 

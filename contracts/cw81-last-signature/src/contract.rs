@@ -1,4 +1,4 @@
-use cosmwasm_std::{
+use types::wasm::{
     entry_point, Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult, to_json_binary, BlockInfo, StdError,
 };
 use cw81::{ValidSignatureResponse, ValidSignaturesResponse};
@@ -14,7 +14,7 @@ pub const CONTRACT_VERSION: &str = env!("CARGO_PKG_VERSION");
 #[entry_point]
 pub fn instantiate(deps: DepsMut, _ : Env, _ : MessageInfo, _ : InstantiateMsg,) 
 -> StdResult<Response> {
-    cw2::set_contract_version(deps.storage, CONTRACT_NAME, CONTRACT_VERSION)?;
+    //cw2::set_contract_version(deps.storage, CONTRACT_NAME, CONTRACT_VERSION)?;
     cw22::set_contract_supported_interface(
         deps.storage, 
         &[cw22::ContractSupportedInterface {
@@ -60,7 +60,7 @@ pub fn query(deps: Deps, env: Env, msg: QueryMsg) -> StdResult<Binary> {
 
         QueryMsg::ValidSignature { signature, .. } => {
             to_json_binary(&ValidSignatureResponse {
-                is_valid: check_signature_state(deps, &env.block, &signature),
+                is_valid: check_signature_state(deps, &env.block, signature.to_vec()),
             })
         },
 
@@ -70,7 +70,7 @@ pub fn query(deps: Deps, env: Env, msg: QueryMsg) -> StdResult<Binary> {
             }
             let signature = signatures.get(0).unwrap();
             to_json_binary(&ValidSignaturesResponse {
-                are_valid: vec![check_signature_state(deps, &env.block, &signature)],
+                are_valid: vec![check_signature_state(deps, &env.block, signature.to_vec())],
             })
 
         }
@@ -81,8 +81,17 @@ pub fn query(deps: Deps, env: Env, msg: QueryMsg) -> StdResult<Binary> {
 fn check_signature_state(
     deps: Deps,
     block: &BlockInfo,
-    signature: &Binary,
+    signature: Vec<u8>
 ) -> bool {
     let state : SignatureState = SIGNATURE_STATE.load(deps.storage).unwrap();
-    !state.expiration.is_expired(block) && state.signature == *signature
+    !is_expired(state.expiration, block) && state.signature.to_vec() == signature
+}
+
+
+fn is_expired(exp : Expiration, block: &BlockInfo) -> bool {
+    match exp {
+        Expiration::AtHeight(height) => block.height >= height,
+        Expiration::AtTime(time) => block.time.seconds() >= time.seconds(),
+        Expiration::Never {} => false,
+    }
 }

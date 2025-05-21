@@ -1,10 +1,12 @@
 #[cfg(test)]
 mod tests {
-    use cosmwasm_std::{
-        coins, from_json, testing::{
+    #![allow(deprecated)]
+    use types::wasm::{
+        from_json, testing::{
             mock_info, mock_dependencies, mock_env
-        }, to_json_binary, BankMsg, Binary, CosmosMsg
+        }
     };
+    use cosmwasm_std::{BankMsg, CosmosMsg, Binary, to_json_binary, coins};
 
     use cw82::{CanExecuteResponse, ValidSignatureResponse};
     use k256::{
@@ -64,10 +66,16 @@ mod tests {
             .chain(&to_json_binary(&CosmosMsg::<SignedMsg>::Bank(bank.clone())).unwrap())
         );
 
+        let msg =  types::wasm::CosmosMsg::Bank(
+            types::wasm::BankMsg::Send { 
+                to_address: "test".into(), 
+                amount: types::wasm::coins(1, "test")
+            }
+        );
 
         let msg : CosmosMsg<SignedMsg> = CosmosMsg::Custom(SignedMsg {
             signed_hash: signed_hash.to_bytes().as_slice().into(),
-            msg: bank.into()
+            msg
         });
 
 

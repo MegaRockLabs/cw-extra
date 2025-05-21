@@ -1,6 +1,8 @@
 #[cfg(test)]
 mod tests {
-    use cosmwasm_std::{from_json, testing::{mock_info, mock_dependencies, mock_env}, Binary};
+    #![allow(deprecated)]
+    use types::wasm::{testing::{mock_info, mock_dependencies, mock_env}};
+    use cosmwasm_std::{from_json, Binary};
     use cw81::ValidSignatureResponse;
 
     use crate::{contract::{instantiate, execute, query}, msg::{InstantiateMsg, ExecureMsg, QueryMsg}};
@@ -19,7 +21,7 @@ mod tests {
         let signature = Binary::from("signature".as_bytes());
 
         let msg = ExecureMsg::SaveSignature { 
-            signature: signature.clone(), 
+            signature: signature.clone().0.into(), 
             expiration: None 
         };
         execute(deps.as_mut(), env.clone(), info.clone(), msg).unwrap();
