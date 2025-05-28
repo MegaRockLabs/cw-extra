@@ -35,5 +35,6 @@ Project **TRIES** adhering to
 
 
 ## Fixed
--- [`cw82`]: the query macro doesn't break if the message doesn't have a generic `T` 
+- Reduced the number of dependencies and improved compilation times
+- [`cw82`]: the query macro doesn't break if the message doesn't have a generic `T` 
 
