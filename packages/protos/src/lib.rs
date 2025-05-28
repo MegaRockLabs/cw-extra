@@ -420,9 +420,9 @@ pub fn account_execute(_metadata: TokenStream, input: TokenStream) -> TokenStrea
 /// // Generated:
 /// //
 /// // pub struct CreateAccountMsg {
-/// //     pub code_id   :  u64,
-/// //     pub chain_id  :  String,
-/// //     pub msg       :  Binary
+/// //     pub code_id      :  u64,
+/// //     pub chain_id     :  String,
+/// //     pub account_data :  Binary
 /// // }
 /// 
 /// // pub enum ExecuteMsg {
@@ -459,9 +459,9 @@ pub fn account_execute(_metadata: TokenStream, input: TokenStream) -> TokenStrea
 /// // Generated:
 /// 
 /// // pub struct CreateAccountMsgData {
-/// //     pub code_id   :  u64,
-/// //     pub chain_id  :  String,
-/// //     pub msg       :  CredentialData
+/// //     pub code_id      :  u64,
+/// //     pub chain_id     :  String,
+/// //     pub account_data :  CredentialData
 /// // }
 /// //
 /// // pub enum ExecuteMsgData {

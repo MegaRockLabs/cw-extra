@@ -110,7 +110,7 @@ where CreateAccountMsg is defined in the following manner:
 struct CreateAccountMsg<T = Binary> {
     pub code_id: u64,
     pub chain_id: String,
-    pub msg: T
+    pub account_data: T
 }
 ```
 allowing contracts to define payload needed for validation in the registry and also for generating an instantiation message for smart account contracts

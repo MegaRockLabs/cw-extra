@@ -9,7 +9,7 @@ authors     = { workspace = true }
 
 
 [dev-dependencies]
-cw81            = { workspace = true, features = ["multi"] }
+cw81            = { workspace = true, features = ["multi", "cosmwasm_1"] }
 types           = { workspace = true }
 
 sha2            = { workspace = true }

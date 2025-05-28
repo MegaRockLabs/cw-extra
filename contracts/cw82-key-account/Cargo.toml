@@ -25,8 +25,8 @@ cw-storage-plus = { workspace = true }
 cw-utils        = { workspace = true }
 sha2            = { workspace = true }
 cw2             = { workspace = true }
-cw22            = { workspace = true, default-features = false, features = ["cosmwasm_1"] }
-cw82            = { workspace = true, default-features = false, features = ["multi", "cosmwasm_1"] }
+cw22            = { workspace = true, features = ["cosmwasm_1"] }
+cw82            = { workspace = true, features = ["multi", "cosmwasm_1"] }
 
 [dev-dependencies]
 k256            = { workspace = true }

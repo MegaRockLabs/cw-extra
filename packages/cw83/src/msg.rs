@@ -43,7 +43,7 @@ pub struct CreateAccountMsg<T = Binary> {
     /// Chain identifier of a network where the account will be created
     pub chain_id: String,
     /// Payload data for account configuration
-    pub msg: T
+    pub account_data: T
 }
 
 
