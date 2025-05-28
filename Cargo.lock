@@ -755,6 +755,39 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0d6ef0072f8a535281e4876be788938b528e9a1d43900b82c2569af7da799125"
 
 [[package]]
+name = "e2e"
+version = "1.0.1"
+dependencies = [
+ "assert_matches",
+ "async-trait",
+ "cosm-orc",
+ "cosm-tome",
+ "cosmrs",
+ "cosmwasm-schema",
+ "cosmwasm-std",
+ "cw-ownable",
+ "cw1",
+ "cw2 1.1.1",
+ "cw22",
+ "cw721 0.18.0",
+ "cw81",
+ "cw82",
+ "cw82-token-account",
+ "cw83",
+ "cw83-tba-registry",
+ "env_logger",
+ "k256 0.13.1",
+ "once_cell",
+ "rand",
+ "serde",
+ "serde_json",
+ "sg721",
+ "sg721-base",
+ "test-context",
+ "tokio",
+
+
+[[package]]
 name = "ecdsa"
 version = "0.14.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
