@@ -1,4 +1,4 @@
-use cosmwasm_std::Binary;
+use types::wasm::Binary;
 use cosmwasm_schema::{cw_serde, QueryResponses};
 use cw81::valid_signature_query;
 

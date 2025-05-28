@@ -2,42 +2,42 @@
 members = [
     "packages/*", 
     "contracts/*",
-    "e2e"
 ]
 
 resolver = "2"
 
 [workspace.package]
-version    = "1.0.1"
+version    = "2.0.0"
 edition    = "2021"
 repository = "https://github.com/MegaRockLabs/cw-extra"
+authors    = [ "Kromsten <kromsten@megarock.app>" ]
+license    = "MIT"
 
 
 [workspace.dependencies]
-cosmwasm-schema = "1.4.1"
-cosmwasm-std = { version = "1.4.1", default-features = false }
-cw-storage-plus = "1.1.0"
+# --- reference contracts --
+cw-storage-plus         = { version = "1.2.0"  }
+cosmwasm-schema         = { version = "1.5.11" }
+cosmwasm-std            = { version = "1.5.11" }
+sha2                    = { version = "0.10.9", default-features = false }
+k256                    = { version = "0.13.4", default-features = false, features = ["ecdsa"] }
+serde                   = { version = "1.0.219", default-features = false, features = ["derive"] }
+schemars                = { version = "0.8.22" }
+thiserror               = "2.0.12"
+semver                  = "1.0.26"
+cw-utils                = "1.0.3"
+cw2                     = "1.1.2"
 
-k256                 = { version = "0.13.1", default-features = false, features = ["ecdsa"] }
-sha2                 = { version = "0.10.2", default-features = false }
 
-schemars                = "0.8.15"
-semver                  = "1.0.20"
-thiserror               = "1.0.50"
+# --- 
 
-cw-ownable              = "0.5.1"
-cw-utils                = "1.0.2"
-cw1                     = "1.1.1"
-cw2                     = "1.1.1"
-cw81                    = { path = "packages/cw81" }
-cw82                    = { path = "packages/cw82" }
-cw83                    = { path = "packages/cw83" }
-cw22                    = { git = "https://github.com/aura-nw/cw-plus", package = "cw22" }
-cw721                   = "0.18.0"
-sg721                   = "3.3.0"
-sg721-base              = "3.3.0"
-cw82-token-account      = { path = "contracts/cw82-token-account" }
-cw83-tba-registry       = { path = "contracts/cw83-tba-registry" }
+cw22                    = { path = "packages/cw22", default-features = false, version = "2.0.0" }
+cw81                    = { path = "packages/cw81", default-features = false, version = "2.0.0" }
+cw82                    = { path = "packages/cw82", default-features = false, version = "2.0.0" }
+cw83                    = { path = "packages/cw83", default-features = false, version = "2.0.0" }
+types                   = { path = "packages/types", version = "2.0.0", package = "cw-extra-types" }
+protos                  = { path = "packages/protos", version = "2.0.0", package = "cw-extra-protos" }
+
 
 [profile.release.package.cw81]
 codegen-units = 1
@@ -51,11 +51,7 @@ incremental = false
 codegen-units = 1
 incremental = false
 
-[profile.release.package.cw82-token-account]
-codegen-units = 1
-incremental   = false
-
-[profile.release.package.cw83-tba-registry]
+[profile.release.package.cw22]
 codegen-units = 1
 incremental = false
 

@@ -1,5 +1,5 @@
-use cosmwasm_std::{
-    entry_point, Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult, to_binary,
+use types::wasm::{
+    entry_point, Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult, to_json_binary,
 };
 use cw81::{ValidSignatureResponse, ValidSignaturesResponse};
 
@@ -16,7 +16,7 @@ use sha2::{
 #[entry_point]
 pub fn instantiate(deps: DepsMut, _ : Env, _ : MessageInfo, msg : InstantiateMsg,) 
 -> StdResult<Response> {
-    cw2::set_contract_version(deps.storage, CONTRACT_NAME, CONTRACT_VERSION)?;
+    //cw2::set_contract_version(deps.storage, CONTRACT_NAME, CONTRACT_VERSION)?;
     cw22::set_contract_supported_interface(
         deps.storage, 
         &[cw22::ContractSupportedInterface {
@@ -32,14 +32,14 @@ pub fn instantiate(deps: DepsMut, _ : Env, _ : MessageInfo, msg : InstantiateMsg
 #[entry_point]
 pub fn query(deps: Deps, _: Env, msg: QueryMsg) -> StdResult<Binary> {
     match msg {
-        QueryMsg::PubKey {} => to_binary(&PUBKEY.load(deps.storage)?),
+        QueryMsg::PubKey {} => to_json_binary(&PUBKEY.load(deps.storage)?),
 
         QueryMsg::ValidSignature { signature, data, .. } => {
 
             let hash = Sha256::new().chain(&data).finalize();
             let pk: Binary = PUBKEY.load(deps.storage)?;
 
-            to_binary(&ValidSignatureResponse {
+            to_json_binary(&ValidSignatureResponse {
                 is_valid: deps.api.secp256k1_verify(
                     &hash, 
                     &signature, 
@@ -70,7 +70,7 @@ pub fn query(deps: Deps, _: Env, msg: QueryMsg) -> StdResult<Binary> {
                 })
                 .collect(); 
 
-            to_binary(&ValidSignaturesResponse {
+            to_json_binary(&ValidSignaturesResponse {
                 are_valid
             })
 

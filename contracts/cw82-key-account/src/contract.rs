@@ -1,8 +1,7 @@
-use cosmwasm_std::{
-    entry_point, Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult, to_binary, CosmosMsg,
+use types::wasm::{
+    entry_point, to_json_binary, Binary, CosmosMsg, Deps, DepsMut, Env, MessageInfo, Response, StdError, StdResult
 };
 use cw82::{ValidSignaturesResponse, ValidSignatureResponse, CanExecuteResponse};
-
 use crate::{msg::{QueryMsg, InstantiateMsg, ExecuteMsg, SignedMsg}, state::PUBKEY};
 
 pub const CONTRACT_NAME: &str = "crates:cw82-key-account";
@@ -16,7 +15,7 @@ use sha2::{
 #[entry_point]
 pub fn instantiate(deps: DepsMut, _ : Env, _ : MessageInfo, msg : InstantiateMsg,) 
 -> StdResult<Response> {
-    cw2::set_contract_version(deps.storage, CONTRACT_NAME, CONTRACT_VERSION)?;
+    //cw2::set_contract_version(deps.storage, CONTRACT_NAME, CONTRACT_VERSION)?;
     cw22::set_contract_supported_interface(
         deps.storage, 
         &[
@@ -67,7 +66,7 @@ pub fn execute(deps: DepsMut, _ : Env, _ : MessageInfo, msg : ExecuteMsg)
 #[entry_point]
 pub fn query(deps: Deps, _: Env, msg: QueryMsg) -> StdResult<Binary> {
     match msg {
-        QueryMsg::PubKey {} => to_binary(&PUBKEY.load(deps.storage)?),
+        QueryMsg::PubKey {} => to_json_binary(&PUBKEY.load(deps.storage)?),
 
         QueryMsg::CanExecute { msg, .. } => {
             let key: Binary = PUBKEY.load(deps.storage)?;
@@ -77,7 +76,7 @@ pub fn query(deps: Deps, _: Env, msg: QueryMsg) -> StdResult<Binary> {
                 } else {
                     false
                 };
-            to_binary(&CanExecuteResponse { can_execute })
+            to_json_binary(&CanExecuteResponse { can_execute })
         },
 
 
@@ -85,7 +84,7 @@ pub fn query(deps: Deps, _: Env, msg: QueryMsg) -> StdResult<Binary> {
             let hash = Sha256::new().chain(&data).finalize();
             let pk: Binary = PUBKEY.load(deps.storage)?;
 
-            to_binary(&ValidSignatureResponse {
+            to_json_binary(&ValidSignatureResponse {
                 is_valid: deps.api.secp256k1_verify(
                     &hash, 
                     &signature, 
@@ -115,7 +114,7 @@ pub fn query(deps: Deps, _: Env, msg: QueryMsg) -> StdResult<Binary> {
                 })
                 .collect(); 
 
-            to_binary(&ValidSignaturesResponse {
+            to_json_binary(&ValidSignaturesResponse {
                 are_valid
             })
 
@@ -126,15 +125,15 @@ pub fn query(deps: Deps, _: Env, msg: QueryMsg) -> StdResult<Binary> {
 
 fn validate_signed(
     deps: Deps,
-    msg: &CosmosMsg<SignedMsg>,
+    msg: &cosmwasm_std::CosmosMsg<SignedMsg>,
     key: &[u8],
 ) -> StdResult<CosmosMsg> {
 
 
     match msg {
-        CosmosMsg::Custom(msg) => {
+        cosmwasm_std::CosmosMsg::Custom(msg) => {
             let hash = Sha256::new()
-                .chain(&to_binary(&msg.msg)?)
+                .chain(&to_json_binary(&msg.msg)?)
                 .finalize();
             
             deps.api.secp256k1_verify(
@@ -146,9 +145,7 @@ fn validate_signed(
             Ok(msg.msg.clone())
         },
 
-        _ => Err(cosmwasm_std::StdError::GenericErr { 
-            msg: "Only SignedMsg is supported".into() 
-        })
+        _ => Err(StdError::generic_err("Only SignedMsg is supported"))
         
     }
 

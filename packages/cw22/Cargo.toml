@@ -1,0 +1,24 @@
+[package]
+name = "cw22"
+authors = [
+    "ThienLK1@aura-nw",
+    "Kromsten <kromsten@megarock.app>"
+]
+version     = { workspace = true }
+edition     = { workspace = true }
+license     = { workspace = true }
+repository  = { workspace = true }
+
+
+[dependencies]
+cosmwasm-schema     = { workspace = true }
+thiserror           = { workspace = true }
+schemars            = { workspace = true }
+semver              = { workspace = true }
+types               = { workspace = true }
+
+
+[features]
+default         =   ["cosmwasm"]
+cosmwasm        =   ["types/cosmwasm"]
+cosmwasm_1      =   ["types/cosmwasm_1"]

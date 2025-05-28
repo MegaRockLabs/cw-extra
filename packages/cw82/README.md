@@ -14,7 +14,7 @@ The standard doesn't introduce any new primitives and achieved through a combina
 
 ## Queries
 
-A final query message looks in the following manner
+A final query message looks in the following manner. ValidSignatures (in plural) and requires `multi` feature flag to be enabled
 
 ```rust
 pub enum QueryMsg {
@@ -31,7 +31,7 @@ pub enum QueryMsg {
         payload: Option<Binary>
     },
     
-    // cw81
+    // cw81 (optional) and requires `multi` feature flag
     #[returns(ValidSignaturesResponse)]
     ValidSignatures {
         data: Vec<Binary>,
@@ -44,15 +44,17 @@ pub enum QueryMsg {
 ```
 `cw2`and `cw22`operate on storage level and use raw queries and do not enforce any variants
 
-The package expose `#[smart_account_query]` macro attribute that injects the variants into a custom query message enum and also exposes a `Cw82QueryMsg<T = Empty>` that can be extended to to check an executional validity of any custom CosmosMsg
+The package expose `#[account_query]` macro attribute that injects the variants into a your query message. There is also a default `Cw82QueryMsg` thay can be extended
 
 ## Messages
-The only execution message the standard enforces is
+The only message action the standard enforces is
 ```rust
 enum ExecuteMsg<T = Empty>
     ...
+
     Execute { msgs: Vec<CosmosMsg<T>> },
-.    ...
+    
+    ...
 }
 ```
 coming from `cw1`standard. Keep in mind that 
@@ -60,8 +62,9 @@ coming from `cw1`standard. Keep in mind that
 T: Clone + fmt::Debug + PartialEq + JsonSchema
 ```
 
-The package provides an `Cw82ExecuteMsg` alias and no macro attributes
+The package provides a default `Cw82ExecuteMsg` alias and `#[account_execute]` macro attribute that injects the variant into your execute message.
 
+Both macros anticipate a `QueryMsg` or `ExecuteMsg` to have a template parameter `T` that is used to customize the type of the inner cosmos messages. Keep in mind that they only recognize the letter T and will not work with other letters 
 
 
 ## Examples

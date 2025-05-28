@@ -11,23 +11,21 @@ Whatever the logic is we need primitives to verifyably query the results and tha
 
 ## Queries
 
-All CW81-compliant contracts must add the following query variants to their QueryMsg':'s and return the corresponding responses (in binary format).
-ValidSignatures (in plural) is an optinal variant to add and can be turn on by using the `multi` feature flag. 
+All CW81-compliant contracts must add the following query variants to their QueryMsg:s and return the corresponding responses:
 
 
 ```rust
 pub enum QueryMsg {
     ...
 
-    #[returns(cw81::ValidSignatureResponse)]
+    #[returns(ValidSignatureResponse)]
     ValidSignature {
         data: Binary,
         signature: Binary,
         payload: Option<Binary>
     },
 
-    // Only if `multi` feature is enabled
-    #[returns(cw81::ValidSignaturesResponse)]
+    #[returns(ValidSignaturesResponse)]
     ValidSignatures {
         data: Vec<Binary>,
         signatures: Vec<Binary>,

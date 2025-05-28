@@ -12,30 +12,84 @@ All CW83-compliant registries must define a message with the following variants 
 enum QueryMsg {
     ...
 
-   #[returns(AccountInfoResponse)]
-   AccountInfo(AccountQuery)
+   #[returns(AccountResponse)]
+   AccountInfo( ** Your Custom Query Type ** ) // default is Option<Binary> / Binary
+    ...
+}
+```
+With `multi` feature flag enabled the `AccountInfo` there is an additional variant for searching multiple accounts at once
+
+```rust
+enum QueryMsg {
+
+    ...
+
+    #[returns(AccountResponse)]
+    Accounts {
+        query           :     ** Your Custom Query Type **
+        start_after     :     Option<String>,
+        skip            :     Option<u32>,
+        limit           :     Option<u32>,
+    }
+
     ...
 }
 ```
 
-Where AccountQuery is defined in the following manner
 
+The minimal information to send back as a response is the address of the snart acciybt if it exists. On top of that users are free to extend the response with any additional information they want to expose.  The response is defined as follows:
 ```rust
-struct AccountQuery<T = Empty> {
-    pub query: T
+struct AccountResponse<T = Option<Empty>> {
+    pub address : String,
+    pub info    : T
 }
 ```
-Different implementations are free to customise the query in any desirable manner to link an account to a username, a non-fungible token, credential info and so on.
 
+### Macro
 
-The response type enforces the contracts implementing the standard to return a smart account **address** corresponsing to the query and leave a room to customize for returning addition info related to the account
+The crate of `cw83` exposes a macro attribute `registry_query` that injects the required variants with high degree of customization.  It takes optional positional arguments that modify ether the inner query type or the response type
 
+#### Default Usage
+Without additional feature flags the macro takes up to two optional positional arguments
 ```rust
-struct AccountInfoResponse<T = Empty> {
-    pub address: String,
-    pub info: Option<T>
+#[registry_query(YourQueryType, YourResponseType)]
+enum QueryMsg {}
+
+//would correspond to the following code
+enum QueryMsg {
+    #[returns(AccountResponse<YourResponseType>)]
+    AccountInfo(YourQueryType)
 }
 ```
+By default QueryType is set to Option<Binary> and ResponseType is set to Option<Empty>. 
+
+#### With `multi` feature 
+
+In this case we can use up to four positional arguments
+```rust
+#[registry_query(Query, RespInfo, MultiQuery, MultiResInfo)]
+enum QueryMsg {}
+
+//would correspond to the following code
+enum QueryMsg {
+    
+    #[returns(AccountResponse<RespInfo>)]
+    AccountInfo(Query),
+
+    #[returns(AccountResponse<MultiResInfo>)]
+    Accounts {
+        query           :     MultiQuery,
+        start_after     :     Option<String>,
+        skip            :     Option<u32>,
+        limit           :     Option<u32>,
+    }
+}
+```
+
+If not specified the `MultiResInfo` used the same type as `RespInfo`. 
+`MultiQuery` uses `Option`:al form of `Query` type in case if it isn't an `Option` itself. In case of the latter it's assigned to the same type without nesting 
+
+
 
 
 ## Messages
@@ -56,69 +110,39 @@ where CreateAccountMsg is defined in the following manner:
 struct CreateAccountMsg<T = Binary> {
     pub code_id: u64,
     pub chain_id: String,
-    pub msg: T
+    pub account_data: T
 }
 ```
 allowing contracts to define payload needed for validation in the registry and also for generating an instantiation message for smart account contracts
 
 
-## Usage
+### Macro
 
-A contract that wishes to follow the standard must add the variants described above to their query and execute messages. This package exposes a helper macro attribute `registry_query` that injects it automatically:
+The crate of `cw83` exposes a macro attribute `registry_execute` that injects the required variant into your execute message. 
 
-```Rust
-#[registry_query] // <- Must be before #[cw_serde]
-#[cw_serde]
-#[derive(QueryResponses)]
-enum QueryMsg {}
-```
-
-Modules using the message must ether import `AccountQuery` from cw83 package or to define it manually. Here is an example of customising it from token bound account registry:
-
-```Rust
-use cw83::AccountQuery as AccountQueryBase;
-
-#[cw_serde]
-pub struct TokenInfo {
-    pub collection: String,
-    pub id: String,
-}
-
-pub type AccountQuery = AccountQueryBase<TokenInfo>;
-```
-
-
-Defining execute message can also happen through a helper
-
-```Rust
-#[registry_execute]
-#[cw_serde]
-pub enum Cw83ExecuteMsg {}
-```
-Note: `AccountQuery` must also be imported
-
-
-Same scenario must be repeated for `CreateAccountMsg`. An example of customizing a message from the tba-registry:
+The macros takes one optional positional argument that allows to customise the type of the `msg` field in the `CreateAccountMsg` struct. By default it is set to `Binary` but can be changed to any other type. 
 
 ```rust
-use cw83::CreateAccountMsg as CreateAccountMsgBase
+#[registry_execute(TokenAccount)]
+enum ExecuteMsg {}
 
-#[cw_serde]
-pub struct CreateInitMsg {
-    pub token_info: TokenInfo,
-    pub pubkey: Binary,
+//would correspond to the following code
+enum ExecuteMsg {
+    ...
+    CreateAccount(CreateAccountMsg<TokenAccount>)
+    ...
 }
-
-pub type CreateAccountMsg = CreateAccountMsgBase<CreateInitMsg>;
 ```
 
 
-If a contract doesn't define additional variants it can directly use  `Cw83QueryMsg` and `Cw83ExecuteMsg` from the package directly
+It is also possible to use the minimal messages that have the variants of the staandard directly.  The easieast option is importing `Cw83QueryMsg` or `Cw83ExecuteMsg` from the crate
+
+
 
 ## Examples
 Example contracts can be found in this repository and are prefixed with `cw83-`  
 
 | Contract                                                         | Description                                                  |
 | ---------------------------------------------------------------- | ------------------------------------------------------------ |
-| [`cw83-tba-registry`](contracts/cw83-tba-registry)               | A Registry of token bound accounts                           |
+| [`cw83-tba-registry`](https://github.com/MegaRockLabs/cw-tba/tree/main/contracts/cw83-tba-registry)               | A Registry of token bound accounts                           |
 

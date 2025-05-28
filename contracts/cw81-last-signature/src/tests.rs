@@ -1,6 +1,8 @@
 #[cfg(test)]
 mod tests {
-    use cosmwasm_std::{testing::{mock_dependencies, mock_env, mock_info}, Binary, from_binary};
+    #![allow(deprecated)]
+    use types::wasm::{testing::{mock_info, mock_dependencies, mock_env}};
+    use cosmwasm_std::{from_json, Binary};
     use cw81::ValidSignatureResponse;
 
     use crate::{contract::{instantiate, execute, query}, msg::{InstantiateMsg, ExecureMsg, QueryMsg}};
@@ -19,7 +21,7 @@ mod tests {
         let signature = Binary::from("signature".as_bytes());
 
         let msg = ExecureMsg::SaveSignature { 
-            signature: signature.clone(), 
+            signature: signature.clone().0.into(), 
             expiration: None 
         };
         execute(deps.as_mut(), env.clone(), info.clone(), msg).unwrap();
@@ -31,7 +33,7 @@ mod tests {
         };
 
         let query_res = query(deps.as_ref(), env.clone(), query_msg.clone()).unwrap();
-        let res : ValidSignatureResponse = from_binary(&query_res).unwrap();
+        let res : ValidSignatureResponse = from_json(&query_res).unwrap();
         assert_eq!(res.is_valid, true);
 
 
@@ -39,13 +41,13 @@ mod tests {
             signature: Binary::from("another".as_bytes()), data: Binary::default(), payload: None 
         };        
         let query_res = query(deps.as_ref(), env.clone(), another_msg).unwrap();
-        let res : ValidSignatureResponse = from_binary(&query_res).unwrap();
+        let res : ValidSignatureResponse = from_json(&query_res).unwrap();
         assert_eq!(res.is_valid, false);
 
 
         env.block.height += 101;
         let query_res = query(deps.as_ref(), env.clone(), query_msg).unwrap();
-        let res : ValidSignatureResponse = from_binary(&query_res).unwrap();
+        let res : ValidSignatureResponse = from_json(&query_res).unwrap();
         assert_eq!(res.is_valid, false);
 
     }

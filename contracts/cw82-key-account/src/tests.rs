@@ -1,15 +1,12 @@
 #[cfg(test)]
 mod tests {
-    use cosmwasm_std::{
-        testing::{
-            mock_dependencies, 
-            mock_env, 
-            mock_info
-        }, 
-        from_binary, 
-        to_binary, 
-        coins, CosmosMsg, BankMsg, Binary
+    #![allow(deprecated)]
+    use types::wasm::{
+        from_json, testing::{
+            mock_info, mock_dependencies, mock_env
+        }
     };
+    use cosmwasm_std::{BankMsg, CosmosMsg, Binary, to_json_binary, coins};
 
     use cw82::{CanExecuteResponse, ValidSignatureResponse};
     use k256::{
@@ -53,7 +50,7 @@ mod tests {
         };
 
 
-        let res : CanExecuteResponse = from_binary(&query(deps.as_ref(), env.clone(), 
+        let res : CanExecuteResponse = from_json(&query(deps.as_ref(), env.clone(), 
             QueryMsg::CanExecute { 
                 sender: "test".into(),
                 msg: bank.clone().into()
@@ -66,17 +63,23 @@ mod tests {
 
         let signed_hash: Signature = secret_key.sign_digest(
             Sha256::new()
-            .chain(&to_binary(&CosmosMsg::<SignedMsg>::Bank(bank.clone())).unwrap())
+            .chain(&to_json_binary(&CosmosMsg::<SignedMsg>::Bank(bank.clone())).unwrap())
         );
 
+        let msg =  types::wasm::CosmosMsg::Bank(
+            types::wasm::BankMsg::Send { 
+                to_address: "test".into(), 
+                amount: types::wasm::coins(1, "test")
+            }
+        );
 
         let msg : CosmosMsg<SignedMsg> = CosmosMsg::Custom(SignedMsg {
             signed_hash: signed_hash.to_bytes().as_slice().into(),
-            msg: bank.into()
+            msg
         });
 
 
-        let res : CanExecuteResponse = from_binary(&query(deps.as_ref(), env.clone(), 
+        let res : CanExecuteResponse = from_json(&query(deps.as_ref(), env.clone(), 
             QueryMsg::CanExecute { 
                 sender: "test".into(),
                 msg
@@ -109,7 +112,7 @@ mod tests {
 
 
         // dapp asks user to sign message
-        let data : Binary = to_binary("message").unwrap();
+        let data : Binary = to_json_binary("message").unwrap();
         let data_digest = Sha256::new().chain(&data);
 
         // user signs message
@@ -124,7 +127,7 @@ mod tests {
 
         // dapp verifies signature from the contract
         let query_res = query(deps.as_ref(), env.clone(), query_msg.clone()).unwrap();
-        let res : ValidSignatureResponse = from_binary(&query_res).unwrap();
+        let res : ValidSignatureResponse = from_json(&query_res).unwrap();
         assert_eq!(res.is_valid, true);
 
 
@@ -138,7 +141,7 @@ mod tests {
             payload: None 
         };      
         let query_res = query(deps.as_ref(), env.clone(), another_msg).unwrap();
-        let res : ValidSignatureResponse = from_binary(&query_res).unwrap();
+        let res : ValidSignatureResponse = from_json(&query_res).unwrap();
         assert_eq!(res.is_valid, false);
     }
 }

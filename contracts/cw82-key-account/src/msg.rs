@@ -1,9 +1,6 @@
-use cosmwasm_std::{Binary, Empty, CosmosMsg};
+use types::wasm::{Binary, Empty, CosmosMsg};
 use cosmwasm_schema::{cw_serde, QueryResponses};
-use cw82::{
-    smart_account_query, 
-    Cw82ExecuteMsg
-};
+use cw82::{account_query, account_execute};
 
 #[cw_serde]
 pub struct InstantiateMsg {
@@ -23,13 +20,15 @@ impl<T> From<SignedMsg<T>> for CosmosMsg::<SignedMsg<T>> {
     }
 }
 
-#[smart_account_query]
+#[account_query]
 #[cw_serde]
 #[derive(QueryResponses)]
-pub enum QueryMsg <T = SignedMsg> {
+pub enum QueryMsg<T = SignedMsg> {
     #[returns(Binary)]
     PubKey {},
 }
 
 
-pub type ExecuteMsg = Cw82ExecuteMsg<SignedMsg>;
+#[account_execute]
+#[cw_serde]
+pub enum ExecuteMsg<T = SignedMsg> {}

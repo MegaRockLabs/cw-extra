@@ -1,26 +1,21 @@
 [package]
 name = "cw83"
-authors = [ "Kromsten <s@users.noreply.megarock.labs>" ]
-edition = "2021"
-version     = { workspace = true }
 description = "Definition and types for the CosmWasm-83 interface"
-repository = "https://github.com/MegaRockLabs/cw-extra"
+version     = { workspace = true }
+edition     = { workspace = true }
+repository  = { workspace = true }
+license     = { workspace = true }
+authors     = { workspace = true }
+
 
 [dependencies]
+types           = { workspace = true }
 cosmwasm-schema = { workspace = true }
-cosmwasm-std    = { workspace = true }
-schemars        = { workspace = true }
 
-cw1             = { workspace = true }
-cw2             = { workspace = true }
-cw22            = { workspace = true }
-cw82            = { workspace = true }
-cw83-derive     = { path = "./derive", version = "0.1.0" }
 
-[dev-dependencies]
-sha2            = { workspace = true }
-k256            = { workspace = true }
-
-cosmwasm-crypto = "1.4.1"
-ed25519-zebra = "4.0.3"
-rand_chacha = "0.3.1"
+[features]
+default         =   ["cosmwasm"]
+cosmwasm        =   ["types/cosmwasm"]
+cosmwasm_1      =   ["types/cosmwasm_1"]
+secretwasm      =   ["types/secretwasm"]
+multi           =   ["types/registry_multi"]

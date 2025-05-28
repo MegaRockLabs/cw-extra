@@ -15,16 +15,20 @@ exclude = [
 crate-type = ["cdylib", "rlib"]
 
 [features]
-backtraces = ["cosmwasm-std/backtraces"]
 library = []
 
 [dependencies]
-cosmwasm-schema = { workspace = true }
+types           = { workspace = true }
 cosmwasm-std    = { workspace = true }
+cosmwasm-schema = { workspace = true }
 cw-storage-plus = { workspace = true }
 cw-utils        = { workspace = true }
 sha2            = { workspace = true }
 cw2             = { workspace = true }
-cw22            = { workspace = true }
-cw82            = { workspace = true }
+cw22            = { workspace = true, features = ["cosmwasm_1"] }
+cw82            = { workspace = true, features = ["multi", "cosmwasm_1"] }
+
+[dev-dependencies]
 k256            = { workspace = true }
+
+
