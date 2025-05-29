@@ -6,7 +6,7 @@ Project **TRIES** adhering to
 
 <!-- next-header -->
 
-## [Unreleased] 
+## [2.0.0] 
 
 ## Added
 - added [cw84] for handling signed actions and queries in smart accounts
