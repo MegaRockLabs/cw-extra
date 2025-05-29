@@ -1,8 +1,8 @@
-# CW82: Smart Contract Account
+# CW82: Minimal Smart Account
 
 The standard defining minimal interface for interacting with a smart contract based on CosmWasm. Contract implementing the standard might be both fully fledged accounts serving as a replacement for externally owned accounts (EOAs) or accounts of ephemeral nature and/or limited set of features meant to be used for the needs of an individual application. 
 
-The standard doesn't introduce any new primitives and achieved through a combination of multiple existing standards, mainly:
+The standard doesn't introduce any new primitives and is achievable through a combination of multiple existing standards, mainly:
 
 
 | Standard                                                               | Description                               |
@@ -10,14 +10,15 @@ The standard doesn't introduce any new primitives and achieved through a combina
 | [`cw-1`](https://github.com/CosmWasm/cw-plus/tree/main/packages/cw1)   | Proxy Contracts                           |
 | [`cw-2`](https://github.com/CosmWasm/cw-plus/tree/main/packages/cw2)   | Contract Info                             |
 | [`cw-81`](/packages/cw81)                                              | Signature Verification                    |
-| [`cw-22`](https://github.com/aura-nw/cw-plus/tree/main/packages/cw22)  | Supported Interface      (in-review)      |                
+| [`cw-22`](/packages/cw22)                                              | Supported Interface                       |                
 
 ## Queries
 
 A final query message looks in the following manner. ValidSignatures (in plural) and requires `multi` feature flag to be enabled
 
+
 ```rust
-pub enum QueryMsg {
+pub enum QueryMsg<T = Empty> {
     ...
     // cw1
     #[returns(CanExecuteResponse)]
@@ -44,12 +45,14 @@ pub enum QueryMsg {
 ```
 `cw2`and `cw22`operate on storage level and use raw queries and do not enforce any variants
 
-The package expose `#[account_query]` macro attribute that injects the variants into a your query message. There is also a default `Cw82QueryMsg` thay can be extended
+The package expose `#[account_query]` macro attribute that injects the variants into a your query message. There is also a default `Cw82QueryMsg` thay can be extended. The macro takes an optional argument to override the `Binary` type used in `payload` field. Check [`cw81`](/packages/cw81) for the examples.  The name `T` for the template parameter for your `QueryMsg` is special and will be used down to the CosmosMsg type. Using any other letter will not work and it will default to `Empty` type.
+
+```rust
 
 ## Messages
 The only message action the standard enforces is
 ```rust
-enum ExecuteMsg<T = Empty>
+enum ExecuteMsg<T = Empty> {
     ...
 
     Execute { msgs: Vec<CosmosMsg<T>> },

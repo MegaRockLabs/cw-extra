@@ -11,12 +11,18 @@ pub use protos::registry_query_one as registry_query;
 pub use {
     protos::valid_signature_multi as valid_signature_query,
     protos::account_query_multi as account_query,
+    protos::signed_query_multi as signed_query,
+    protos::signed_execute_multi as signed_execute,
 };
 #[cfg(not(feature = "account_multi"))]
 pub use {
     protos::valid_signature_one as valid_signature_query,
     protos::account_query_one as account_query,
+    protos::signed_query_one as signed_query,
+    protos::signed_execute_one as signed_execute,
 };
+
+
 
 pub use protos::{
     registry_execute, 
@@ -44,3 +50,8 @@ pub struct ValidSignaturesResponse {
     pub are_valid: Vec<bool>
 }
 
+
+#[cw_serde]
+pub struct CanExecuteSignedResponse {
+    pub can_execute: Vec<bool>,
+}

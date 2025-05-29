@@ -5,6 +5,22 @@ use syn::{parse_macro_input, DataEnum, DeriveInput};
 
 
 
+// generate macro to generate an error from &NestedMeta and &str
+macro_rules! comp_err {
+    ($other:expr, $msg:expr) => {
+        syn::Error::new_spanned($other, $msg)
+            .to_compile_error()
+            .into()
+    };
+    ($other:expr) => {
+        syn::Error::new_spanned($other, "Unexpected argument")
+            .to_compile_error()
+            .into()
+    };
+}
+
+
+
 pub (crate) fn merge_variants(left: TokenStream, right: TokenStream) -> TokenStream {
     use syn::Data::Enum;
 
@@ -41,3 +57,5 @@ pub (crate) fn merge_variants(left: TokenStream, right: TokenStream) -> TokenStr
 pub(crate) fn has_generic_t(generics: &syn::Generics) -> bool {
     generics.type_params().any(|tp| tp.ident == "T")
 }
+
+pub(crate) use comp_err;

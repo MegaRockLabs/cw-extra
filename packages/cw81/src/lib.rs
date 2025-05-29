@@ -3,6 +3,8 @@ use types::wasm::Binary;
 
 
 pub const INTERFACE_NAME: &str = "crates:cw81";
+#[cfg(feature = "multi")]
+pub const INTERFACE_NAME_MULTI: &str = "crates:cw81-multi";
 
 
 /// Absolute minimum of a query that follows cw82 standard

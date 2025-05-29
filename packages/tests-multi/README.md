@@ -11,24 +11,21 @@ Whatever the logic is we need primitives to verifyably query the results and tha
 
 ## Queries
 
-All CW81-compliant contracts must add the following query variants to their QueryMsg':'s and return the corresponding responses (in binary format).
-ValidSignatures (in plural) is an optinal variant to add and can be turn on by using the `multi` feature flag. 
+All CW81-compliant contracts must add the following query variants to their QueryMsg:s and return the corresponding responses:
 
-The contracts are free to ovveride the type inside the option for `payload` field to fit their needs the best. The default is `Option<Binary>` which is a good fit for most cases.
 
 ```rust
 pub enum QueryMsg {
     ...
 
-    #[returns(cw81::ValidSignatureResponse)]
+    #[returns(ValidSignatureResponse)]
     ValidSignature {
         data: Binary,
         signature: Binary,
-        payload: Option<Binary> 
+        payload: Option<Binary>
     },
 
-    // Only if `multi` feature is enabled
-    #[returns(cw81::ValidSignaturesResponse)]
+    #[returns(ValidSignaturesResponse)]
     ValidSignatures {
         data: Vec<Binary>,
         signatures: Vec<Binary>,
@@ -49,7 +46,7 @@ Used to verify one message and its corresponding signature. Useful in atomic sce
 
 `signature` stands for signed bytes of the data field and doesn't enforce any conditions
 
-`payload` is an optional payload used for passing additional info to the contract. It can be used to pass necessary data like a list of public keys for a multisig contract or for example information desctibing which credential to use in complex contracts. Things you might want to customise are e.g. signature schema to use, hashing algorithm to select or whether data had been serialized with a wrapper already.
+`payload` is an optional payload used for passing additional info to the contract. It can be used to pass necessary data like a list of public keys for a multisign contract but also meta information for complex contracts e.g. what signature schema to use, hashing algorithm to select or whether data had been pre-hashed already.
 
 #### Returns
 ```Rust 
@@ -73,7 +70,7 @@ A great example use-case would be is situation where a querier is satisfied with
 
 `signatures` contains a list of signatures for each message in the data list. Must have the same length.
 
-`payload` field is identical to `ValidSignature` and can be used to pass additional information to the contract.
+`payload` field is identical.
 
 ***
 Technically doesn't need a different schema, but semantically works better this way. Since we use Binary (bytes) we even can use one field and serialize it to anything we need, but that doesn't provide additional intuitional utilities
@@ -119,46 +116,8 @@ enum QueryMsg {
 }
 ```
 
-You can also pass an optional argument to the `valid_signature_query` macro to customize the optional type in the `payload` field:  
-```Rust
-# taken from `smart-account-auth`
-struct AuthPayload {
-    /// Which credential to use if multiple are available
-    pub credential_id   :   Option<String>,
-    /// Human readable prefix to use to derive an address
-    pub hrp             :   Option<String>,
-    /// Additional arguments to pass depending on a credential in question
-    pub extension       :   Option<Binary>,
-}
 
-#[valid_signature_query(AuthPayload)] 
-#[cw_serde]
-#[derive(QueryResponses)]
-enum QueryMsg {}
-```
-
-This is equivalent to the following:
-```Rust
-#[cw_serde]
-#[derive(QueryResponses)]
-enum QueryMsg {
-    #[returns(ValidSignatureResponse)]
-    ValidSignature {
-        data: Binary,
-        signature: Binary,
-        payload: Option<AuthPayload>
-    },
-
-    #[returns(ValidSignaturesResponse)]
-    ValidSignatures {
-        data: Vec<Binary>,
-        signatures: Vec<Binary>,
-        payload: Option<AuthPayload>
-    }
-}
-```
-
-
+Note: `cosmwasm_std`must be imported for definition of `Binary`
 
 ## Examples
 Example contracts can be found in this repository and are prefixed with `cw81-`  

@@ -2,23 +2,31 @@
 Experimental CosmWasm based contracts, packages and protocols 
 
 
-## Standards
 
-
-### Smart Account Standards
+## Smart Account Standards
 
 Standards focusing on interfaces for smart contract based accounts
 
 | Name                                      | Description                                                           |  Examples      |
 | ----------------------------------------- | --------------------------------------------------------------------- | -------------- |
+| [`cw22`](./packages/cw81/)                | Supported Interface (by Aura Network)                                 | [link](#cw22) |
 | [`cw81`](./packages/cw81/)                | Signature verification for smart contracts (inspired by ERC-1271)     | [link](#cw81) |
 | [`cw82`](./packages/cw82/)                | Minimal smart contract based abstract account                         | [link](#cw82) |
 | [`cw83`](./packages/cw83/)                | Registry for smart contract based accounts (inspired by ERC-6551)     | [link](#cw83) |
+| [`cw84`](./packages/cw84/)                | Signed Actions and actioon queries for smart contract accounts        | [link](#cw84) |
 
 
-## Contracts
+
+## NFTs
+To be released in near future 
+
+
+## Examples
 
 Example contracts showcasing usage of the proposed protocols and standards
+
+### CW22
+Any example contract from this repository
 
 ### CW81
 | Contract                                                         | Description                                                  |
@@ -39,6 +47,11 @@ Example contracts showcasing usage of the proposed protocols and standards
 | Contract                                                         | Description                                                  |
 | ---------------------------------------------------------------- | ------------------------------------------------------------ |
 | [`cw83-tba-registry`](https://github.com/MegaRockLabs/cw-tba/tree/main/contracts/cw83-tba-registry)               | A Registry of token (NFT) bound accounts                     |
+
+### CW84
+
+To be added shortly
+
 
 <br/>
 

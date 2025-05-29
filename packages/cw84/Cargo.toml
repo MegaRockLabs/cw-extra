@@ -1,6 +1,6 @@
 [package]
-name = "cw82"
-description = "Definition and types for the CosmWasm-82 interface"
+name = "cw84"
+description = "Definition and types for the CosmWasm-84 interface"
 version     = { workspace = true }
 edition     = { workspace = true }
 repository  = { workspace = true }
@@ -11,7 +11,6 @@ authors     = { workspace = true }
 [dependencies]
 types           = { workspace = true }
 cosmwasm-schema = { workspace = true }
-
 
 [features]
 default         =   ["cosmwasm"]

@@ -1,5 +1,5 @@
 [package]
-name = "cw-extra-tests"
+name = "cw-extra-tests-multi"
 description = "Unit tests for cw-extra"
 version     = { workspace = true }
 edition     = { workspace = true }
@@ -9,10 +9,11 @@ authors     = { workspace = true }
 
 
 [dev-dependencies]
-cw81            = { workspace = true, features = ["cosmwasm_v1"] }
-cw84            = { workspace = true, features = ["cosmwasm_v1"] }
+cw81            = { workspace = true, features = ["multi", "cosmwasm_v1"] }
+cw84            = { workspace = true, features = ["multi", "cosmwasm_v1"] }
 types           = { workspace = true }
 protos          = { workspace = true }
+
 
 saa-common      = { version = "0.25.1", default-features = false, features = ["cosmwasm_v1", "std"] }
 cosmwasm-crypto = { version = "1.5.11" }

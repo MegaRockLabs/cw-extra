@@ -9,8 +9,10 @@ Project **TRIES** adhering to
 ## [Unreleased] 
 
 ## Added
-- support for both `cosmwasm 2.0` and `cosmwasm 1.x` at the same time
+- added [cw84] for handling signed actions and queries in smart accounts
 - added a local fork of [`cw22`](https://github.com/aura-nw/cw-plus/tree/main/packages/cw22) for convenience and dependency compatibility
+- support for all `cosmwasm 2.0` and `cosmwasm 1.x` and partially `secretwasm` at the same time
+- multi versions of interface names
 
 - [`cw81`]: added `multi` feature tag to hide some of the variants and types
 

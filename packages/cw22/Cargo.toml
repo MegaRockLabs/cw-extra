@@ -21,4 +21,4 @@ types               = { workspace = true }
 [features]
 default         =   ["cosmwasm"]
 cosmwasm        =   ["types/cosmwasm"]
-cosmwasm_1      =   ["types/cosmwasm_1"]
+cosmwasm_v1     =   ["types/cosmwasm_v1"]
