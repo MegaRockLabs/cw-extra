@@ -1282,15 +1282,17 @@ pub fn registry_query_one(attr: TokenStream, input: TokenStream) -> TokenStream 
 /// - **First type** (required): Inner action message type (e.g., `ExecuteMsg`) for `CanExecuteSigned`.
 /// - **Second type** (optional): Signed data type (e.g., `SignedDataMsg`) for `CanExecuteSigned`.
 ///   Defaults to `cosmwasm_std::Binary`.
-/// - **Third type** (optional): Payload type (e.g., `CustomPayload`) for `ValidSignature` and
-///   `ValidSignatures`, wrapped in `Option`. Defaults to `Option<cosmwasm_std::Binary>`.
+/// - **Third type** (optional): Payload type (e.g., `CustomPayload`) for `ValidSignature`, wrapped in
+///   `Option`. Defaults to `Option<cosmwasm_std::Binary>`.
+/// - **Fourth type** (optional): Payload type (e.g., `CustomMultiPayload`) for `ValidSignatures`, 
+///   wrapped in `Option`. Defaults to the same as the third argument if not provided.
 ///
 /// # Generated Variants
 ///
 /// - `CanExecute`: Queries if a `CosmosMsg` can be executed.
 /// - `CanExecuteSigned`: Queries if signed messages can be executed, using provided types.
 /// - `ValidSignature`: Verifies a single signature against data and optional payload.
-/// - `ValidSignatures`: Verifies multiple signatures against data and optional payload.
+/// - `ValidSignatures`: Verifies multiple signatures against data and optional payload (may use different payload type).
 ///
 /// # Notes
 ///
@@ -1346,7 +1348,26 @@ pub fn signed_query_multi(metadata: TokenStream, input: TokenStream) -> TokenStr
 
     let args = parse_macro_input!(metadata as AttributeArgs);
 
-    let (act_type, sign_type, pl_type) = match args.len() {
+    let (act_type, sign_type, pl_type, pl_multi_type) = match args.len() {
+        4 => {
+            let exec = match &args[0] {
+                NestedMeta::Meta(syn::Meta::Path(path)) => quote!(#path),
+                other => return comp_err!(other, "Expected a type for the inner action message, like `ExecuteMsg`"),
+            };
+            let signed = match &args[1] {
+                NestedMeta::Meta(syn::Meta::Path(path)) => quote!(#path),
+                other => return comp_err!(other, "Expected a type for the signed message, like `SignedDataMsg`"),
+            };
+            let payload = match &args[2] {
+                NestedMeta::Meta(syn::Meta::Path(path)) => quote!(Option<#path>),
+                other => return comp_err!(other, "Expected a type for the payload, like `CustomPayload`"),
+            };
+            let payload_multi = match &args[3] {
+                NestedMeta::Meta(syn::Meta::Path(path)) => quote!(Option<#path>),
+                other => return comp_err!(other, "Expected a type for the multi payload, like `CustomMultiPayload`"),
+            };
+            (exec, signed, payload, payload_multi)
+        },
         3 => {
             let exec = match &args[0] {
                 NestedMeta::Meta(syn::Meta::Path(path)) => quote!(#path),
@@ -1360,7 +1381,7 @@ pub fn signed_query_multi(metadata: TokenStream, input: TokenStream) -> TokenStr
                 NestedMeta::Meta(syn::Meta::Path(path)) => quote!(Option<#path>),
                 other => return comp_err!(other, "Expected a type for the payload, like `CustomPayload`"),
             };
-            (exec, signed, payload)
+            (exec, signed, payload.clone(), payload)
         },
         2 => {
             let exec = match &args[0] {
@@ -1371,17 +1392,22 @@ pub fn signed_query_multi(metadata: TokenStream, input: TokenStream) -> TokenStr
                 NestedMeta::Meta(syn::Meta::Path(path)) => quote!(#path),
                 other => return comp_err!(other, "Expected a type for the signed message, like `SignedDataMsg`"),
             };
-            (exec, signed, quote!(Option<::cosmwasm_std::Binary>))
+            let default_payload = quote!(Option<::cosmwasm_std::Binary>);
+            (exec, signed, default_payload.clone(), default_payload)
         },
         1 => match &args[0] {
-            NestedMeta::Meta(syn::Meta::Path(path)) => (
-                quote!(#path),
-                quote!(::cosmwasm_std::Binary),
-                quote!(Option<::cosmwasm_std::Binary>)
-            ),
+            NestedMeta::Meta(syn::Meta::Path(path)) => {
+                let default_payload = quote!(Option<::cosmwasm_std::Binary>);
+                (
+                    quote!(#path),
+                    quote!(::cosmwasm_std::Binary),
+                    default_payload.clone(),
+                    default_payload
+                )
+            },
             other => return comp_err!(other, "Expected a type for the inner action message, like `ExecuteMsg`"),
         },
-        _ => return comp_err!(&args.get(0), "Expected one to three arguments: `#[signed_query(ExecuteMsg[, SignedDataMsg][, CustomPayload])]`"),
+        _ => return comp_err!(&args.get(0), "Expected one to four arguments: `#[signed_query(ExecuteMsg[, SignedDataMsg][, CustomPayload][, CustomMultiPayload])]`"),
     };
 
     let right_enum = quote! {
@@ -1391,10 +1417,16 @@ pub fn signed_query_multi(metadata: TokenStream, input: TokenStream) -> TokenStr
                 sender: String,
                 msg: #msg_type
             },
+            #[returns(::cw84::CanExecuteResponse)]
+            CanExecuteNative {
+                sender: String,
+                msg: #msg_type
+            },
             #[returns(::cw84::CanExecuteSignedResponse)]
             CanExecuteSigned {
                 msgs: Vec<#act_type>,
                 signed: #sign_type,
+                nonce: Option<::cosmwasm_std::Uint64>,
             },
             #[returns(::cw84::ValidSignatureResponse)]
             ValidSignature {
@@ -1406,7 +1438,7 @@ pub fn signed_query_multi(metadata: TokenStream, input: TokenStream) -> TokenStr
             ValidSignatures {
                 data: Vec<::cosmwasm_std::Binary>,
                 signatures: Vec<::cosmwasm_std::Binary>,
-                payload: #pl_type
+                payload: #pl_multi_type
             }
         }
     };
@@ -1538,9 +1570,15 @@ pub fn signed_query_one(metadata: TokenStream, input: TokenStream) -> TokenStrea
                 msg: #msg_type
             },
             #[returns(::cw84::CanExecuteResponse)]
+            CanExecuteNative {
+                sender: String,
+                msg: #msg_type
+            },
+            #[returns(::cw84::CanExecuteResponse)]
             CanExecuteSigned {
                 msg: #exec_type,
                 signed: #data_type,
+                nonce: Option<::cosmwasm_std::Uint64>,
             },
             #[returns(::cw84::ValidSignatureResponse)]
             ValidSignature {
@@ -1610,6 +1648,7 @@ pub fn signed_query_one(metadata: TokenStream, input: TokenStream) -> TokenStrea
 /// //     ExecuteSigned {
 /// //         msgs: Vec<ExecuteMsg>,
 /// //         signed: ::cw84::Binary,
+/// //         nonce: Option<::cosmwasm_std::Uint64>,
 /// //     },
 /// // }
 /// ```
@@ -1639,6 +1678,7 @@ pub fn signed_query_one(metadata: TokenStream, input: TokenStream) -> TokenStrea
 /// //     ExecuteSigned {
 /// //         msgs: Vec<ActionMsg>,
 /// //         signed: ::cw84::Binary,
+/// //         nonce: Option<::cosmwasm_std::Uint64>,
 /// //     },
 /// //
 /// //     ExecuteNative {
@@ -1673,6 +1713,7 @@ pub fn signed_query_one(metadata: TokenStream, input: TokenStream) -> TokenStrea
 /// //     ExecuteSigned {
 /// //         msgs: Vec<ActionMsg>,
 /// //         signed: SignedDataMsg,
+/// //         nonce: Option<::cosmwasm_std::Uint64>,
 /// //     },
 /// //
 /// //     ExecuteNative {
@@ -1701,6 +1742,7 @@ pub fn signed_query_one(metadata: TokenStream, input: TokenStream) -> TokenStrea
 /// //     ExecuteSigned {
 /// //         msgs: Vec<ActionMsg>,
 /// //         signed: SignedDataMsg,
+/// //         nonce: Option<::cosmwasm_std::Uint64>,
 /// //     },
 /// //
 /// //     ExecuteNative {
@@ -1761,10 +1803,12 @@ pub fn signed_execute_multi(metadata: TokenStream, input: TokenStream) -> TokenS
             enum Right {
                 Execute {
                     msgs: Vec<#cms_type>,
+                    signed: Option<#sign_type>,
                 },
                 ExecuteSigned {
                     msgs: Vec<#exec_type>,
                     signed: #sign_type,
+                    nonce: Option<::cosmwasm_std::Uint64>,
                 },
                 ExecuteNative {
                     msgs: Vec<#exec_type>,
@@ -1777,10 +1821,12 @@ pub fn signed_execute_multi(metadata: TokenStream, input: TokenStream) -> TokenS
             enum Right {
                 Execute {
                     msgs: Vec<#cms_type>,
+                    signed: Option<#sign_type>,
                 },
                 ExecuteSigned {
                     msgs: Vec<#exec_type>,
                     signed: #sign_type,
+                    nonce: Option<::cosmwasm_std::Uint64>,
                 },
             }
         }
@@ -1845,6 +1891,7 @@ pub fn signed_execute_multi(metadata: TokenStream, input: TokenStream) -> TokenS
 /// //     ExecuteSigned {
 /// //         msg: Box<ExecuteMsg>,
 /// //         signed: ::cosmwasm_std::Binary,
+/// //         nonce: Option<::cosmwasm_std::Uint64>,
 /// //     },
 /// // }
 /// ```
@@ -1874,6 +1921,7 @@ pub fn signed_execute_multi(metadata: TokenStream, input: TokenStream) -> TokenS
 /// //     ExecuteSigned {
 /// //         msg: InnerActionMsg,
 /// //         signed: ::cosmwasm_std::Binary,
+/// //         nonce: Option<::cosmwasm_std::Uint64>,
 /// //     },
 /// // }
 /// ```
@@ -1904,6 +1952,7 @@ pub fn signed_execute_multi(metadata: TokenStream, input: TokenStream) -> TokenS
 /// //     ExecuteSigned {
 /// //         msg: InnerActionMsg,
 /// //         signed: SignedDataMsg,
+/// //         nonce: Option<::cosmwasm_std::Uint64>,
 /// //     },
 /// // }
 /// ```
@@ -1928,6 +1977,7 @@ pub fn signed_execute_multi(metadata: TokenStream, input: TokenStream) -> TokenS
 /// //     ExecuteSigned {
 /// //         msg: InnerActionMsg,
 /// //         signed: SignedDataMsg,
+/// //         nonce: Option<::cosmwasm_std::Uint64>,
 /// //     },
 /// // }
 /// ```
@@ -1982,10 +2032,12 @@ pub fn signed_execute_one(metadata: TokenStream, input: TokenStream) -> TokenStr
         enum Right {
             Execute {
                 msgs: Vec<#cms_type>,
+                signed: Option<#sign_type>,
             },
             ExecuteSigned {
                 msg:  Box<#exec_type>,
                 signed: #sign_type,
+                nonce: Option<::cosmwasm_std::Uint64>,
             },
         }
     };

@@ -1,6 +1,6 @@
 
 use cosmwasm_schema::{cw_serde, QueryResponses};
-use types::wasm::{Binary, CosmosMsg, Empty};
+use types::wasm::{Binary, CosmosMsg, Empty, Uint64};
 
 #[cfg(feature = "multi")]
 pub use types::{CanExecuteSignedResponse, ValidSignaturesResponse};
@@ -19,16 +19,26 @@ where
     /// Execute requests the contract to re-dispatch all these messages with the
     /// contract's address as sender. Every implementation has it's own logic to
     /// determine in
-    Execute { msgs: Vec<CosmosMsg<T>> },
+    Execute { 
+        msgs: Vec<CosmosMsg<T>>,
+        signed: Option<SignedData>,
+    },
 
     /// ExecuteSigned requests the contract to use a custom signature verification scheme
     /// and after successful check, execute custom messages defined by the contract.
     #[cfg(feature = "multi")]
-    ExecuteSigned { msgs: Vec<Cw84ExecuteMsg<T>>, signed: SignedData },
-
+    ExecuteSigned { 
+        msgs: Vec<Cw84ExecuteMsg<T>>, 
+        signed: SignedData,
+        nonce: Option<Uint64>,
+    },
 
     #[cfg(not(feature = "multi"))]
-    ExecuteSigned { msg: Box<Cw84ExecuteMsg<T>>, signed: SignedData }
+    ExecuteSigned { 
+        msg: Box<Cw84ExecuteMsg<T>>, 
+        signed: SignedData,
+        nonce: Option<Uint64>,
+    }
 }
 
 
@@ -52,6 +62,7 @@ where
     CanExecuteSigned {
         msg         :   Cw84ExecuteMsg<T>,
         signed      :   SignedData,
+        nonce       :   Option<Uint64>,
     },
     
     #[cfg(feature = "multi")]
@@ -59,6 +70,7 @@ where
     CanExecuteSigned {
         msgs        :   Vec<Cw84ExecuteMsg<T>>,
         signed      :   SignedData,
+        nonce       :   Option<Uint64>,
     },
 
     #[returns(ValidSignatureResponse)]
@@ -73,6 +85,6 @@ where
     ValidSignatures {
         data        :   Vec<Binary>,
         signatures  :   Vec<Binary>,
-        payload     :   Option<Binary>
+        payload     :   Option<Vec<Binary>>
     }
 }

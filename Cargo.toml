@@ -7,7 +7,7 @@ members = [
 resolver = "2"
 
 [workspace.package]
-version    = "2.0.0"
+version    = "2.1.0"
 edition    = "2021"
 repository = "https://github.com/MegaRockLabs/cw-extra"
 authors    = [ "Kromsten <kromsten@megarock.app>" ]
@@ -31,14 +31,13 @@ cw2                     = "1.1.2"
 
 # --- 
 
-cw22                    = { path = "packages/cw22", default-features = false, version = "2.0.0" }
-cw81                    = { path = "packages/cw81", default-features = false, version = "2.0.0" }
-cw82                    = { path = "packages/cw82", default-features = false, version = "2.0.0" }
-cw83                    = { path = "packages/cw83", default-features = false, version = "2.0.0" }
-cw84                    = { path = "packages/cw84", default-features = false, version = "2.0.0" }
-
-types                   = { path = "packages/types", version = "2.0.0", package = "cw-extra-types" }
-protos                  = { path = "packages/protos", version = "2.0.0", package = "cw-extra-protos" }
+cw22                    = { path = "packages/cw22", default-features = false, version = "2.1.0" }
+cw81                    = { path = "packages/cw81", default-features = false, version = "2.1.0" }
+cw82                    = { path = "packages/cw82", default-features = false, version = "2.1.0" }
+cw83                    = { path = "packages/cw83", default-features = false, version = "2.1.0" }
+cw84                    = { path = "packages/cw84", default-features = false, version = "2.1.0" }
+types                   = { path = "packages/types", default-features = false, version = "2.1.0", package = "cw-extra-types" }
+protos                  = { path = "packages/protos", version = "2.1.0", package = "cw-extra-protos" }
 
 
 [profile.release.package.cw81]

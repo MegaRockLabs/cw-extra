@@ -663,7 +663,7 @@ dependencies = [
 
 [[package]]
 name = "cw-extra-protos"
-version = "2.0.0"
+version = "2.1.0"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -672,7 +672,7 @@ dependencies = [
 
 [[package]]
 name = "cw-extra-tests"
-version = "2.0.0"
+version = "2.1.0"
 dependencies = [
  "cosmwasm-crypto 1.5.11",
  "cosmwasm-schema",
@@ -690,7 +690,7 @@ dependencies = [
 
 [[package]]
 name = "cw-extra-tests-multi"
-version = "2.0.0"
+version = "2.1.0"
 dependencies = [
  "cosmwasm-crypto 1.5.11",
  "cosmwasm-schema",
@@ -708,7 +708,7 @@ dependencies = [
 
 [[package]]
 name = "cw-extra-types"
-version = "2.0.0"
+version = "2.1.0"
 dependencies = [
  "cosmwasm-schema",
  "cosmwasm-std 1.5.11",
@@ -773,7 +773,7 @@ dependencies = [
 
 [[package]]
 name = "cw22"
-version = "2.0.0"
+version = "2.1.0"
 dependencies = [
  "cosmwasm-schema",
  "cw-extra-types",
@@ -784,7 +784,7 @@ dependencies = [
 
 [[package]]
 name = "cw81"
-version = "2.0.0"
+version = "2.1.0"
 dependencies = [
  "cosmwasm-schema",
  "cw-extra-types",
@@ -821,7 +821,7 @@ dependencies = [
 
 [[package]]
 name = "cw82"
-version = "2.0.0"
+version = "2.1.0"
 dependencies = [
  "cosmwasm-schema",
  "cw-extra-types",
@@ -829,7 +829,7 @@ dependencies = [
 
 [[package]]
 name = "cw82-key-account"
-version = "2.0.0"
+version = "2.1.0"
 dependencies = [
  "cosmwasm-schema",
  "cosmwasm-std 1.5.11",
@@ -845,7 +845,7 @@ dependencies = [
 
 [[package]]
 name = "cw83"
-version = "2.0.0"
+version = "2.1.0"
 dependencies = [
  "cosmwasm-schema",
  "cw-extra-types",
@@ -853,7 +853,7 @@ dependencies = [
 
 [[package]]
 name = "cw84"
-version = "2.0.0"
+version = "2.1.0"
 dependencies = [
  "cosmwasm-schema",
  "cw-extra-types",

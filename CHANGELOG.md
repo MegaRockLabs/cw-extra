@@ -5,6 +5,16 @@ Project **TRIES** adhering to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html), however going through the active development stage and can't guarantee it (FOR NOW).
 
 <!-- next-header -->
+## [2.1.0] 
+
+## Changed
+- [`cw84`]: added optional `signed` field to `Execute` variant for enhanced security
+- [`cw84`]: added optional `nonce` field to `ExecuteSigned` and `CanExecuteSigned` variants for replay protection
+- [`cw84`]: added `CanExecuteNative` variant injection in query macros when arguments are provided
+- [`cw84`]: added `ExecuteNative` variant injection in execute macros when arguments are provided (multi feature)
+- [`cw84`]: enhanced macro support for fourth argument in `signed_query_multi` for custom `ValidSignatures` payload
+
+
 
 ## [2.0.0] 
 

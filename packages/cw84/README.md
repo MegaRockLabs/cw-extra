@@ -40,12 +40,16 @@ pub enum ActionMsg {
 
 pub enum ExecuteMsg {
     // cw82 | cw1
-    Execute { msgs: Vec<CosmosMsg> },
+    Execute { 
+        msgs: Vec<CosmosMsg>,
+        signed: Option<Binary>,  // Optional signature data for enhanced security
+    },
 
     // cw84
     ExecuteSigned {
         msg   : ActionMsg,
         signed  : Binary,
+        nonce: Option<Uint64>,  // Optional nonce for replay protection
     },
 }
 ```
@@ -58,6 +62,7 @@ pub enum ExecuteMsg {
     ExecuteSigned {
         msg: Box<ExecuteMsg>,
         signed: Binary,
+        nonce: Option<Uint64>,  // Optional nonce for replay protection
     }
 }
 ``` 
@@ -73,6 +78,7 @@ pub enum ExecuteMsg {
     ExecuteSigned {
         msgs: Vec<ActionMsg>, // or Vec<ExecuteMsg>, Box isn't necessary in this case
         signed: Binary,
+        nonce: Option<Uint64>,  // Optional nonce for replay protection
     }
 }
 ```
@@ -95,9 +101,11 @@ The `signed` field is a binary payload that can be used to pass additional infor
 
 
 ### Macros
-**signed_execute**: Primary effect is injects both variants (`Execute` and `ExecuteSigned`) descrived about into your enum. Takes up to two positional arguments to customise the behaviour. The first argument is used to set the message type allowed to be sign like `ActionMsg` from above. The second argument is used to customse the type of `signed` to use something other than `cosmwasm_std::Binary`
+**signed_execute**: Primary effect is injects both variants (`Execute` and `ExecuteSigned`) described above into your enum. Takes up to two positional arguments to customise the behaviour. The first argument is used to set the message type allowed to be signed like `ActionMsg` from above. The second argument is used to customise the type of `signed` to use something other than `cosmwasm_std::Binary`
 
-With both `multi` feature tag active and first positional argument passed the macro also injects the plural variant `ExecuteSigned` as described above.
+With both `multi` feature tag active and first positional argument passed the macro also injects the plural variant `ExecuteNative` as described above.
+
+The `Execute` variant now includes an optional `signed` field for enhanced security, and both `ExecuteSigned` variants include an optional `nonce` field for replay protection.
 
 #### Default Usage
 
@@ -116,12 +124,14 @@ which is equivalent to:
 enum ExecuteMsg {
 
     Execute { 
-        msgs: Vec<CosmosMsg> 
+        msgs: Vec<CosmosMsg>,
+        signed: Option<Binary>,
     },
 
     ExecuteSigned {
         msg: ActionMsg,  
-        signed: Binary,    
+        signed: Binary,
+        nonce: Option<Uint64>,
     },
 }
 ```
@@ -145,12 +155,14 @@ Which is equivalent to:
 enum ExecuteMsg {
 
     Execute { 
-        msgs: Vec<CosmosMsg> 
+        msgs: Vec<CosmosMsg>,
+        signed: Option<SignedDataMsg>,
     },
 
     ExecuteSigned {
         msgs: Vec<ActionMsg>, 
         signed: SignedDataMsg,  // or Binary if you didn't pass the second argument
+        nonce: Option<Uint64>,
     },
 
     // If `multi` feature is enabled and first argument is passed
@@ -169,6 +181,7 @@ The query interface includes variants for checking execution permissions and val
 
 `cw84` requires all the compatible contracts have all the query variants imposed by `cw82`, namely:
 - CanExecute: Verifies if a CosmosMsg can be executed by the specified sender, inherited from cw1 and cw81.
+- CanExecuteNative: Verifies if a CosmosMsg can be executed natively (injected by macros when arguments are provided).
 - ValidSignature: Validates a single signature against provided data and an optional payload, inherited from cw81.
 - ValidSignatures: Validates multiple signatures against a list of data and an optional payload, available with the multi feature, also from cw81.
 
@@ -178,12 +191,15 @@ enum QueryMsg {
     #[returns(::cw1::CanExecuteResponse)]
     CanExecuteSigned {
         msg:  ExecuteMsg, 
-        signed: Binary,         
+        signed: Binary,
+        nonce: Option<Uint64>,  // Optional nonce for replay protection
     }
 }
 ```
 ### Customisation
 The feature `multi`, the type of `signed` field behaves identical to what was described in the `ExecuteMsg` section. The response object when `multi` is enabled is `CanExecuteSignedResponse` that contains vector of booleans indicating whether each message can be executed or not.
+
+The `nonce` field provides replay protection and is included in both single and multi variants of `CanExecuteSigned`.
 
 ```rust
 #[cw_serde]
@@ -215,20 +231,26 @@ enum QueryMsg {
      // cw84
     CanExecuteSigned {
         msg: ActionMsg, 
-        signed: Binary,         
+        signed: Binary,
+        nonce: Option<Uint64>,
     },
 
     // cw82 | cw1
     CanExecute {
+        sender: String,
         msg: CosmosMsg, 
-        owner: String,         
     },
 
+    // cw82 | cw1 (injected when arguments provided)
+    CanExecuteNative {
+        sender: String,
+        msg: CosmosMsg,
+    },
 
     // cw81
     ValidSignature {
-        msg: ExecuteMsg,
-        signed: Binary,
+        data: Binary,
+        signature: Binary,
         payload: Option<Binary>,
     },
 }
@@ -254,32 +276,36 @@ enum QueryMsg {
     // cw84
     CanExecuteSigned {
         msg: ActionMsg, 
-        signed: SignedDataMsg,  
+        signed: SignedDataMsg,
+        nonce: Option<Uint64>,
     },
 
     // cw82 | cw1
     CanExecute {
+        sender: String,
         msg: CosmosMsg, 
-        owner: String,         
+    },
+
+    // cw82 | cw1 (injected when arguments provided)
+    CanExecuteNative {
+        sender: String,
+        msg: CosmosMsg,
     },
 
     // cw81
     ValidSignature {
-        msg: ExecuteMsg,
-        signed: SignedDataMsg, 
+        data: Binary,
+        signature: Binary, 
         payload: Option<AuthPayload>, 
     },
     // cw81-multi
     ValidSignatures {
-        msgs: Vec<ExecuteMsg>,
-        signed: Vec<SignedDataMsg>,  
+        data: Vec<Binary>,
+        signatures: Vec<Binary>,  
         payload: Option<AuthPayload>, 
     },
 }
 ```
-
-
-
 
 ## References 
 
