@@ -49,7 +49,7 @@ pub fn set_contract_supported_interface(
                 )?;
             }
             Err(_) => {
-                return Err(StdError::generic_err("Version's format is invalid"));
+                return Err(StdError::msg("Version's format is invalid"));
             }
         }
     }
@@ -128,8 +128,8 @@ mod tests {
 
         let rs_error =
             set_contract_supported_interface(&mut store, supported_interface).unwrap_err();
-        let expected = StdError::generic_err("Version's format is invalid");
-        assert_eq!(expected, rs_error);
+        let expected = StdError::msg("Version's format is invalid");
+        assert_eq!(expected.to_string(), rs_error.to_string());
 
         // set supported_interface
         let supported_interface = &[contract_interface2, contract_interface22];

@@ -3,7 +3,7 @@ mod tests {
     #![allow(deprecated)]
     use types::wasm::{
         from_json, testing::{
-            mock_info, mock_dependencies, mock_env
+            message_info, mock_dependencies, mock_env
         }
     };
     use cosmwasm_std::{BankMsg, CosmosMsg, Binary, to_json_binary, coins};
@@ -33,7 +33,7 @@ mod tests {
 
         let mut deps = mock_dependencies();
         let env = mock_env();
-        let info = mock_info("creator", &[]);
+        let info = message_info(&deps.api.addr_make("creator"), &[]);
 
         let secret_key = SigningKey::random(&mut OsRng);
         let public_key = VerifyingKey::from(&secret_key);
@@ -95,7 +95,7 @@ mod tests {
 
         let mut deps = mock_dependencies();
         let env = mock_env();
-        let info = mock_info("creator", &[]);
+        let info = message_info(&deps.api.addr_make("creator"), &[]);
 
      
         let secret_key = SigningKey::random(&mut OsRng);

@@ -7,7 +7,7 @@ members = [
 resolver = "2"
 
 [workspace.package]
-version    = "2.1.0"
+version    = "2.2.0"
 edition    = "2021"
 repository = "https://github.com/MegaRockLabs/cw-extra"
 authors    = [ "Kromsten <kromsten@megarock.app>" ]
@@ -16,28 +16,28 @@ license    = "MIT"
 
 [workspace.dependencies]
 # --- reference contracts --
-cw-storage-plus         = { version = "1.2.0"  }
-cosmwasm-schema         = { version = "1.5.11" }
-cosmwasm-std            = { version = "1.5.11" }
+cw-storage-plus         = { version = "3.0.1"  }
+cosmwasm-schema         = { version = "3.0.2" }
+cosmwasm-std            = { version = "3.0.2" }
 sha2                    = { version = "0.10.9", default-features = false }
 k256                    = { version = "0.13.4", default-features = false, features = ["ecdsa"] }
 serde                   = { version = "1.0.219", default-features = false, features = ["derive"] }
-schemars                = { version = "0.9.0" }
-thiserror               = "2.0.12"
+schemars                = { version = "0.8.4" }
+thiserror               = "2.0.16"
 semver                  = "1.0.26"
-cw-utils                = "1.0.3"
-cw2                     = "1.1.2"
+cw-utils                = "3.0.0"
+cw2                     = "3.0.0"
 
 
 # --- 
 
-cw22                    = { path = "packages/cw22", default-features = false, version = "2.1.0" }
-cw81                    = { path = "packages/cw81", default-features = false, version = "2.1.0" }
-cw82                    = { path = "packages/cw82", default-features = false, version = "2.1.0" }
-cw83                    = { path = "packages/cw83", default-features = false, version = "2.1.0" }
-cw84                    = { path = "packages/cw84", default-features = false, version = "2.1.0" }
-types                   = { path = "packages/types", default-features = false, version = "2.1.0", package = "cw-extra-types" }
-protos                  = { path = "packages/protos", version = "2.1.0", package = "cw-extra-protos" }
+cw22                    = { path = "packages/cw22", default-features = false, version = "2.2.0" }
+cw81                    = { path = "packages/cw81", default-features = false, version = "2.2.0" }
+cw82                    = { path = "packages/cw82", default-features = false, version = "2.2.0" }
+cw83                    = { path = "packages/cw83", default-features = false, version = "2.2.0" }
+cw84                    = { path = "packages/cw84", default-features = false, version = "2.2.0" }
+types                   = { path = "packages/types", default-features = false, version = "2.2.0", package = "cw-extra-types" }
+protos                  = { path = "packages/protos", version = "2.2.0", package = "cw-extra-protos" }
 
 
 [profile.release.package.cw81]

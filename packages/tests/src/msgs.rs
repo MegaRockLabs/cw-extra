@@ -1,7 +1,7 @@
 use protos::{signed_execute_one, signed_query_one};
-use saa_common::types::msgs::SignedDataMsg;
 use cosmwasm_schema::{cw_serde, QueryResponses};
 use cosmwasm_std::from_json;
+use types::SignedDataMsg;
 
 
 #[signed_execute_one]

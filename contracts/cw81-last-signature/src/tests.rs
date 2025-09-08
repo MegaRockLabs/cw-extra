@@ -1,7 +1,7 @@
 #[cfg(test)]
 mod tests {
     #![allow(deprecated)]
-    use types::wasm::{testing::{mock_info, mock_dependencies, mock_env}};
+    use types::wasm::{testing::{message_info, mock_dependencies, mock_env}};
     use cosmwasm_std::{from_json, Binary};
     use cw81::ValidSignatureResponse;
 
@@ -13,7 +13,7 @@ mod tests {
 
         let mut deps = mock_dependencies();
         let mut env = mock_env();
-        let info = mock_info("creator", &[]);
+        let info = message_info(&deps.api.addr_make("creator"), &[]);
 
 
         instantiate(deps.as_mut(), env.clone(), info.clone(), InstantiateMsg {}).unwrap();
@@ -21,7 +21,7 @@ mod tests {
         let signature = Binary::from("signature".as_bytes());
 
         let msg = ExecureMsg::SaveSignature { 
-            signature: signature.clone().0.into(), 
+            signature: signature.clone().to_vec().into(), 
             expiration: None 
         };
         execute(deps.as_mut(), env.clone(), info.clone(), msg).unwrap();

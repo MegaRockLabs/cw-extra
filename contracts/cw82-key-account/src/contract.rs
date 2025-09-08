@@ -145,7 +145,7 @@ fn validate_signed(
             Ok(msg.msg.clone())
         },
 
-        _ => Err(StdError::generic_err("Only SignedMsg is supported"))
+        _ => Err(StdError::msg("Only SignedMsg is supported"))
         
     }
 

@@ -14,8 +14,8 @@ cw84            = { workspace = true, features = ["cosmwasm_v1"] }
 types           = { workspace = true }
 protos          = { workspace = true }
 
-saa-common      = { version = "0.25.1", default-features = false, features = ["cosmwasm_v1", "std"] }
-cosmwasm-crypto = { version = "1.5.11" }
+saa-common      = { version = "0.27.0", default-features = false, features = ["cosmwasm_v1", "std"] }
+cosmwasm-crypto = { version = "3.0.2" }
 ed25519-zebra   = { version = "4.0.3" }
 rand_chacha     = { version = "0.9.0" }
 

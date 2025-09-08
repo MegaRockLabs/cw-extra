@@ -20,6 +20,7 @@ metadata.csv
 .env
 
 # Auto-gen
+.qodo
 .cargo-ok
 
 # Build artifacts
@@ -27,6 +28,7 @@ metadata.csv
 hash.txt
 contracts.txt
 artifacts/
+logs
 
 # code coverage
 tarpaulin-report.*

@@ -66,7 +66,7 @@ pub fn query(deps: Deps, env: Env, msg: QueryMsg) -> StdResult<Binary> {
 
         QueryMsg::ValidSignatures { signatures, .. } => {
             if signatures.len() != 1 {
-                return Err(StdError::generic_err("Only one signature is supported"));
+                return Err(StdError::msg("Only one signature is supported"));
             }
             let signature = signatures.get(0).unwrap();
             to_json_binary(&ValidSignaturesResponse {

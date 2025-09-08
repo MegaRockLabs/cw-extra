@@ -1,7 +1,7 @@
 #[cfg(test)]
 mod tests {
     #![allow(deprecated)]
-    use types::wasm::testing::{mock_info, mock_dependencies, mock_env};
+    use types::wasm::testing::{message_info, mock_dependencies, mock_env};
     use cosmwasm_std::{
         from_json, to_json_binary, Binary
     };
@@ -28,7 +28,7 @@ mod tests {
 
         let mut deps = mock_dependencies();
         let env = mock_env();
-        let info = mock_info("creator", &[]);
+        let info = message_info(&deps.api.addr_make("creator"), &[]);
 
      
         let secret_key = SigningKey::random(&mut OsRng);

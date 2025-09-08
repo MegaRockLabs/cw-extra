@@ -1,10 +1,15 @@
 # CHANGELOG
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-Project **TRIES** adhering to
-[Semantic Versioning](https://semver.org/spec/v2.0.0.html), however going through the active development stage and can't guarantee it (FOR NOW).
+Project adheres to
+[Semantic Versioning](https://semver.org/spec/v2.0.0.html) but there might be exceptions however going through the active development stage and can't guarantee it (FOR NOW).
+
 
 <!-- next-header -->
+## [2.2.0] 
+- Bumped default cosmwasm crates to the version `3.0.2` 
+
+
 ## [2.1.0] 
 
 ## Changed

@@ -1,7 +1,9 @@
-use saa_common::types::msgs::SignedDataMsg;
+// use saa_common::types::signed::SignedDataMsg;
 use cosmwasm_schema::{cw_serde, QueryResponses};
-use cosmwasm_std::from_json;
 use protos::{signed_execute_multi, signed_query_multi};
+use cosmwasm_std::from_json;
+use types::SignedDataMsg;
+
 
 
 #[signed_execute_multi]

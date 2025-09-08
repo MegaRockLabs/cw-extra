@@ -55,3 +55,24 @@ pub struct ValidSignaturesResponse {
 pub struct CanExecuteSignedResponse {
     pub can_execute: Vec<bool>,
 }
+
+
+#[cw_serde]
+pub struct AuthPayload {
+    /// Which credential to use if multiple are available
+    pub credential_id   :   Option<String>,
+    /// Human readable prefix to use to derive an address
+    pub hrp             :   Option<String>,
+    /// Additional arguments to pass depending on a credential in question
+    pub extension       :   Option<wasm::Binary>,
+}
+
+#[cw_serde]
+pub struct SignedDataMsg {
+    /// Base64 encoded JSON string of replay envelope, serialized actions messages, both of them or none of them
+    pub data        :   wasm::Binary,
+    /// Signature to verify the data
+    pub signature   :   wasm::Binary,
+    /// Optional payload to use customize the verification flow if possible
+    pub payload     :   Option<AuthPayload>,
+}
