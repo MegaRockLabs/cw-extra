@@ -7,7 +7,8 @@ Project adheres to
 
 <!-- next-header -->
 ## [2.2.0] 
-- Bumped default cosmwasm crates to the version `3.0.2` 
+- Bumped default cosmwasm crates to the version `3.0.2`
+- Temporarily re-declared types from `saa-common`
 
 
 ## [2.1.0] 
