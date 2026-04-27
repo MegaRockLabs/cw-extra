@@ -10,6 +10,7 @@ mod tests {
 
     use cw82::{CanExecuteResponse, ValidSignatureResponse};
     use k256::{
+        sha2::{Sha256, digest::{Update, Digest}}, 
         ecdsa::{
             signature::DigestSigner,
             SigningKey, VerifyingKey, Signature
@@ -17,10 +18,6 @@ mod tests {
         elliptic_curve::rand_core::OsRng
     };
 
-    use sha2::{
-        Sha256, 
-        digest::{Update, Digest}
-    };
 
     use crate::{
         contract::{instantiate, query}, 

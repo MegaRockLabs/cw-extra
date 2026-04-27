@@ -2,6 +2,7 @@ use types::wasm::{Binary, to_json_binary};
 use cosmwasm_crypto::{secp256k1_verify};
 
 use k256::{
+    sha2::{Sha256, digest::{Update, Digest}}, 
     ecdsa::{
         signature::DigestSigner,
         SigningKey, VerifyingKey, Signature
@@ -14,10 +15,6 @@ use ed25519_zebra::{
     VerificationKey as Ed25519VerificationKey
 };
 
-use sha2::{
-    Sha256, 
-    digest::{Update, Digest}
-};
 
 use cw81::Cw81QueryMsg;
 

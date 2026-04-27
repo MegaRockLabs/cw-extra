@@ -9,16 +9,16 @@ authors     = { workspace = true }
 
 
 [dev-dependencies]
-cw81            = { workspace = true, features = ["multi", "cosmwasm_v1"] }
-cw84            = { workspace = true, features = ["multi", "cosmwasm_v1"] }
+cw81            = { workspace = true, features = ["multi", "cosmwasm"] }
+cw84            = { workspace = true, features = ["multi", "cosmwasm"] }
 types           = { workspace = true }
 protos          = { workspace = true }
 
 
-saa-common      = { version = "0.27.0", default-features = false, features = ["cosmwasm_v1", "std"] }
+saa-common      = { version = "0.27.0", default-features = false, features = ["cosmwasm", "std"] }
 cosmwasm-crypto = { version = "3.0.2" }
 ed25519-zebra   = { version = "4.0.3" }
-rand_chacha     = { version = "0.9.0" }
+rand_chacha     = { version = "0.10.0" }
 
 sha2            = { workspace = true }
 k256            = { workspace = true }
